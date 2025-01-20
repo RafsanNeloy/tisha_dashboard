@@ -108,6 +108,16 @@ const Drawer = (props) => {
                                 open && <ListItemText > <span className={classes.menuText}>Menu</span> </ListItemText>
                             }
                         </ListItem>
+                        <Link to='/profile' className={classes.menuLink}>
+                            <ListItem className={classes.menuItem} button>
+                                <ListItemIcon className={classes.menuIcon}>
+                                    <AccountCircleIcon />
+                                </ListItemIcon>
+                                {
+                                    open && <ListItemText> <span className={classes.menuText}>Profile</span> </ListItemText>
+                                }
+                            </ListItem>
+                        </Link>
                         {
                             menuItems.map((menu, i) => {
                                 const { name, icon, link } = menu

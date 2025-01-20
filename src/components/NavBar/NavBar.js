@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react'
-import { Routes, Route, useNavigate } from 'react-router-dom'
+import { Routes, Route, useNavigate, useLocation } from 'react-router-dom'
 import { useSelector, useDispatch } from 'react-redux'
 import { setLogin } from '../../action/loginAction'
 import HomePage from '../HomePage/HomePage'
@@ -20,13 +20,17 @@ const NavBar = (props) => {
     const isLoggedIn = useSelector(state => state.login)
     const dispatch = useDispatch()
     const navigate = useNavigate()
+    const location = useLocation()
 
     useEffect(() => {
-        if(localStorage.getItem('token')){
+        if (localStorage.getItem('token') && 
+            (location.pathname === '/' || location.pathname === '/login-or-register')) {
             dispatch(setLogin())
             navigate('/dashboard')
+        } else if (localStorage.getItem('token')) {
+            dispatch(setLogin())
         }
-    }, [dispatch, isLoggedIn, navigate])
+    }, [dispatch, navigate, location.pathname])
 
     return(
         <div>
@@ -41,6 +45,7 @@ const NavBar = (props) => {
             <Routes>
                 <Route path="/" element={<HomePage />} />
                 <Route path="/login-or-register" element={<LoginRegisterPage />} />
+                <Route path="/profile" element={<PrivateRoute><UserPage /></PrivateRoute>} />
                 <Route path="/user" element={<PrivateRoute><UserPage /></PrivateRoute>} />
                 <Route path="/customers" element={<PrivateRoute><CustomerPage /></PrivateRoute>} />
                 <Route path="/products" element={<PrivateRoute><ProductPage /></PrivateRoute>} />
