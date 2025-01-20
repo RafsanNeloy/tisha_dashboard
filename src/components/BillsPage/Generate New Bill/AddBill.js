@@ -1,10 +1,12 @@
 import React, { useState } from 'react'
 import { Container, Typography, Box, Grid } from '@mui/material'
 import { makeStyles } from '@mui/styles'
+import { useNavigate } from 'react-router-dom'
 import ProductSuggestion from './ProductSuggestion'
 import ProductListTable from './ProductListTable'
 import SummaryOfBill from './SummaryOfBill'
 import AddCustomerModal from './AddCustomerModal'
+import Swal from 'sweetalert2'
 
 const useStyle = makeStyles({
     title:{
@@ -21,8 +23,10 @@ const useStyle = makeStyles({
 
 const AddBill = (props) => {
     const classes = useStyle()
+    const navigate = useNavigate()
     const [ lineItems, setLineItems ] = useState([])
     const [ customerInfo, setCustomerInfo ] = useState([])
+    const [isLoading, setIsLoading] = useState(false)
 
     // functions related to lineitems
     const handleAddLineItem = (data) => {
@@ -68,6 +72,24 @@ const AddBill = (props) => {
         setCustomerInfo(value)
     }
 
+    const handleGenerateBillError = (error) => {
+        Swal.fire({
+            icon: 'error',
+            title: 'Bill Generation Failed',
+            text: error.response?.data?.message || 'Please check all required fields and try again',
+        })
+    }
+
+    const handleBillSuccess = (billId) => {
+        Swal.fire({
+            icon: 'success',
+            title: 'Bill Generated Successfully',
+            showConfirmButton: false,
+            timer: 1500
+        })
+        navigate(`/bills/${billId}`)
+    }
+
     return (
         <Container className={classes.container}>
             <Box display='flex' flexDirection='row' justifyContent='space-between'>
@@ -92,7 +114,11 @@ const AddBill = (props) => {
                     <SummaryOfBill 
                         handleCustomerInfo={handleCustomerInfo} 
                         lineItems={lineItems} 
-                        customerInfo={customerInfo} 
+                        customerInfo={customerInfo}
+                        onGenerateError={handleGenerateBillError}
+                        onGenerateSuccess={handleBillSuccess}
+                        isLoading={isLoading}
+                        setIsLoading={setIsLoading}
                     />
                 </Grid>
             </Grid>

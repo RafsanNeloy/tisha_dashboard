@@ -1,7 +1,9 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Container, Typography, Box, TextField, Grid } from '@mui/material'
 import { makeStyles } from '@mui/styles'
-import { useSelector } from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux'
+import { asyncGetCustomers } from '../../action/customerAction'
+import { asyncGetBills } from '../../action/billsAction'
 import BillsTable from './BillsTable'
 import SummarySection from './SummarySection'
 
@@ -35,8 +37,20 @@ const useStyle = makeStyles({
 const BillsPage = (props) => {
     const bills = useSelector(state => state.bills) || []
     const classes = useStyle()
+    const dispatch = useDispatch()
     const [ search, setSearch ] = useState('')
-    const [ allBills, setAllBills ] = useState(Array.isArray(bills) ? bills : [])
+    const [ allBills, setAllBills ] = useState([])
+
+    useEffect(() => {
+        // Fetch both bills and customers when component mounts
+        dispatch(asyncGetBills())
+        dispatch(asyncGetCustomers())
+    }, [dispatch])
+
+    useEffect(() => {
+        // Update allBills when bills change
+        setAllBills(Array.isArray(bills) ? bills : [])
+    }, [bills])
 
     const handleSearch = (e) => {
         setSearch(e.target.value)

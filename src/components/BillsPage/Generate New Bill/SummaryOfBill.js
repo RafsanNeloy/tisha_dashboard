@@ -24,16 +24,46 @@ const SummaryOfBill = (props) => {
     const navigate = useNavigate()
 
     const handleGenerateBill = () => {
-        const items = []
-        lineItems.forEach(item => {
-            items.push({product: item._id, quantity: item.quantity})
-        })
+        // Validate required fields
+        if (!customerInfo._id || lineItems.length === 0) {
+            props.onGenerateError({ 
+                response: { 
+                    data: { message: 'Please select a customer and add at least one product' }
+                }
+            });
+            return;
+        }
+
+        props.setIsLoading(true);
+
+        // Format line items with required fields from the model
+        const formattedLineItems = lineItems.map(item => ({
+            product: item._id,
+            quantity: item.quantity,
+            price: item.price,
+            subTotal: item.subTotal
+        }));
+
+        // Calculate total
+        const total = lineItems.reduce((sum, item) => sum + item.subTotal, 0);
+
         const billData = {
             date: new Date(),
             customer: customerInfo._id,
-            lineItems: items
-        }
+            items: formattedLineItems,
+            total: total
+        };
+
         dispatch(asyncAddBill(billData, navigate))
+            .then(response => {
+                props.onGenerateSuccess(response.data._id);
+            })
+            .catch(error => {
+                props.onGenerateError(error);
+            })
+            .finally(() => {
+                props.setIsLoading(false);
+            });
     }
 
     return (

@@ -52,7 +52,14 @@ const NavBar = (props) => {
                 <Route path="/bills" element={<PrivateRoute><BillsPage /></PrivateRoute>} />
                 <Route path="/addBill" element={<PrivateRoute><AddBill /></PrivateRoute>} />
                 <Route path="/customers/:id" element={<PrivateRoute><ViewCustomer /></PrivateRoute>} />
-                <Route path="/bills/:id" element={<PrivateRoute><BillView /></PrivateRoute>} />
+                <Route 
+                    path="/bills/:id" 
+                    element={
+                        <PrivateRoute>
+                            <BillView />
+                        </PrivateRoute>
+                    } 
+                />
                 <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
             </Routes>
         </div>
