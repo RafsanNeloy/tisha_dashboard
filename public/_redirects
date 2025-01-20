@@ -1,0 +1,10 @@
+/*    /index.html   200
+/loginOrRegister  /loginOrRegister
+/user  /user
+/customers  /customers
+/products  /products
+/bills  /bills
+/addBill  /addBill
+/customers/:id  /customers/:id
+/bills/:id  /bills/:id
+/dashboard  /dashboard
