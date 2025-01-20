@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
-import { makeStyles, Container, Typography, Box, Grid } from '@material-ui/core'
+import { Container, Typography, Box, Grid } from '@mui/material'
+import { makeStyles } from '@mui/styles'
 import ProductSuggestion from './ProductSuggestion'
 import ProductListTable from './ProductListTable'
 import SummaryOfBill from './SummaryOfBill'

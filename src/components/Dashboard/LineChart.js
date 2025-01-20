@@ -1,5 +1,5 @@
 import React from 'react'
-import { Container, CircularProgress } from '@material-ui/core'
+import { Container, CircularProgress } from '@mui/material'
 import Chart from "react-google-charts"
 import { useSelector } from 'react-redux'
 import moment from 'moment'

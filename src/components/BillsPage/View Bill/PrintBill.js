@@ -1,9 +1,9 @@
-import { Button } from '@material-ui/core'
+import { Button } from '@mui/material'
 import moment from 'moment'
 import React from 'react'
 import jsPDF from 'jspdf'
 import autoTable from 'jspdf-autotable'
-import GetAppIcon from '@material-ui/icons/GetApp'
+import GetAppIcon from '@mui/icons-material/GetApp'
 import { useSelector } from 'react-redux'
 
 const PrintBill = (props) => {

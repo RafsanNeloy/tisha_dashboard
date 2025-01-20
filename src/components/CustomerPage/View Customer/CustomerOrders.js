@@ -1,9 +1,9 @@
-import { Typography, Container, Box } from '@material-ui/core'
-import { withStyles } from '@material-ui/core/styles';
-import MuiAccordion from '@material-ui/core/Accordion';
-import MuiAccordionSummary from '@material-ui/core/AccordionSummary';
-import MuiAccordionDetails from '@material-ui/core/AccordionDetails';
 import React from 'react'
+import { Typography, Container, Box } from '@mui/material'
+import { withStyles } from '@mui/styles'
+import MuiAccordion from '@mui/material/Accordion'
+import MuiAccordionSummary from '@mui/material/AccordionSummary'
+import MuiAccordionDetails from '@mui/material/AccordionDetails'
 import ViewOrderTable from './ViewOrderTable'
 import moment from 'moment'
 

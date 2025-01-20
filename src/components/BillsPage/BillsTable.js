@@ -1,5 +1,6 @@
-import { makeStyles, Table, TableContainer, Paper, TableHead, TableRow, TableCell, TableBody, Button, Box } from '@material-ui/core'
 import React from 'react'
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, Box } from '@mui/material'
+import { makeStyles } from '@mui/styles'
 import { useDispatch, useSelector } from 'react-redux'
 import moment from 'moment'
 import { asyncDeleteBill } from '../../action/billsAction'

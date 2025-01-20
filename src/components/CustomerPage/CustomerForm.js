@@ -1,8 +1,9 @@
-import { Button, TextField, Box, makeStyles } from '@material-ui/core'
 import React, { useState } from 'react'
-import validator from 'validator'
+import { Box, TextField, Button } from '@mui/material'
+import { makeStyles } from '@mui/styles'
 import { useDispatch } from 'react-redux'
 import { asyncAddCustomer, asyncUpdateCustomer } from '../../action/customerAction'
+import validator from 'validator'
 
 const useStyle = makeStyles({
     // form:{

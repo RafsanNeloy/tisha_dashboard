@@ -1,10 +1,11 @@
-import { Container, IconButton, makeStyles } from '@material-ui/core'
 import React, { useState, useEffect, useCallback } from 'react'
+import { Container, IconButton } from '@mui/material'
+import { makeStyles } from '@mui/styles'
 import { useSelector } from 'react-redux'
-import ArrowBackIcon from '@material-ui/icons/ArrowBack';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import { Link } from 'react-router-dom'
-import CustomerStats from './CustomerStats';
-import CustomerOrders from './CustomerOrders';
+import CustomerStats from './CustomerStats'
+import CustomerOrders from './CustomerOrders'
 
 const useStyle = makeStyles({
     container: {

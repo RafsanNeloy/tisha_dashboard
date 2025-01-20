@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react'
-import { Route, withRouter } from 'react-router-dom'
+import { Routes, Route, useNavigate } from 'react-router-dom'
 import { useSelector, useDispatch } from 'react-redux'
 import { setLogin } from '../../action/loginAction'
 import HomePage from '../HomePage/HomePage'
@@ -19,13 +19,14 @@ import PrivateRoute from './PrivateRoute'
 const NavBar = (props) => {
     const isLoggedIn = useSelector(state => state.login)
     const dispatch = useDispatch()
+    const navigate = useNavigate()
 
     useEffect(() => {
         if(localStorage.getItem('token')){
             dispatch(setLogin())
-            // props.history.push('/dashboard')
+            navigate('/dashboard')
         }
-    }, [dispatch, props.history, isLoggedIn])
+    }, [dispatch, isLoggedIn, navigate])
 
     return(
         <div>
@@ -37,20 +38,20 @@ const NavBar = (props) => {
                 )
             }
 
-            <Route path='/' component={HomePage} exact={true} />
-            <Route path='/faq' />
-            <Route path='/login-or-register' component={LoginRegisterPage} />
-
-            <PrivateRoute path='/user' component={UserPage} exact={true} />
-            <PrivateRoute path='/customers' component={CustomerPage} exact={true} />
-            <PrivateRoute path='/products' component={ProductPage} exact={true} />
-            <PrivateRoute path='/bills' component={BillsPage} exact={true} />
-            <PrivateRoute path='/addBill' component={AddBill} exact={true} />
-            <PrivateRoute path='/customers/:id' component={ViewCustomer} exact={true} />
-            <PrivateRoute path='/bills/:id' component={BillView} exact={true} />
-            <PrivateRoute path='/dashboard' component={Dashboard} exact={true} />
+            <Routes>
+                <Route path="/" element={<HomePage />} />
+                <Route path="/login-or-register" element={<LoginRegisterPage />} />
+                <Route path="/user" element={<PrivateRoute><UserPage /></PrivateRoute>} />
+                <Route path="/customers" element={<PrivateRoute><CustomerPage /></PrivateRoute>} />
+                <Route path="/products" element={<PrivateRoute><ProductPage /></PrivateRoute>} />
+                <Route path="/bills" element={<PrivateRoute><BillsPage /></PrivateRoute>} />
+                <Route path="/addBill" element={<PrivateRoute><AddBill /></PrivateRoute>} />
+                <Route path="/customers/:id" element={<PrivateRoute><ViewCustomer /></PrivateRoute>} />
+                <Route path="/bills/:id" element={<PrivateRoute><BillView /></PrivateRoute>} />
+                <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
+            </Routes>
         </div>
     )
 }
 
-export default withRouter(NavBar)
+export default NavBar

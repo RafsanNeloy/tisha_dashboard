@@ -1,5 +1,6 @@
-import { Grid, Typography, makeStyles } from '@material-ui/core'
 import React from 'react'
+import { Grid, Typography } from '@mui/material'
+import { makeStyles } from '@mui/styles'
 import { useSelector } from 'react-redux'
 import StatsItem from './StatsItem'
 import moment from 'moment'

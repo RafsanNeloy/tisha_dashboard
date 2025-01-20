@@ -1,5 +1,6 @@
-import { Table, TableBody, TableCell, TableContainer, TableFooter, TableHead, TableRow, makeStyles } from '@material-ui/core'
 import React from 'react'
+import { Table, TableBody, TableCell, TableContainer, TableFooter, TableHead, TableRow } from '@mui/material'
+import { makeStyles } from '@mui/styles'
 import { useSelector } from 'react-redux'
 
 const useStyle = makeStyles({

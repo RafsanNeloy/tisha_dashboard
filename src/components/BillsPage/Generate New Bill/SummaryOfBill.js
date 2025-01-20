@@ -1,6 +1,7 @@
 import React from 'react'
-import { withRouter } from 'react-router-dom'
-import { Paper, Typography, makeStyles, Divider, Button, Container } from '@material-ui/core'
+import { useNavigate } from 'react-router-dom'
+import { Paper, Typography, Divider, Button, Container } from '@mui/material'
+import { makeStyles } from '@mui/styles'
 import CustomerSuggestion from './CustomerSuggestion'
 import OrderDetails from './OrderDetails'
 import { useDispatch } from 'react-redux'
@@ -20,6 +21,7 @@ const SummaryOfBill = (props) => {
     const classes = useStyle()
     const { handleCustomerInfo, lineItems, customerInfo } = props
     const dispatch = useDispatch()
+    const navigate = useNavigate()
 
     const handleGenerateBill = () => {
         const items = []
@@ -31,7 +33,7 @@ const SummaryOfBill = (props) => {
             customer: customerInfo._id,
             lineItems: items
         }
-        dispatch(asyncAddBill(billData, props.history))
+        dispatch(asyncAddBill(billData, navigate))
     }
 
     return (
@@ -57,4 +59,4 @@ const SummaryOfBill = (props) => {
     )
 }
 
-export default withRouter(SummaryOfBill)
+export default SummaryOfBill

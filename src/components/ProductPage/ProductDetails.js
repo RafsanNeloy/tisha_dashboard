@@ -1,10 +1,11 @@
-import { Typography, Paper, Button, makeStyles, Box, Divider } from '@material-ui/core'
 import React, { useState, useEffect } from 'react'
+import { Typography, Paper, Box, Button } from '@mui/material'
+import { makeStyles } from '@mui/styles'
 import { useDispatch } from 'react-redux'
 import { asyncDeleteProducts, asyncProductDetail } from '../../action/productAction'
 import moment from 'moment'
 
-const useStyle= makeStyles({
+const useStyle = makeStyles({
     container:{
         display: 'grid',
         placeItems: 'center',
@@ -63,7 +64,6 @@ const ProductDetails = (props) => {
                 productId ? (
                     <Box>
                         <Typography className={classes.detailsTitle} variant='h5'>Product Details</Typography>
-                        <Divider variant='middle' />
                         <Box className={classes.content}>
                             <Typography variant='h6'>Name: {detail.name}</Typography>
                             <Typography variant='h6'>Price: {detail.price}</Typography>

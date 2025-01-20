@@ -1,9 +1,9 @@
 import React from 'react'
 import NavBar from './components/NavBar/NavBar.js'
 import './App.css'
-import { createMuiTheme, ThemeProvider } from '@material-ui/core'
+import { createTheme, ThemeProvider } from '@mui/material/styles'
 
-const theme = createMuiTheme({
+const theme = createTheme({
   typography: {
     fontFamily: 'Quicksand',
     fontWeightLight: '300',

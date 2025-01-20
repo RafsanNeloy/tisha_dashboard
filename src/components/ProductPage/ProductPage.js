@@ -1,11 +1,12 @@
-import { Box, Container, Divider, Grid, makeStyles, TextField, Typography } from '@material-ui/core'
-import React, { useEffect, useState } from 'react'
+import React, { useState, useEffect } from 'react'
+import { Box, Container, Divider, Grid, TextField, Typography } from '@mui/material'
 import { useDispatch, useSelector } from 'react-redux'
 import { asyncDeleteProducts } from '../../action/productAction'
 import AddProduct from './AddProduct'
 import EditProduct from './EditProduct'
 import ProductDetails from './ProductDetails'
 import ProductTable from './ProductTable'
+import { makeStyles } from '@mui/styles'
 
 const useStyle = makeStyles({
     container: {

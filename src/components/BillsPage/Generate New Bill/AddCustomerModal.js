@@ -1,5 +1,6 @@
-import { Backdrop, Box, Button, Fade, Modal, Paper, makeStyles, Container, Typography } from '@material-ui/core'
 import React, { useState } from 'react'
+import { Backdrop, Box, Button, Fade, Modal, Paper, Container, Typography } from '@mui/material'
+import { makeStyles } from '@mui/styles'
 import CustomerForm from '../../CustomerPage/CustomerForm'
 
 const useStyle = makeStyles({

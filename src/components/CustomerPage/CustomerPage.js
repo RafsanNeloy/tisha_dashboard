@@ -1,5 +1,6 @@
-import { Container, Typography, makeStyles, Box, Divider, TextField } from '@material-ui/core'
-import React, { useEffect, useState } from 'react'
+import React, { useState, useEffect } from 'react'
+import { Container, Typography, Box, Divider, TextField } from '@mui/material'
+import { makeStyles } from '@mui/styles'
 import { useSelector, useDispatch } from 'react-redux'
 import { asyncGetCustomers } from '../../action/customerAction'
 import EditCustomer from './EditCustomer'

@@ -1,7 +1,8 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
-import { Box, Typography, makeStyles, Paper, Divider, Fab, Tooltip } from '@material-ui/core'
-import AddIcon from '@material-ui/icons/Add'
+import { Box, Typography, Paper, Divider, Fab, Tooltip } from '@mui/material'
+import { makeStyles } from '@mui/styles'
+import AddIcon from '@mui/icons-material/Add'
 import { useSelector } from 'react-redux'
 
 const useStyle = makeStyles({

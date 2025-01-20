@@ -1,5 +1,6 @@
-import { Container, makeStyles, Typography } from '@material-ui/core'
 import React from 'react'
+import { Container, Typography } from '@mui/material'
+import { makeStyles } from '@mui/styles'
 import CustomerForm from './CustomerForm'
 
 const useStyle = makeStyles({

@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
-import { Box, Grid, TextField, Typography, Button, makeStyles } from '@material-ui/core'
+import { Box, Grid, TextField, Typography, Button } from '@mui/material'
+import { makeStyles } from '@mui/styles'
 import { useDispatch } from 'react-redux'
 import validator from 'validator'
 import { asyncRegister } from '../../action/registerAction'

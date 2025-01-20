@@ -1,5 +1,6 @@
-import { Container, Typography, makeStyles, Grid } from '@material-ui/core'
 import React from 'react'
+import { Container, Typography, Grid } from '@mui/material'
+import { makeStyles } from '@mui/styles'
 import StatsContainer from './StatsContainer'
 import StatsChart from './StatsChart'
 

@@ -1,5 +1,6 @@
-import { Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, makeStyles } from '@material-ui/core'
 import React from 'react'
+import { Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material'
+import { makeStyles } from '@mui/styles'
 
 const useStyle = makeStyles({
     table: {

@@ -1,8 +1,9 @@
-import { Table, TableContainer, TableRow, TableHead, TableCell, TableBody, IconButton, Paper, Container, TableFooter, makeStyles } from '@material-ui/core'
 import React from 'react'
-import RemoveIcon from '@material-ui/icons/Remove'
-import AddIcon from '@material-ui/icons/Add'
-import DeleteForeverIcon from '@material-ui/icons/DeleteForever'
+import { Table, TableContainer, TableRow, TableHead, TableCell, TableBody, IconButton, Paper, Container, TableFooter } from '@mui/material'
+import { makeStyles } from '@mui/styles'
+import RemoveIcon from '@mui/icons-material/Remove'
+import AddIcon from '@mui/icons-material/Add'
+import DeleteForeverIcon from '@mui/icons-material/DeleteForever'
 
 const useStyle = makeStyles({
     tableHeaderFooter: {

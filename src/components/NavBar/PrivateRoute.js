@@ -1,15 +1,11 @@
 import React from 'react'
-import { Route, Redirect } from 'react-router-dom'
+import { Navigate } from 'react-router-dom'
+import { useSelector } from 'react-redux'
 
-const PrivateRoute = (props) => {
-    const isLogin = localStorage.getItem('token')
-    const { component: Component, exact, path } = props
-
-    return (
-            <Route path={path} render={(props) => {
-                return isLogin ? <Component {...props} /> : <Redirect to='/login-or-register' />
-            }} exact={exact} />
-    )
+const PrivateRoute = ({ children }) => {
+    const user = useSelector(state => state.user)
+    
+    return user.loggedIn ? children : <Navigate to="/" />
 }
 
 export default PrivateRoute

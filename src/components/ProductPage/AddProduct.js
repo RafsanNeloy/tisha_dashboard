@@ -1,5 +1,6 @@
-import { Container, Typography, makeStyles } from '@material-ui/core'
 import React from 'react'
+import { Container, Typography } from '@mui/material'
+import { makeStyles } from '@mui/styles'
 import ProductForm from './ProductForm'
 
 const useStyle = makeStyles({

@@ -1,7 +1,8 @@
 import React, { useState } from 'react'
 import { useSelector } from 'react-redux'
-import { TextField, Typography, makeStyles, Box } from '@material-ui/core'
-import { Autocomplete } from '@material-ui/lab'
+import { TextField, Typography, Box } from '@mui/material'
+import { Autocomplete } from '@mui/material'
+import { makeStyles } from '@mui/styles'
 
 const useStyle = makeStyles({
     custInfo: {

@@ -1,5 +1,6 @@
-import { Paper, Typography, Grid, makeStyles } from '@material-ui/core'
 import React from 'react'
+import { Paper, Typography, Grid } from '@mui/material'
+import { makeStyles } from '@mui/styles'
 
 const useStyle = makeStyles({
     statItem: {
@@ -9,7 +10,7 @@ const useStyle = makeStyles({
 
 const StatsItem = (props) => {
     const { statTitle, statNumber } = props
-    const classes = useStyle
+    const classes = useStyle()
 
     return (
         <Grid item lg={4} md={4} sm={4} xs={6}>

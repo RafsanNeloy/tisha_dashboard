@@ -1,5 +1,6 @@
-import { Container, Typography, Box, makeStyles} from '@material-ui/core'
 import React from 'react'
+import { Container, Typography, Box } from '@mui/material'
+import { makeStyles } from '@mui/styles'
 import { useSelector } from 'react-redux'
 
 const useStyle = makeStyles({
