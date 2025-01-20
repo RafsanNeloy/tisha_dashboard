@@ -33,10 +33,10 @@ const useStyle = makeStyles({
 })
 
 const BillsPage = (props) => {
-    const bills = useSelector(state => state.bills)
+    const bills = useSelector(state => state.bills) || []
     const classes = useStyle()
-    const [ search, setSearch ] = useState()
-    const [ allBills, setAllBills ] = useState(bills)
+    const [ search, setSearch ] = useState('')
+    const [ allBills, setAllBills ] = useState(Array.isArray(bills) ? bills : [])
 
     const handleSearch = (e) => {
         setSearch(e.target.value)
@@ -45,11 +45,11 @@ const BillsPage = (props) => {
     }
 
     const searchBill = (id) => {
-        if(id.length > 0) {
+        if (!Array.isArray(bills)) return []
+        if (id.length > 0) {
             return bills.filter(bill => bill._id.includes(id))
-        } else {
-            return bills
         }
+        return bills
     }
 
     const resetSearch = () => {

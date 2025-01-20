@@ -25,6 +25,9 @@ const BillsTable = (props) => {
     const customers = useSelector(state => state.customers)
     const classes = useStyle()
 
+    // Create a safe copy of bills array before reversing
+    const reversedBills = Array.isArray(bills) ? [...bills].reverse() : []
+
     const getCustomerName = (id) => {
         if(customers.length > 0){
             const getCustomer = customers.find(cust => cust._id === id)
@@ -32,54 +35,58 @@ const BillsTable = (props) => {
         }
     }
 
+    const handleDelete = (id) => {
+        const confirmDelete = window.confirm('Are you sure?')
+        if(confirmDelete){
+            dispatch(asyncDeleteBill(id))
+            resetSearch()
+        }
+    }
+
     return (
-        <TableContainer component={Paper}  className={classes.table} >
-            <Table stickyHeader size='small'>
+        <TableContainer component={Paper} className={classes.table}>
+            <Table stickyHeader>
                 <TableHead>
                     <TableRow>
-                        <TableCell className={classes.tableHeader} align='center'>S.No</TableCell>
-                        <TableCell className={classes.tableHeader} align='center'>Order ID</TableCell>
-                        <TableCell className={classes.tableHeader} align='center'>Customer Name</TableCell>
-                        <TableCell className={classes.tableHeader} align='center'>{'Date & Time'}</TableCell>
-                        <TableCell className={classes.tableHeader} align='center'>View/Delete</TableCell>
+                        <TableCell className={classes.tableHeader}>Date</TableCell>
+                        <TableCell className={classes.tableHeader}>Order ID</TableCell>
+                        <TableCell className={classes.tableHeader}>Customer Name</TableCell>
+                        <TableCell className={classes.tableHeader}>Total Amount</TableCell>
+                        <TableCell className={classes.tableHeader}>Actions</TableCell>
                     </TableRow>
                 </TableHead>
                 <TableBody>
-                    {
-                        bills.map((bill, index) => {
-                            return (
-                                <TableRow hover key={bill._id}>
-                                    <TableCell align='center'> {index + 1} </TableCell>
-                                    <TableCell> {bill._id} </TableCell>
-                                    <TableCell> {getCustomerName(bill.customer)} </TableCell>
-                                    <TableCell align='center'> {bill.createdAt && moment(bill.createdAt).format('DD/MM/YYYY, hh:mm A')} </TableCell>
-                                    <TableCell align='center'> 
+                    {reversedBills.map(bill => {
+                        return (
+                            <TableRow key={bill._id}>
+                                <TableCell>{moment(bill.date).format('DD/MM/YYYY')}</TableCell>
+                                <TableCell>{bill._id}</TableCell>
+                                <TableCell>{getCustomerName(bill.customer)}</TableCell>
+                                <TableCell>{bill.total}</TableCell>
+                                <TableCell>
                                     <Box display='flex' flexDirection='row' justifyContent='space-evenly'>
-                                        <Link to={`/bills/${bill._id}`} className={classes.viewBtn} >
+                                        <Link to={`/bills/${bill._id}`} className={classes.viewBtn}>
                                             <Button 
                                                 variant='contained' 
-                                                color='primary'
+                                                color='primary' 
+                                                size='small'
                                             >
-                                                view
+                                                View
                                             </Button>
-                                        </Link> 
+                                        </Link>
                                         <Button 
                                             variant='contained' 
-                                            color='secondary'
-                                            onClick = {() => {
-                                                resetSearch()
-                                                dispatch(asyncDeleteBill(bill._id))
-                                            }}
+                                            color='secondary' 
+                                            size='small'
+                                            onClick={() => handleDelete(bill._id)}
                                         >
-                                            delete
+                                            Delete
                                         </Button>
                                     </Box>
-                                            
-                                    </TableCell>
-                                </TableRow>
-                            )
-                        })
-                    }
+                                </TableCell>
+                            </TableRow>
+                        )
+                    })}
                 </TableBody>
             </Table>
         </TableContainer>

@@ -1,9 +1,12 @@
 import { Box, Button, Grid, TextField, Typography } from '@mui/material'
 import React, { useState } from 'react'
 import { useDispatch } from 'react-redux'
+import { useNavigate } from 'react-router-dom'
 import validator from 'validator'
-import { asyncLogin } from '../../action/loginAction'
 import { makeStyles } from '@mui/styles'
+import axiosInstance from '../../config/axios'
+import { setLogin } from '../../action/loginAction'
+import { API_BASE_URL } from '../../config/api'
 
 const useStyle = makeStyles({
     formElements: {
@@ -12,13 +15,13 @@ const useStyle = makeStyles({
 })
 
 const LoginForm = (props) => {  
-    const { handleErrorNotify } = props
     const [ email, setEmail ] = useState('')
     const [ password, setPassword ] = useState('')
     const [ formErrors, setFormErrors ] = useState({})
     const errors = {}
     const classes = useStyle()
     const dispatch = useDispatch()
+    const navigate = useNavigate()
 
     const handleChange = (e) => {
         if(e.target.name === 'email') {
@@ -48,8 +51,18 @@ const LoginForm = (props) => {
                 email: email,
                 password: password
             }
-            dispatch(asyncLogin(formData, props.history, handleErrorNotify))
-            console.log(formData)
+            axiosInstance.post(`${API_BASE_URL}/users/login`, formData)
+                .then((response) => {
+                    localStorage.setItem('token', response.data.token)
+                    dispatch(setLogin())
+                    navigate('/dashboard')
+                })
+                .catch((err) => {
+                    props.handleErrorNotify({
+                        error: true,
+                        errorMessage: err.response?.data?.message || 'Login failed'
+                    })
+                })
         }
     }
 

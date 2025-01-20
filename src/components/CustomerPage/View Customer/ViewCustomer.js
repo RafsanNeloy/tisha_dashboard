@@ -16,11 +16,12 @@ const useStyle = makeStyles({
 
 const ViewCustomer = (props) => {
     const classes = useStyle()
-    const bills = useSelector(state => state.bills)
+    const bills = useSelector(state => state.bills) || []
     const [ customerBills, setCustomerBills ] = useState([])
     const id = props.match.params.id
 
     const getBills = useCallback((id) => {
+        if (!Array.isArray(bills)) return
         const custBills = bills.filter(bill => bill.customer === id)
         handleCustomerBills(custBills)
     }, [bills])

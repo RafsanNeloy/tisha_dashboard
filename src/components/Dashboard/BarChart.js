@@ -4,11 +4,15 @@ import { Chart } from 'react-google-charts'
 import { useSelector } from 'react-redux'
 
 const BarChart = (props) => {
-    const bills = useSelector(state => state.bills)
-    const products = useSelector(state => state.products)
-    const customers = useSelector(state => state.customers)
+    const bills = useSelector(state => state.bills) || []
+    const products = useSelector(state => state.products) || []
+    const customers = useSelector(state => state.customers) || []
 
-    const chartData = [['Customers', customers.length], ['Products', products.length], ['Orders', bills.length]]
+    const chartData = [
+        ['Customers', customers.length],
+        ['Products', products.length],
+        ['Orders', bills.length]
+    ]
 
     return (
         <Container>
@@ -17,7 +21,7 @@ const BarChart = (props) => {
                 height={'300px'}
                 chartType='Bar'
                 loader={<CircularProgress />}
-                data={[['category', 'total in number'],...chartData]}
+                data={[['category', 'total in number'], ...chartData]}
                 options={{
                     chart: {
                         title: 'Complete Statistics',

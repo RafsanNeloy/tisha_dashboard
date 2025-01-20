@@ -1,9 +1,9 @@
 import React, { useState } from 'react'
 import { Box, Grid, TextField, Typography, Button } from '@mui/material'
 import { makeStyles } from '@mui/styles'
-import { useDispatch } from 'react-redux'
 import validator from 'validator'
-import { asyncRegister } from '../../action/registerAction'
+import axiosInstance from '../../config/axios'
+import { API_BASE_URL } from '../../config/api'
 
 const useStyle = makeStyles({
     formElements: {
@@ -12,7 +12,6 @@ const useStyle = makeStyles({
 })
 
 const RegisterForm = (props) => {
-    const { handleChangeTabValue } = props
     const [ username, setUsername ] = useState('')
     const [ email, setEmail ] = useState('')
     const [ password, setPassword ] = useState('')
@@ -21,7 +20,6 @@ const RegisterForm = (props) => {
     const [ formErrors, setFormErrors ] = useState({})
     const errors = {}
     const classes = useStyle()
-    const dispatch = useDispatch()
 
     const handleChange = (e) => {
         if(e.target.name==='username') {
@@ -35,6 +33,15 @@ const RegisterForm = (props) => {
         } else if(e.target.name==='address') {
             setAddress(e.target.value)
         }
+    }
+
+    const resetForm = () => {
+        setUsername('')
+        setEmail('')
+        setPassword('')
+        setBusinessName('')
+        setAddress('')
+        setFormErrors({})
     }
 
     const validation = () => {
@@ -54,20 +61,31 @@ const RegisterForm = (props) => {
             errors.address = "address can't be blank"
         }
         setFormErrors(errors)
+        return Object.keys(errors).length === 0
     }
 
     const handleSubmit = (e) => {
         e.preventDefault()
-        validation()
-        if(Object.keys(errors).length === 0) {
+        
+        if(validation()){
             const formData = {
-                username: username[0].toUpperCase() + username.slice(1),
+                username: username,
                 email: email,
                 password: password,
                 businessName: businessName,
                 address: address
             }
-            dispatch(asyncRegister(formData, handleChangeTabValue ))
+            
+            axiosInstance.post(`${API_BASE_URL}/users/register`, formData)
+                .then((response) => {
+                    console.log('Registration successful:', response.data)
+                    resetForm()
+                    props.handleChangeTabValue()
+                })
+                .catch((err) => {
+                    console.error('Registration error:', err.response?.data || err.message)
+                    setFormErrors({ submit: err.response?.data?.message || 'Registration failed' })
+                })
         }
     }
 

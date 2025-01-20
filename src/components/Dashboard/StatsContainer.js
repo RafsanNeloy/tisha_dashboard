@@ -12,19 +12,18 @@ const useStyle = makeStyles({
 })
 
 const StatsContainer = (props) => {
-    const products = useSelector(state => state.products)
-    const customers = useSelector(state => state.customers)
-    const bills = useSelector(state => state.bills)
+    const products = useSelector(state => state.products) || []
+    const customers = useSelector(state => state.customers) || []
+    const bills = useSelector(state => state.bills) || []
     const classes = useStyle()
 
-    const todayBills = bills.filter(bill => moment(bill.createdAt).isBetween(moment().startOf('days'), moment()))
+    const todayBills = Array.isArray(bills) ? bills.filter(bill => 
+        moment(bill.createdAt).isBetween(moment().startOf('days'), moment())
+    ) : []
 
     const calculateTotal = (data) => {
-        let total = 0
-        data.forEach(bill => {
-            total = bill.total + total
-        })
-        return total
+        if (!Array.isArray(data)) return 0
+        return data.reduce((total, bill) => total + (bill.total || 0), 0)
     }
 
     return(
