@@ -1,4 +1,6 @@
 import axios from 'axios'
+import axiosInstance from '../config/axios'
+import { API_URL } from '../config/api'
 
 const url = 'https://tisha-dashboard-api.onrender.com/api/products'
 
@@ -30,20 +32,15 @@ export const deleteProduct = (data) => {
     }
 }
 
-export const asyncGetProducts = () => {
+export const startGetProducts = () => {
     return (dispatch) => {
-        const token = localStorage.getItem('token')
-        const config = {
-            headers: {
-                Authorization: `Bearer ${token}`
-            }
-        }
-        axios.get(url, config)
-            .then(response => {
-                const data = response.data
-                dispatch(setProducts(data))
+        axiosInstance.get(`/products`)
+            .then((response) => {
+                dispatch(setProducts(response.data))
             })
-            .catch(err => alert(err.message))
+            .catch((err) => {
+                console.log(err.message)
+            })
     }
 }
 
