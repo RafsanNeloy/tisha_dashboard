@@ -8,7 +8,7 @@ export const setUser = (data) => {
 
 export const asyncGetUser = () => {
     return (dispatch) => {
-        const url = 'http://localhost:5000/api/users/account'
+        const url = 'https://tisha-dashboard-api.onrender.com/api/users/account'
         const token = localStorage.getItem('token')
         axios.get(url, {
             headers:{

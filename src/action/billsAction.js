@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-const url = 'http://localhost:5000/api/bills'
+const url = 'https://tisha-dashboard-api.onrender.com/api/bills'
 
 export const setBills = (data) => {
     return {

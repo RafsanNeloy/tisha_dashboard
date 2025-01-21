@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-const url = 'http://localhost:5000/api/products'
+const url = 'https://tisha-dashboard-api.onrender.com/api/products'
 
 export const setProducts = (data) => {
     return {

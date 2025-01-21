@@ -76,7 +76,7 @@ const AddBill = (props) => {
         Swal.fire({
             icon: 'error',
             title: 'Bill Generation Failed',
-            text: error.response?.data?.message || 'Please check all required fields and try again',
+            text: error.response?.data?.message || 'Network error. Please check your connection and try again.',
         })
     }
 

@@ -6,7 +6,7 @@ import validator from 'validator'
 import { makeStyles } from '@mui/styles'
 import axiosInstance from '../../config/axios'
 import { setLogin } from '../../action/loginAction'
-import { API_BASE_URL } from '../../config/api'
+import { API_URL } from '../../config/api'
 
 const useStyle = makeStyles({
     formElements: {
@@ -51,7 +51,7 @@ const LoginForm = (props) => {
                 email: email,
                 password: password
             }
-            axiosInstance.post(`${API_BASE_URL}/users/login`, formData)
+            axiosInstance.post(`${API_URL}/users/login`, formData)
                 .then((response) => {
                     localStorage.setItem('token', response.data.token)
                     dispatch(setLogin())
