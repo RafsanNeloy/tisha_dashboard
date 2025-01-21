@@ -5,8 +5,7 @@ import { makeStyles } from '@mui/styles'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import { useDispatch, useSelector } from 'react-redux'
 import { asyncGetBillDetail } from '../../../action/billsAction'
-import { asyncGetCustomers } from '../../../action/customerAction'
-import { asyncGetProducts } from '../../../action/productAction'
+import { startGetProducts } from '../../../action/productAction'
 import BillDetail from './BillDetail'
 import BillItemtable from './BillItemTable'
 import PrintBill from './PrintBill'
@@ -27,7 +26,6 @@ const useStyle = makeStyles({
 const BillView = () => {
     const classes = useStyle()
     const { id } = useParams()
-    const customers = useSelector(state => state.customers)
     const products = useSelector(state => state.products)
     const [billDetails, setBillDetails] = useState(null)
     const [isLoading, setIsLoading] = useState(true)
@@ -41,7 +39,7 @@ const BillView = () => {
             setError(null)
             try {
                 await Promise.all([
-                    dispatch(asyncGetProducts())
+                    dispatch(startGetProducts())
                 ])
             } catch (err) {
                 setError('Failed to load required data')
