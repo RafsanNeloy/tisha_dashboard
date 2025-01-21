@@ -33,6 +33,7 @@ const BillView = () => {
     const [isLoading, setIsLoading] = useState(true)
     const [error, setError] = useState(null)
     const dispatch = useDispatch()
+    const [customerAddress, setCustomerAddress] = useState('')
 
     // Load required data
     useEffect(() => {
@@ -68,6 +69,10 @@ const BillView = () => {
                 })
         }
     }, [dispatch, id, handleBillDetails, products.length])
+
+    const handleAddressChange = (address) => {
+        setCustomerAddress(address)
+    }
 
     if (isLoading || !products.length) {
         return (
@@ -110,7 +115,8 @@ const BillView = () => {
                 <PrintBill 
                     id={id} 
                     bill={billDetails} 
-                    customer={billDetails.customer} 
+                    customer={billDetails.customer}
+                    customerAddress={customerAddress} 
                     items={billDetails.items} 
                 />
             </Box>
@@ -118,7 +124,8 @@ const BillView = () => {
             <BillDetail 
                 id={id} 
                 bill={billDetails} 
-                customer={billDetails.customer} 
+                customer={billDetails.customer}
+                onAddressChange={handleAddressChange}
             />
             <BillItemtable 
                 items={billDetails.items.map(item => ({
