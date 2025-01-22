@@ -1,5 +1,6 @@
 const asyncHandler = require('express-async-handler');
 const Customer = require('../models/customerModel');
+const Bill = require('../models/billModel');
 
 // @desc    Get all customers
 // @route   GET /api/customers
@@ -96,10 +97,50 @@ const getCustomer = asyncHandler(async (req, res) => {
   res.status(200).json(customer);
 });
 
+// @desc    Get customer bills and stats
+// @route   GET /api/customers/:id/bills
+// @access  Private
+const getCustomerBills = asyncHandler(async (req, res) => {
+  const customerId = req.params.id;
+
+  // First verify if customer exists and belongs to user
+  const customer = await Customer.findOne({
+    _id: customerId,
+    user: req.user.id
+  });
+
+  if (!customer) {
+    res.status(404);
+    throw new Error('Customer not found');
+  }
+
+  // Get all bills for this customer
+  const bills = await Bill.find({
+    customer: customerId,
+    user: req.user.id
+  })
+  .populate('items.product', 'name price')
+  .sort({ createdAt: -1 });
+
+  // Calculate statistics
+  const totalOrders = bills.length;
+  const totalAmount = bills.reduce((sum, bill) => sum + bill.total, 0);
+
+  res.status(200).json({
+    customer,
+    stats: {
+      totalOrders,
+      totalAmount
+    },
+    bills
+  });
+});
+
 module.exports = {
   getCustomers,
   addCustomer,
   updateCustomer,
   deleteCustomer,
-  getCustomer
+  getCustomer,
+  getCustomerBills
 }; 

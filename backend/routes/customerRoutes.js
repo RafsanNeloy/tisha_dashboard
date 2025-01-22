@@ -6,7 +6,8 @@ const {
   addCustomer,
   updateCustomer,
   deleteCustomer,
-  getCustomer
+  getCustomer,
+  getCustomerBills
 } = require('../controllers/customerController');
 
 router.route('/')
@@ -17,5 +18,7 @@ router.route('/:id')
   .get(protect, getCustomer)
   .put(protect, updateCustomer)
   .delete(protect, deleteCustomer);
+
+router.get('/:id/bills', protect, getCustomerBills);
 
 module.exports = router; 
