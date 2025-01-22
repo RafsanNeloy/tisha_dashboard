@@ -1,46 +1,80 @@
 import React, { useState, useEffect } from 'react'
-import { Typography, Paper, Box, Button } from '@mui/material'
+import { Typography, Paper, Box, Button, Accordion, AccordionSummary, AccordionDetails, Container } from '@mui/material'
 import { makeStyles } from '@mui/styles'
 import { useDispatch } from 'react-redux'
-import { asyncDeleteProducts, asyncProductDetail } from '../../action/productAction'
+import { asyncDeleteProducts } from '../../action/productAction'
 import moment from 'moment'
+import axios from 'axios'
 
 const useStyle = makeStyles({
-    container:{
-        display: 'grid',
-        placeItems: 'center',
-        width: '350px',
-        height: "230px",
-        padding: '10px'
+    container: {
+        width: '400px',
+        padding: '20px',
+        maxHeight: '80vh',
+        overflowY: 'auto'
     },
-    content:{
-        marginTop: '30px'
+    content: {
+        marginTop: '20px'
     },
     noProduct: {
         width: '150px',
         wordBreak: 'break-word',
         color: 'grey'
     },
-    detailsTitle:{
+    detailsTitle: {
         textAlign: 'center',
-        fontWeight: 600
+        fontWeight: 600,
+        marginBottom: '20px'
+    },
+    statsContainer: {
+        marginTop: '20px',
+        marginBottom: '20px'
+    },
+    statsBox: {
+        padding: '15px',
+        marginBottom: '10px',
+        backgroundColor: '#f5f5f5',
+        borderRadius: '4px'
+    },
+    ordersList: {
+        marginTop: '20px'
+    },
+    accordion: {
+        marginBottom: '8px'
     }
 })
 
 const ProductDetails = (props) => {
-    const { productId, resetViewProduct, handleUpdateProd } = props
+    const { productId, resetViewProduct } = props
     const classes = useStyle()
-    const [ detail, setDetail ] = useState({})
+    const [productData, setProductData] = useState(null)
+    const [isLoading, setIsLoading] = useState(false)
+    const [error, setError] = useState(null)
     const dispatch = useDispatch()
 
-    const handleDetailChange = (data) => {
-        setDetail(data)
-    }
+    useEffect(() => {
+        const fetchProductData = async () => {
+            if (!productId) return
+            setIsLoading(true)
+            try {
+                const token = localStorage.getItem('token')
+                const response = await axios.get(`http://localhost:5000/api/products/${productId}/bills`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                })
+                setProductData(response.data)
+            } catch (err) {
+                console.error('Error fetching product data:', err)
+                setError(err.response?.data?.message || 'Could not fetch product data')
+            } finally {
+                setIsLoading(false)
+            }
+        }
 
-    const handleUpdate = (data) => {
-        handleUpdateProd(data)
-        resetViewProduct()
-    }
+        fetchProductData()
+    }, [productId])
 
     const handleRemove = (id) => {
         dispatch(asyncDeleteProducts(id))
@@ -48,54 +82,129 @@ const ProductDetails = (props) => {
     }
 
     const handleClose = () => {
-        setDetail({})
+        setProductData(null)
         resetViewProduct()
     }
 
-    useEffect(() => {
-        if(productId) {
-            dispatch(asyncProductDetail(productId, handleDetailChange))
-        }
-    }, [productId, dispatch])
+    if (!productId) {
+        return (
+            <Paper className={classes.container}>
+                <Typography className={classes.noProduct} variant='h6'>
+                    Select a product to view its details
+                </Typography>
+            </Paper>
+        )
+    }
+
+    if (isLoading) {
+        return (
+            <Paper className={classes.container}>
+                <Typography>Loading...</Typography>
+            </Paper>
+        )
+    }
+
+    if (error) {
+        return (
+            <Paper className={classes.container}>
+                <Typography color="error">{error}</Typography>
+            </Paper>
+        )
+    }
+
+    if (!productData) return null
 
     return (
         <Paper className={classes.container}>
-            {
-                productId ? (
-                    <Box>
-                        <Typography className={classes.detailsTitle} variant='h5'>Product Details</Typography>
-                        <Box className={classes.content}>
-                            <Typography variant='h6'>Name: {detail.name}</Typography>
-                            <Typography variant='h6'>Price: {detail.price}</Typography>
-                            <Typography variant='h6'>Added on: {detail.createdAt && moment(detail.createdAt).format('hh:mm A, DD/MM/YYYY')}</Typography>
-                            <Box display='flex' flexDirection='row' justifyContent='space-evenly'>
-                                <Button
-                                    variant='outlined'
-                                    color='primary'
-                                    onClick={() => handleUpdate(detail)}
-                                >
-                                    update
-                                </Button>
-                                <Button
-                                    variant='outlined'
-                                    color='secondary'
-                                    onClick={() => handleRemove(detail._id)}
-                                >
-                                    remove
-                                </Button>
-                                <Button
-                                    variant='outlined'
-                                    onClick={handleClose}
-                                >
-                                    close
-                                </Button>
-                            </Box>
-                        </Box>
-                    </Box>
+            <Typography className={classes.detailsTitle} variant='h5'>Product Details</Typography>
+            
+            {/* Basic Info */}
+            <Box className={classes.content}>
+                <Typography variant='h6'>Name: {productData?.product?.name}</Typography>
+                <Typography variant='h6'>Price: Rs.{productData?.product?.price}</Typography>
+                <Typography variant='subtitle1'>
+                    Added on: {productData?.product?.createdAt ? 
+                        moment(productData.product.createdAt).format('DD/MM/YYYY, hh:mm A') : 
+                        'N/A'}
+                </Typography>
+            </Box>
+
+            {/* Stats */}
+            <Box className={classes.statsContainer}>
+                <Paper className={classes.statsBox}>
+                    <Typography variant='h6' align='center'>Total Orders</Typography>
+                    <Typography variant='h4' align='center'>{productData?.stats?.totalOrders || 0}</Typography>
+                </Paper>
+                <Paper className={classes.statsBox}>
+                    <Typography variant='h6' align='center'>Total Quantity Sold</Typography>
+                    <Typography variant='h4' align='center'>{productData?.stats?.totalQuantity || 0}</Typography>
+                </Paper>
+                <Paper className={classes.statsBox}>
+                    <Typography variant='h6' align='center'>Total Revenue</Typography>
+                    <Typography variant='h4' align='center'>Rs.{productData?.stats?.totalAmount || 0}</Typography>
+                </Paper>
+            </Box>
+
+            {/* Orders List */}
+            <Box className={classes.ordersList}>
+                <Typography variant='h6'>Order History</Typography>
+                {productData?.bills?.length > 0 ? (
+                    productData.bills.map((bill) => {
+                        if (!bill?.customer || !bill?.items?.[0]) return null;
+                        
+                        return (
+                            <Accordion key={bill._id} className={classes.accordion}>
+                                <AccordionSummary>
+                                    <Box width='100%' display='flex' flexDirection='row' justifyContent='space-between'>
+                                        <Typography>{bill.customer.name || 'Unknown Customer'}</Typography>
+                                        <Typography>Qty: {bill.items[0].quantity || 0}</Typography>
+                                        <Typography>Rs.{bill.items[0].subTotal || 0}</Typography>
+                                    </Box>
+                                </AccordionSummary>
+                                <AccordionDetails>
+                                    <Box>
+                                        <Typography>
+                                            <strong>Order Date:</strong> {bill.date ? 
+                                                moment(bill.date).format('DD/MM/YYYY, hh:mm A') : 
+                                                'N/A'}
+                                        </Typography>
+                                        <Typography>
+                                            <strong>Customer Email:</strong> {bill.customer.email || 'N/A'}
+                                        </Typography>
+                                        <Typography>
+                                            <strong>Customer Mobile:</strong> {bill.customer.mobile || 'N/A'}
+                                        </Typography>
+                                        <Typography>
+                                            <strong>Unit Price:</strong> Rs.{bill.items[0].price || 0}
+                                        </Typography>
+                                    </Box>
+                                </AccordionDetails>
+                            </Accordion>
+                        );
+                    })
                 ) : (
-                    <Typography className={classes.noProduct} variant='h6'>select a product to view its details</Typography>
-                )
-            }
+                    <Typography color="textSecondary" align="center">
+                        No orders found for this product
+                    </Typography>
+                )}
+            </Box>
+
+            {/* Actions */}
+            <Box display='flex' justifyContent='space-around' mt={3}>
+                <Button
+                    variant='contained'
+                    color='secondary'
+                    onClick={() => handleRemove(productData?.product?._id)}
+                >
+                    Remove
+                </Button>
+                <Button
+                    variant='contained'
+                    onClick={handleClose}
+                >
+                    Close
+                </Button>
+            </Box>
         </Paper>
     )
 }
