@@ -11,26 +11,11 @@ const useStyle = makeStyles({
 })
 
 const CustomerStats = (props) => {
-    const { id, customerBills } = props
+    const { customer, stats } = props
     const classes = useStyle()
-    const [ customerDetail, setCustomerDetail ] = useState({})
 
-    const dispatch = useDispatch()
-
-    useEffect(() => {
-        dispatch(asyncCustomerDetail(id, handleCustomerDetail))
-    }, [dispatch, id])
-
-    const handleCustomerDetail = (data) => {
-        setCustomerDetail(data)
-    }
-
-    const calculateTotal = (data) => {
-        let total = 0
-        data.forEach(bill => {
-            total = total + bill.total
-        })
-        return total
+    if (!customer || !stats) {
+        return null
     }
 
     return (
@@ -38,22 +23,22 @@ const CustomerStats = (props) => {
             <Grid item lg={4}>
                 <Paper className={classes.custDetail}>
                     <Container>
-                        <Typography variant='body1'><strong>Name: </strong>{customerDetail.name}</Typography>
-                        <Typography variant='body1'><strong>Email: </strong>{customerDetail.email}</Typography>
-                        <Typography variant='body1'><strong>Mobile: </strong>{customerDetail.mobile}</Typography>
+                        <Typography variant='body1'><strong>Name: </strong>{customer.name}</Typography>
+                        <Typography variant='body1'><strong>Email: </strong>{customer.email}</Typography>
+                        <Typography variant='body1'><strong>Mobile: </strong>{customer.mobile}</Typography>
                     </Container>
                 </Paper>
             </Grid>
             <Grid item lg={4}>
                 <Paper>
                     <Typography variant='h6' align='center'>Total Orders</Typography>
-                    <Typography variant='h2' align='center'>{customerBills.length}</Typography>
+                    <Typography variant='h2' align='center'>{stats.totalOrders}</Typography>
                 </Paper>
             </Grid>
             <Grid item lg={4}>
                 <Paper>
                     <Typography variant='h6' align='center'>Total Amount of Purchase</Typography>
-                    <Typography variant='h2' align='center'>{calculateTotal(customerBills)}</Typography>
+                    <Typography variant='h2' align='center'>{stats.totalAmount}</Typography>
                 </Paper>
             </Grid>
         </Grid>

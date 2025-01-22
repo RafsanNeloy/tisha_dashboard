@@ -15,11 +15,6 @@ const ViewOrderTable = (props) => {
     const products = useSelector(state => state.products)
     const classes = useStyle()
 
-    const getProductName = (id) => {
-        const product = products.find(ele => ele._id === id)
-        return product.name
-    }
-
     return (
         <TableContainer>
             <Table>
@@ -33,19 +28,19 @@ const ViewOrderTable = (props) => {
                     </TableRow>
                 </TableHead>
                 <TableBody>
-                    {
-                        lineItems.map((list, index) => {
-                            return (
-                                <TableRow key={list._id}>
-                                    <TableCell>{index + 1}</TableCell>
-                                    <TableCell>{getProductName(list.product)}</TableCell>
-                                    <TableCell>{list.price}</TableCell>
-                                    <TableCell>{list.quantity}</TableCell>
-                                    <TableCell>{list.subTotal}</TableCell>
-                                </TableRow>
-                            )
-                        })
-                    }
+                    {lineItems.map((item, index) => {
+                        if (!item || !item.product) return null;
+
+                        return (
+                            <TableRow key={item._id || index}>
+                                <TableCell>{index + 1}</TableCell>
+                                <TableCell>{item.product.name}</TableCell>
+                                <TableCell>{item.price}</TableCell>
+                                <TableCell>{item.quantity}</TableCell>
+                                <TableCell>{item.subTotal}</TableCell>
+                            </TableRow>
+                        )
+                    })}
                 </TableBody>
                 <TableFooter>
                     <TableRow>

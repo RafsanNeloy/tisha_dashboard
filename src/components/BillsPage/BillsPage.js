@@ -8,29 +8,22 @@ import BillsTable from './BillsTable'
 import SummarySection from './SummarySection'
 
 const useStyle = makeStyles({
-    title:{
+    title: {
         fontWeight: '700'
     },
     container: {
-        width: '100vw',
+        width: '100%',
         padding: '2vh 2vw',
-        marginLeft: '50px',
-        display: 'flex',
-        flexDirection : 'row',
-        justifyContent: 'center'
+        marginLeft: '0',
     },
-    titleContainer:{
-        width: '100%'
-    },
-    searchField:{
+    searchField: {
         width: '35%'
     },
-    summarySection:{
-        marginTop: '60px'
+    summarySection: {
+        marginTop: '20px'
     },
     billTableSection: {
-        // position: 'fixed',
-        width: '67vw'
+        width: '100%'
     }
 })
 
@@ -42,9 +35,17 @@ const BillsPage = (props) => {
     const [ allBills, setAllBills ] = useState([])
 
     useEffect(() => {
-        // Fetch both bills and customers when component mounts
-        dispatch(asyncGetBills())
-        dispatch(asyncGetCustomers())
+        const loadData = async () => {
+            try {
+                await Promise.all([
+                    dispatch(asyncGetBills()),
+                    dispatch(asyncGetCustomers())
+                ])
+            } catch (error) {
+                console.error('Error loading data:', error)
+            }
+        }
+        loadData()
     }, [dispatch])
 
     useEffect(() => {
@@ -75,10 +76,11 @@ const BillsPage = (props) => {
             <Grid container spacing={2}>
                 <Grid className={classes.billTableSection} item lg={9} md={9} sm={12} xs={12}>
                     <Box 
-                        disableGutters
                         display='flex'
                         flexDirection='row'
                         justifyContent='space-between'
+                        alignItems='center'
+                        mb={2}
                     >
                         <Typography 
                             className={classes.title} 
@@ -97,7 +99,7 @@ const BillsPage = (props) => {
                     </Box>
                     { bills.length > 0 && <BillsTable bills={allBills} resetSearch={resetSearch} /> }
                 </Grid>
-                <Grid className={classes.summarySection} item lg={3} md={3} sm={3} xs={3}>
+                <Grid className={classes.summarySection} item lg={3} md={3} sm={12} xs={12}>
                     <SummarySection />        
                 </Grid>
             </Grid>
