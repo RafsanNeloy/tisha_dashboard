@@ -20,10 +20,10 @@ const BillItemtable = (props) => {
                 <TableHead>
                     <TableRow>
                         <TableCell className={classes.tableHeaderFooter}>S.No</TableCell>
-                        <TableCell className={classes.tableHeaderFooter}>Product Name</TableCell>
-                        <TableCell className={classes.tableHeaderFooter}>Price</TableCell>
-                        <TableCell className={classes.tableHeaderFooter}>Quantity</TableCell>
-                        <TableCell className={classes.tableHeaderFooter}>SubTotal</TableCell>
+                        <TableCell className={classes.tableHeaderFooter}><b>মালের নাম</b></TableCell>
+                        <TableCell className={classes.tableHeaderFooter}><b>দাম</b></TableCell>
+                        <TableCell className={classes.tableHeaderFooter}><b>পরিমান</b></TableCell>
+                        <TableCell className={classes.tableHeaderFooter}><b>মোট</b></TableCell>
                     </TableRow>
                 </TableHead>
                 <TableBody>

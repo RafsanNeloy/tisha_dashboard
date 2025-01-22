@@ -1,5 +1,5 @@
 import React from 'react'
-import { Table, TableContainer, TableRow, TableHead, TableCell, TableBody, IconButton, Paper, Container, TableFooter } from '@mui/material'
+import { Table, TableContainer, TableRow, TableHead, TableCell, TableBody, IconButton, Paper, Container, TableFooter, TextField } from '@mui/material'
 import { makeStyles } from '@mui/styles'
 import RemoveIcon from '@mui/icons-material/Remove'
 import AddIcon from '@mui/icons-material/Add'
@@ -10,6 +10,17 @@ const useStyle = makeStyles({
         color: 'black',
         fontWeight: 600,
         fontSize: 14
+    },
+    quantityInput: {
+        width: '100px',
+        margin: '0 8px',
+        '& input': {
+            padding: '5px 8px',
+            fontSize: '14px'
+        }
+    },
+    quantityCell: {
+        minWidth: '200px'
     }
 })
 
@@ -23,6 +34,18 @@ const ProductListTable = (props) => {
         return total
     }
 
+    const handleQuantityChange = (product, event) => {
+        const newQuantity = parseInt(event.target.value) || 0
+        if (newQuantity >= 0) {
+            const updatedProduct = {
+                ...product,
+                quantity: newQuantity,
+                subTotal: newQuantity * product.price
+            }
+            handleChangeQuantity(updatedProduct, 'set')
+        }
+    }
+
     return (
         <Container disableGutters>
             {
@@ -34,7 +57,7 @@ const ProductListTable = (props) => {
                                     <TableCell className={classes.tableHeaderFooter}>S.No</TableCell>
                                     <TableCell className={classes.tableHeaderFooter}>Product Name</TableCell>
                                     <TableCell className={classes.tableHeaderFooter}>Price</TableCell>
-                                    <TableCell className={classes.tableHeaderFooter}>Quantity</TableCell>
+                                    <TableCell className={`${classes.tableHeaderFooter} ${classes.quantityCell}`}>Quantity</TableCell>
                                     <TableCell className={classes.tableHeaderFooter}>Sub Total</TableCell>
                                     <TableCell className={classes.tableHeaderFooter}>Remove</TableCell>
                                 </TableRow>
@@ -47,15 +70,28 @@ const ProductListTable = (props) => {
                                                 <TableCell>{index + 1}</TableCell>
                                                 <TableCell>{product.name}</TableCell>
                                                 <TableCell>{product.price}</TableCell>
-                                                <TableCell>
+                                                <TableCell className={classes.quantityCell}>
                                                     <IconButton 
                                                         size='small'
                                                         onClick={() => handleChangeQuantity(product, 'minus')}
-                                                        disabled={product.quantity === 1 ? true : false}
+                                                        disabled={product.quantity === 1}
                                                     >
                                                         <RemoveIcon />
                                                     </IconButton>
-                                                        {` ${product.quantity} `}
+                                                    <TextField
+                                                        className={classes.quantityInput}
+                                                        size="small"
+                                                        type="number"
+                                                        value={product.quantity}
+                                                        onChange={(e) => handleQuantityChange(product, e)}
+                                                        inputProps={{ 
+                                                            min: "1",
+                                                            style: { 
+                                                                textAlign: 'center',
+                                                                width: '100%'
+                                                            }
+                                                        }}
+                                                    />
                                                     <IconButton 
                                                         size='small'
                                                         onClick={() => handleChangeQuantity(product, 'add')}    

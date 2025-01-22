@@ -120,10 +120,10 @@ const PrintBill = (props) => {
                         <thead>
                             <tr style={{ backgroundColor: '#3498db', color: 'white' }}>
                                 <th style={{ padding: '10px', border: '1px solid #bdc3c7' }}>SL</th>
-                                <th style={{ padding: '10px', border: '1px solid #bdc3c7' }}>Product Name</th>
-                                <th style={{ padding: '10px', border: '1px solid #bdc3c7' }}>Rate</th>
-                                <th style={{ padding: '10px', border: '1px solid #bdc3c7' }}>Quantity</th>
-                                <th style={{ padding: '10px', border: '1px solid #bdc3c7' }}>Amount</th>
+                                <th style={{ padding: '10px', border: '1px solid #bdc3c7' }}>মালের নাম</th>
+                                <th style={{ padding: '10px', border: '1px solid #bdc3c7' }}>দাম</th>
+                                <th style={{ padding: '10px', border: '1px solid #bdc3c7' }}>পরিমান</th>
+                                <th style={{ padding: '10px', border: '1px solid #bdc3c7' }}>মোট</th>
                             </tr>
                         </thead>
                         <tbody>
