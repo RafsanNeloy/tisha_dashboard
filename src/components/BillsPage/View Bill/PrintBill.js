@@ -39,8 +39,28 @@ const PrintBill = (props) => {
                     padding: '15px 25px 25px',
                     fontFamily: 'Arial, sans-serif',
                     maxWidth: '210mm',
-                    margin: '0 auto'
+                    margin: '0 auto',
+                    position: 'relative'
                 }}>
+                    {/* Add watermark */}
+                    <div style={{
+                        position: 'absolute',
+                        top: '50%',
+                        left: '50%',
+                        transform: 'translate(-50%, -50%) rotate(-45deg)',
+                        fontSize: '60px',
+                        color: 'rgba(128, 128, 128, 0.10)',
+                        whiteSpace: 'nowrap',
+                        pointerEvents: 'none',
+                        zIndex: 1,
+                        fontWeight: 'bold',
+                        textTransform: 'uppercase',
+                        width: '100%',
+                        textAlign: 'center'
+                    }}>
+                        TISHA PLASTIC
+                    </div>
+
                     {/* Header - Adjusted position upward */}
                     <div style={{ 
                         textAlign: 'center', 
