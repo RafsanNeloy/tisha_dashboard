@@ -1,5 +1,6 @@
 const asyncHandler = require('express-async-handler');
 const Product = require('../models/productModel');
+const Bill = require('../models/billModel');
 
 // @desc    Get all products
 // @route   GET /api/products
@@ -95,10 +96,61 @@ const getProduct = asyncHandler(async (req, res) => {
   res.status(200).json(product);
 });
 
+// @desc    Get product bills and stats
+// @route   GET /api/products/:id/bills
+// @access  Private
+const getProductBills = asyncHandler(async (req, res) => {
+  const productId = req.params.id;
+
+  // First verify if product exists and belongs to user
+  const product = await Product.findOne({
+    _id: productId,
+    user: req.user.id
+  });
+
+  if (!product) {
+    res.status(404);
+    throw new Error('Product not found');
+  }
+
+  // Get all bills containing this product
+  const bills = await Bill.find({
+    user: req.user.id,
+    'items.product': productId
+  })
+  .populate('customer', 'name email mobile')
+  .populate('items.product', 'name price')
+  .sort({ createdAt: -1 });
+
+  // Calculate statistics
+  const totalOrders = bills.length;
+  const productStats = bills.reduce((acc, bill) => {
+    const productItem = bill.items.find(item => item.product._id.toString() === productId);
+    if (productItem) {
+      acc.totalQuantity += productItem.quantity;
+      acc.totalAmount += productItem.subTotal;
+    }
+    return acc;
+  }, { totalQuantity: 0, totalAmount: 0 });
+
+  res.status(200).json({
+    product,
+    stats: {
+      totalOrders,
+      ...productStats
+    },
+    bills: bills.map(bill => ({
+      ...bill.toObject(),
+      items: bill.items.filter(item => item.product._id.toString() === productId)
+    }))
+  });
+});
+
 module.exports = {
   getProducts,
   addProduct,
   updateProduct,
   deleteProduct,
-  getProduct
+  getProduct,
+  getProductBills
 }; 
