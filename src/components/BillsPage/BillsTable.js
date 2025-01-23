@@ -6,6 +6,7 @@ import { makeStyles } from '@mui/styles'
 import { asyncDeleteBill, asyncGetBills } from '../../action/billsAction'
 import { asyncGetCustomers } from '../../action/customerAction'
 import moment from 'moment'
+import { englishToBengali, formatLargeNumber } from '../../utils/bengaliNumerals'
 
 const useStyle = makeStyles({
     table: {
@@ -82,6 +83,11 @@ const BillsTable = (props) => {
         }
     }
 
+    const formatAmount = (amount) => {
+        if (!amount && amount !== 0) return '০';
+        return `৳${formatLargeNumber(amount)}`;
+    };
+
     // Add validation for bills data
     if (!Array.isArray(bills) || bills.length === 0) {
         return (
@@ -104,25 +110,23 @@ const BillsTable = (props) => {
             <Table stickyHeader>
                 <TableHead>
                     <TableRow>
-                        <TableCell className={classes.tableHeader}>Date</TableCell>
-                        <TableCell className={classes.tableHeader}>Order ID</TableCell>
-                        <TableCell className={classes.tableHeader}>Customer Name</TableCell>
-                        <TableCell className={classes.tableHeader}>Total Amount</TableCell>
-                        <TableCell className={classes.tableHeader}>Actions</TableCell>
+                        <TableCell className={classes.tableHeader}>তারিখ</TableCell>
+                        <TableCell className={classes.tableHeader}>অর্ডার আইডি</TableCell>
+                        <TableCell className={classes.tableHeader}>গ্রাহকের নাম</TableCell>
+                        <TableCell className={classes.tableHeader}>মোট টাকা</TableCell>
+                        <TableCell className={classes.tableHeader}>অ্যাকশন</TableCell>
                     </TableRow>
                 </TableHead>
                 <TableBody>
                     {reversedBills.map(bill => {
-                        // Add null check for bill
-                        if (!bill) return null
-
-                        const customerName = getCustomerName(bill.customer)
+                        if (!bill) return null;
+                        const customerName = getCustomerName(bill.customer);
                         return (
                             <TableRow key={bill._id || 'temp-key'}>
                                 <TableCell>{moment(bill.date).format('DD/MM/YYYY, hh:mm A')}</TableCell>
                                 <TableCell>{bill._id}</TableCell>
                                 <TableCell>{customerName}</TableCell>
-                                <TableCell>{bill.total || 0}</TableCell>
+                                <TableCell>{formatAmount(bill.total)}</TableCell>
                                 <TableCell className={classes.actionCell}>
                                     <Link to={`/bills/${bill._id}`} className={classes.viewLink}>
                                         <Button 
@@ -143,7 +147,7 @@ const BillsTable = (props) => {
                                     </Button>
                                 </TableCell>
                             </TableRow>
-                        )
+                        );
                     })}
                 </TableBody>
             </Table>

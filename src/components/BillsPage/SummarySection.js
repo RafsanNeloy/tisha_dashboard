@@ -4,6 +4,7 @@ import { Box, Typography, Paper, Divider, Fab, Tooltip } from '@mui/material'
 import { makeStyles } from '@mui/styles'
 import AddIcon from '@mui/icons-material/Add'
 import { useSelector } from 'react-redux'
+import { formatLargeNumber } from '../../utils/bengaliNumerals'
 
 const useStyle = makeStyles({
     summaryTitle:{
@@ -35,9 +36,9 @@ const SummarySection = (props) => {
     const bills = useSelector(state => state.bills)
 
     const calculateTotal = (data) => {
-        let total = 0
-        data.forEach(bill => total = total + bill.total)
-        return total
+        if (!Array.isArray(data)) return '০';
+        const total = data.reduce((sum, bill) => sum + (Number(bill.total) || 0), 0);
+        return `৳${formatLargeNumber(total)}`;
     }
 
     return (
@@ -49,11 +50,11 @@ const SummarySection = (props) => {
         >
             <Box>
                 <Paper className={classes.summaryContainer}>
-                    <Typography className={classes.summaryTitle} variant='h5'>Summary</Typography>
+                    <Typography className={classes.summaryTitle} variant='h5'>সারসংক্ষেপ</Typography>
                     <Divider variant='middle' />
                     <Box className={classes.summaryContent} display='block'>
-                        <Typography variant='h6'>Total orders: {bills.length}</Typography>
-                        <Typography variant='h6'>Total Amount: {calculateTotal(bills)}</Typography>
+                        <Typography variant='h6'>মোট অর্ডার: {formatLargeNumber(bills.length)}</Typography>
+                        <Typography variant='h6'>মোট টাকা: {calculateTotal(bills)}</Typography>
                     </Box>
                 </Paper>
             </Box>

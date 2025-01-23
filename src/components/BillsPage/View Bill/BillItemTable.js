@@ -1,6 +1,7 @@
 import React from 'react'
 import { TableContainer, Paper, Table, TableHead, TableRow, TableCell, TableBody, TableFooter } from '@mui/material'
 import { makeStyles } from '@mui/styles'
+import { englishToBengali } from '../../../utils/bengaliNumerals'
 
 const useStyle = makeStyles({
     tableHeaderFooter: {
@@ -29,11 +30,11 @@ const BillItemtable = (props) => {
                 <TableBody>
                     {items.map((item, index) => (
                         <TableRow key={index}>
-                            <TableCell>{index + 1}</TableCell>
+                            <TableCell>{englishToBengali(index + 1)}</TableCell>
                             <TableCell>{item.name}</TableCell>
-                            <TableCell>{item.price}</TableCell>
-                            <TableCell>{item.quantity}</TableCell>
-                            <TableCell>{item.subTotal}</TableCell>
+                            <TableCell>{englishToBengali(item.price)}</TableCell>
+                            <TableCell>{englishToBengali(item.quantity)}</TableCell>
+                            <TableCell>{englishToBengali(item.subTotal)}</TableCell>
                         </TableRow>
                     ))}
                 </TableBody>
@@ -42,8 +43,10 @@ const BillItemtable = (props) => {
                         <TableCell></TableCell>
                         <TableCell></TableCell>
                         <TableCell></TableCell>
-                        <TableCell className={classes.tableHeaderFooter}>Total Amount</TableCell>
-                        <TableCell className={classes.tableHeaderFooter}>{total}</TableCell>
+                        <TableCell className={classes.tableHeaderFooter}>মোট টাকা</TableCell>
+                        <TableCell className={classes.tableHeaderFooter}>
+                            {englishToBengali(total)}
+                        </TableCell>
                     </TableRow>   
                 </TableFooter>
             </Table>

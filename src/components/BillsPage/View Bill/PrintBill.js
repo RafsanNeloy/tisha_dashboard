@@ -4,6 +4,7 @@ import React, { useRef } from 'react'
 import html2pdf from 'html2pdf.js'
 import GetAppIcon from '@mui/icons-material/GetApp'
 import logo from '../../../images/tpp.jpg'
+import { englishToBengali } from '../../../utils/bengaliNumerals'
 
 const PrintBill = (props) => {
     const { customer, customerAddress, bill, id, items } = props
@@ -149,11 +150,19 @@ const PrintBill = (props) => {
                         <tbody>
                             {items.map((item, i) => (
                                 <tr key={i}>
-                                    <td style={{ padding: '8px', border: '1px solid #bdc3c7', textAlign: 'center' }}>{i + 1}</td>
+                                    <td style={{ padding: '8px', border: '1px solid #bdc3c7', textAlign: 'center' }}>
+                                        {englishToBengali(i + 1)}
+                                    </td>
                                     <td style={{ padding: '8px', border: '1px solid #bdc3c7' }}>{item.product.name}</td>
-                                    <td style={{ padding: '8px', border: '1px solid #bdc3c7', textAlign: 'right' }}>{item.price}</td>
-                                    <td style={{ padding: '8px', border: '1px solid #bdc3c7', textAlign: 'center' }}>{item.quantity}</td>
-                                    <td style={{ padding: '8px', border: '1px solid #bdc3c7', textAlign: 'right' }}>{item.subTotal}</td>
+                                    <td style={{ padding: '8px', border: '1px solid #bdc3c7', textAlign: 'right' }}>
+                                        ৳{englishToBengali(item.price)}
+                                    </td>
+                                    <td style={{ padding: '8px', border: '1px solid #bdc3c7', textAlign: 'center' }}>
+                                        {englishToBengali(item.quantity)}
+                                    </td>
+                                    <td style={{ padding: '8px', border: '1px solid #bdc3c7', textAlign: 'right' }}>
+                                        ৳{englishToBengali(item.subTotal)}
+                                    </td>
                                 </tr>
                             ))}
                         </tbody>
@@ -163,7 +172,7 @@ const PrintBill = (props) => {
                                     <strong>Total Amount:</strong>
                                 </td>
                                 <td style={{ padding: '8px', border: '1px solid #bdc3c7', textAlign: 'right' }}>
-                                    <strong>{bill.total}</strong>
+                                    <strong>৳{englishToBengali(bill.total)}</strong>
                                 </td>
                             </tr>
                         </tfoot>

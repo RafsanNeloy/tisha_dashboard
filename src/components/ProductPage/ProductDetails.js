@@ -5,6 +5,7 @@ import { useDispatch } from 'react-redux'
 import { asyncDeleteProducts } from '../../action/productAction'
 import moment from 'moment'
 import axios from 'axios'
+import { englishToBengali } from '../../utils/bengaliNumerals'
 
 const useStyle = makeStyles({
     container: {
@@ -120,8 +121,8 @@ const ProductDetails = (props) => {
             
             {/* Basic Info */}
             <Box className={classes.content}>
-                <Typography variant='h6'>Name: {productData?.product?.name}</Typography>
-                <Typography variant='h6'>Price: Rs.{productData?.product?.price}</Typography>
+                <Typography variant='h6'>নাম: {productData?.product?.name}</Typography>
+                <Typography variant='h6'>দাম: ৳{englishToBengali(productData?.product?.price)}</Typography>
                 <Typography variant='subtitle1'>
                     Added on: {productData?.product?.createdAt ? 
                         moment(productData.product.createdAt).format('DD/MM/YYYY, hh:mm A') : 
@@ -132,16 +133,22 @@ const ProductDetails = (props) => {
             {/* Stats */}
             <Box className={classes.statsContainer}>
                 <Paper className={classes.statsBox}>
-                    <Typography variant='h6' align='center'>Total Orders</Typography>
-                    <Typography variant='h4' align='center'>{productData?.stats?.totalOrders || 0}</Typography>
+                    <Typography variant='h6' align='center'>মোট অর্ডার</Typography>
+                    <Typography variant='h4' align='center'>
+                        {englishToBengali(productData?.stats?.totalOrders || 0)}
+                    </Typography>
                 </Paper>
                 <Paper className={classes.statsBox}>
-                    <Typography variant='h6' align='center'>Total Quantity Sold</Typography>
-                    <Typography variant='h4' align='center'>{productData?.stats?.totalQuantity || 0}</Typography>
+                    <Typography variant='h6' align='center'>মোট বিক্রয়</Typography>
+                    <Typography variant='h4' align='center'>
+                        {englishToBengali(productData?.stats?.totalQuantity || 0)}
+                    </Typography>
                 </Paper>
                 <Paper className={classes.statsBox}>
-                    <Typography variant='h6' align='center'>Total Revenue</Typography>
-                    <Typography variant='h4' align='center'>Rs.{productData?.stats?.totalAmount || 0}</Typography>
+                    <Typography variant='h6' align='center'>মোট আয়</Typography>
+                    <Typography variant='h4' align='center'>
+                        ৳{englishToBengali(productData?.stats?.totalAmount || 0)}
+                    </Typography>
                 </Paper>
             </Box>
 

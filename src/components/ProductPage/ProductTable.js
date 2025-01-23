@@ -1,6 +1,7 @@
 import React from 'react'
 import { Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material'
 import { makeStyles } from '@mui/styles'
+import { englishToBengali } from '../../utils/bengaliNumerals'
 
 const useStyle = makeStyles({
     table: {
@@ -32,9 +33,9 @@ const ProductTable = (props) => {
             <Table stickyHeader size='small'>
                 <TableHead>
                     <TableRow>
-                        <TableCell className={classes.tableHeader} align='center'>ID</TableCell>
-                        <TableCell className={`${classes.nameHeader} ${classes.tableHeader}`} align='center'>Product Name</TableCell>
-                        <TableCell className={classes.tableHeader} align='center'>Price</TableCell>
+                        <TableCell className={classes.tableHeader} align='center'>ক্রমিক</TableCell>
+                        <TableCell className={`${classes.nameHeader} ${classes.tableHeader}`} align='center'>নাম</TableCell>
+                        <TableCell className={classes.tableHeader} align='center'>দাম</TableCell>
                         <TableCell className={classes.tableHeader} align='center'>View</TableCell>
                         <TableCell className={classes.tableHeader} align='center'>Action</TableCell>
                     </TableRow>
@@ -44,9 +45,9 @@ const ProductTable = (props) => {
                         products.map((prod,index) => {
                             return (
                                 <TableRow hover key={prod._id}>
-                                    <TableCell> {index + 1} </TableCell>
+                                    <TableCell> {englishToBengali(index + 1)} </TableCell>
                                     <TableCell> {prod.name} </TableCell>
-                                    <TableCell> {prod.price} </TableCell>
+                                    <TableCell> ৳{englishToBengali(prod.price)} </TableCell>
                                     <TableCell align='center'> 
                                         <Button 
                                             variant='contained'

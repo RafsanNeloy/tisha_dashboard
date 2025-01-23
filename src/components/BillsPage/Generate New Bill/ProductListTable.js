@@ -1,9 +1,10 @@
 import React from 'react'
-import { Table, TableContainer, TableRow, TableHead, TableCell, TableBody, IconButton, Paper, Container, TableFooter, TextField } from '@mui/material'
+import { Table, TableContainer, TableRow, TableHead, TableCell, TableBody, IconButton, Paper, Container, TableFooter, TextField, Box } from '@mui/material'
 import { makeStyles } from '@mui/styles'
 import RemoveIcon from '@mui/icons-material/Remove'
 import AddIcon from '@mui/icons-material/Add'
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever'
+import { englishToBengali, bengaliToEnglish, formatLargeNumber } from '../../../utils/bengaliNumerals'
 
 const useStyle = makeStyles({
     tableHeaderFooter: {
@@ -28,107 +29,150 @@ const ProductListTable = (props) => {
     const { items, handleChangeQuantity, handleRemoveLineItem } = props
     const classes = useStyle()
 
-    const calculateTotal = (data) => {
-        let total = 0
-        data.forEach(ele => total = total + ele.subTotal)
-        return total
-    }
+    const calculateSubTotal = (quantity, price) => {
+        // Convert to numbers and handle large values
+        const qty = parseInt(quantity.toString().replace(/,/g, ''));
+        const prc = parseInt(price.toString().replace(/,/g, ''));
+        return qty * prc;
+    };
 
-    const handleQuantityChange = (product, event) => {
-        const newQuantity = parseInt(event.target.value) || 0
-        if (newQuantity >= 0) {
-            const updatedProduct = {
-                ...product,
-                quantity: newQuantity,
-                subTotal: newQuantity * product.price
-            }
-            handleChangeQuantity(updatedProduct, 'set')
+    const calculateTotal = (data) => {
+        let total = 0;
+        data.forEach(ele => {
+            // Handle large numbers by removing commas and converting to number
+            const subTotal = parseInt(ele.subTotal.toString().replace(/,/g, ''));
+            total += subTotal;
+        });
+        return formatLargeNumber(total);
+    };
+
+    const handleQuantityInputChange = (product, e) => {
+        const value = bengaliToEnglish(e.target.value);
+        
+        // Only allow numbers
+        if (!/^\d*$/.test(value)) {
+            return;
         }
-    }
+
+        const quantity = parseInt(value) || 0;
+        const price = parseInt(bengaliToEnglish(product.price));
+        const subTotal = calculateSubTotal(quantity, price);
+
+        const updatedProduct = {
+            ...product,
+            quantity: quantity,
+            subTotal: subTotal
+        };
+        handleChangeQuantity(updatedProduct, 'set');
+    };
+
+    const handleIncrement = (product) => {
+        const currentQty = parseInt(bengaliToEnglish(product.quantity));
+        const price = parseInt(bengaliToEnglish(product.price));
+        const quantity = currentQty + 1;
+        const subTotal = calculateSubTotal(quantity, price);
+
+        handleChangeQuantity({
+            ...product,
+            quantity: quantity,
+            subTotal: subTotal
+        }, 'set');
+    };
+
+    const handleDecrement = (product) => {
+        const currentQty = parseInt(bengaliToEnglish(product.quantity));
+        if (currentQty <= 1) return;
+
+        const price = parseInt(bengaliToEnglish(product.price));
+        const quantity = currentQty - 1;
+        const subTotal = calculateSubTotal(quantity, price);
+
+        handleChangeQuantity({
+            ...product,
+            quantity: quantity,
+            subTotal: subTotal
+        }, 'set');
+    };
 
     return (
         <Container disableGutters>
-            {
-                items.length>0 && (
-                    <TableContainer component={Paper}>
-                        <Table size='small'>
-                            <TableHead>
-                                <TableRow>
-                                    <TableCell className={classes.tableHeaderFooter}>S.No</TableCell>
-                                    <TableCell className={classes.tableHeaderFooter}>Product Name</TableCell>
-                                    <TableCell className={classes.tableHeaderFooter}>Price</TableCell>
-                                    <TableCell className={`${classes.tableHeaderFooter} ${classes.quantityCell}`}>Quantity</TableCell>
-                                    <TableCell className={classes.tableHeaderFooter}>Sub Total</TableCell>
-                                    <TableCell className={classes.tableHeaderFooter}>Remove</TableCell>
+            {items.length > 0 && (
+                <TableContainer component={Paper}>
+                    <Table size='small'>
+                        <TableHead>
+                            <TableRow>
+                                <TableCell className={classes.tableHeaderFooter}>ক্রমিক</TableCell>
+                                <TableCell className={classes.tableHeaderFooter}>মালের নাম</TableCell>
+                                <TableCell className={classes.tableHeaderFooter}>দাম</TableCell>
+                                <TableCell className={`${classes.tableHeaderFooter} ${classes.quantityCell}`}>পরিমান</TableCell>
+                                <TableCell className={classes.tableHeaderFooter}>মোট</TableCell>
+                                <TableCell className={classes.tableHeaderFooter}>বাতিল</TableCell>
+                            </TableRow>
+                        </TableHead>
+                        <TableBody>
+                            {items.map((product, index) => (
+                                <TableRow key={product._id}>
+                                    <TableCell>{englishToBengali(index + 1)}</TableCell>
+                                    <TableCell>{product.name}</TableCell>
+                                    <TableCell>৳{formatLargeNumber(product.price)}</TableCell>
+                                    <TableCell className={classes.quantityCell}>
+                                        <Box display='flex' alignItems='center'>
+                                            <IconButton 
+                                                size='small'
+                                                onClick={() => handleDecrement(product)}
+                                                disabled={parseInt(bengaliToEnglish(product.quantity)) <= 1}
+                                            >
+                                                <RemoveIcon />
+                                            </IconButton>
+                                            <TextField
+                                                className={classes.quantityInput}
+                                                size="small"
+                                                type="text"
+                                                value={formatLargeNumber(product.quantity)}
+                                                onChange={(e) => handleQuantityInputChange(product, e)}
+                                                inputProps={{ 
+                                                    min: "১",
+                                                    style: { 
+                                                        textAlign: 'center',
+                                                        width: '100%'
+                                                    }
+                                                }}
+                                            />
+                                            <IconButton 
+                                                size='small'
+                                                onClick={() => handleIncrement(product)}
+                                            >
+                                                <AddIcon />
+                                            </IconButton>
+                                        </Box>
+                                    </TableCell>
+                                    <TableCell>৳{formatLargeNumber(product.subTotal)}</TableCell>
+                                    <TableCell>
+                                        <IconButton
+                                            size='small'
+                                            onClick={() => handleRemoveLineItem(product)}
+                                        >
+                                            <DeleteForeverIcon />
+                                        </IconButton>
+                                    </TableCell>
                                 </TableRow>
-                            </TableHead>
-                            <TableBody>
-                                {
-                                    items.map((product, index) => {
-                                        return (
-                                            <TableRow key={product._id}>
-                                                <TableCell>{index + 1}</TableCell>
-                                                <TableCell>{product.name}</TableCell>
-                                                <TableCell>{product.price}</TableCell>
-                                                <TableCell className={classes.quantityCell}>
-                                                    <IconButton 
-                                                        size='small'
-                                                        onClick={() => handleChangeQuantity(product, 'minus')}
-                                                        disabled={product.quantity === 1}
-                                                    >
-                                                        <RemoveIcon />
-                                                    </IconButton>
-                                                    <TextField
-                                                        className={classes.quantityInput}
-                                                        size="small"
-                                                        type="number"
-                                                        value={product.quantity}
-                                                        onChange={(e) => handleQuantityChange(product, e)}
-                                                        inputProps={{ 
-                                                            min: "1",
-                                                            style: { 
-                                                                textAlign: 'center',
-                                                                width: '100%'
-                                                            }
-                                                        }}
-                                                    />
-                                                    <IconButton 
-                                                        size='small'
-                                                        onClick={() => handleChangeQuantity(product, 'add')}    
-                                                    >
-                                                        <AddIcon />
-                                                    </IconButton>
-                                                </TableCell>
-                                                <TableCell>{product.subTotal}</TableCell>
-                                                <TableCell>
-                                                    <IconButton
-                                                        size='small'
-                                                        onClick={() => handleRemoveLineItem(product)}
-                                                    >
-                                                        <DeleteForeverIcon />
-                                                    </IconButton>
-                                                </TableCell>
-                                            </TableRow>
-                                        )
-                                    })
-                                }
-                            </TableBody>
-                            <TableFooter>
-                                <TableRow>
-                                    <TableCell></TableCell>
-                                    <TableCell></TableCell>
-                                    <TableCell></TableCell>
-                                    <TableCell className={classes.tableHeaderFooter}>Total Amount</TableCell>
-                                    <TableCell className={classes.tableHeaderFooter}>{calculateTotal(items)}</TableCell>
-                                    <TableCell></TableCell>
-                                </TableRow>
-                            </TableFooter>
-                        </Table>
-                    </TableContainer>
-                )
-            }
+                            ))}
+                        </TableBody>
+                        <TableFooter>
+                            <TableRow>
+                                <TableCell></TableCell>
+                                <TableCell></TableCell>
+                                <TableCell></TableCell>
+                                <TableCell className={classes.tableHeaderFooter}>মোট টাকা</TableCell>
+                                <TableCell className={classes.tableHeaderFooter}>৳{calculateTotal(items)}</TableCell>
+                                <TableCell></TableCell>
+                            </TableRow>
+                        </TableFooter>
+                    </Table>
+                </TableContainer>
+            )}
         </Container>
-    )
-}
+    );
+};
 
-export default ProductListTable
+export default ProductListTable;

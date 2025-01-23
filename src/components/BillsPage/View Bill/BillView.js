@@ -3,7 +3,7 @@ import { useParams } from 'react-router-dom'
 import { Container, IconButton, Typography, Box, Tooltip, Link, CircularProgress } from '@mui/material'
 import { makeStyles } from '@mui/styles'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
-import { useDispatch, useSelector } from 'react-redux'
+import { useDispatch } from 'react-redux'
 import { asyncGetBillDetail } from '../../../action/billsAction'
 import { asyncGetCustomers } from '../../../action/customerAction'
 import { asyncGetProducts } from '../../../action/productAction'
@@ -27,54 +27,43 @@ const useStyle = makeStyles({
 const BillView = () => {
     const classes = useStyle()
     const { id } = useParams()
-    const customers = useSelector(state => state.customers)
-    const products = useSelector(state => state.products)
     const [billDetails, setBillDetails] = useState(null)
     const [isLoading, setIsLoading] = useState(true)
     const [error, setError] = useState(null)
-    const dispatch = useDispatch()
     const [customerAddress, setCustomerAddress] = useState('')
+    const dispatch = useDispatch()
 
-    // Load required data
+    const handleBillDetails = useCallback((data) => {
+        if (data) {
+            setBillDetails(data)
+            setCustomerAddress(data.customer?.address || '')
+        }
+        setIsLoading(false)
+    }, [])
+
     useEffect(() => {
-        const loadData = async () => {
+        const fetchBillDetails = async () => {
             setIsLoading(true)
             setError(null)
             try {
-                await Promise.all([
-                    dispatch(asyncGetProducts())
-                ])
+                await dispatch(asyncGetBillDetail(id, handleBillDetails))
             } catch (err) {
-                setError('Failed to load required data')
+                console.error('Error fetching bill:', err)
+                setError(err.message || 'Failed to load bill details')
                 setIsLoading(false)
             }
         }
-        loadData()
-    }, [dispatch])
 
-    const handleBillDetails = useCallback((data) => {
-        console.log('Bill Details received:', data)
-        setBillDetails(data)
-        setIsLoading(false)
-    }, [])
-    
-    useEffect(() => {
-        if (products.length > 0) {
-            console.log('Fetching bill details for ID:', id)
-            dispatch(asyncGetBillDetail(id, handleBillDetails))
-                .catch(err => {
-                    console.error('Error fetching bill:', err)
-                    setError(err.message || 'Failed to load bill details')
-                    setIsLoading(false)
-                })
+        if (id) {
+            fetchBillDetails()
         }
-    }, [dispatch, id, handleBillDetails, products.length])
+    }, [dispatch, id, handleBillDetails])
 
     const handleAddressChange = (address) => {
         setCustomerAddress(address)
     }
 
-    if (isLoading || !products.length) {
+    if (isLoading) {
         return (
             <Container className={classes.loadingContainer}>
                 <CircularProgress />
@@ -92,11 +81,11 @@ const BillView = () => {
         )
     }
 
-    if (!billDetails) {
+    if (!billDetails || !billDetails.items) {
         return (
             <Container className={classes.container}>
                 <Typography color="error" align="center">
-                    Bill not found
+                    Bill not found or has no items
                 </Typography>
             </Container>
         )
@@ -117,24 +106,26 @@ const BillView = () => {
                     bill={billDetails} 
                     customer={billDetails.customer}
                     customerAddress={customerAddress} 
-                    items={billDetails.items} 
+                    items={billDetails.items || []} 
                 />
             </Box>
-            <Typography variant='h5' align='center'><strong>Bill Invoice</strong></Typography>
+            <Typography variant='h5' align='center'><strong>বিল ইনভয়েস</strong></Typography>
             <BillDetail 
                 id={id} 
                 bill={billDetails} 
                 customer={billDetails.customer}
                 onAddressChange={handleAddressChange}
             />
-            <BillItemtable 
-                items={billDetails.items.map(item => ({
-                    ...item,
-                    product: item.product._id,
-                    name: item.product.name
-                }))} 
-                total={billDetails.total} 
-            />
+            {billDetails.items && billDetails.items.length > 0 && (
+                <BillItemtable 
+                    items={billDetails.items.map(item => ({
+                        ...item,
+                        product: item.product._id,
+                        name: item.product.name
+                    }))} 
+                    total={billDetails.total} 
+                />
+            )}
         </Container>
     )
 }
