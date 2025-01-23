@@ -47,14 +47,33 @@ const ProductListTable = (props) => {
     };
 
     const handleQuantityInputChange = (product, e) => {
-        const value = bengaliToEnglish(e.target.value);
+        const value = e.target.value;
         
-        // Only allow numbers
-        if (!/^\d*$/.test(value)) {
+        // Convert any English numbers to Bengali
+        const bengaliValue = value.split('').map(char => {
+            if (/[0-9]/.test(char)) {
+                return englishToBengali(char);
+            }
+            return char;
+        }).join('');
+
+        // Allow empty string for deletion
+        if (bengaliValue === '') {
+            const updatedProduct = {
+                ...product,
+                quantity: 1,  // Default to 1 if empty
+                subTotal: product.price
+            };
+            handleChangeQuantity(updatedProduct, 'set');
             return;
         }
 
-        const quantity = parseInt(value) || 0;
+        // Only allow Bengali numbers
+        if (!/^[০-৯]*$/.test(bengaliValue)) {
+            return;
+        }
+
+        const quantity = parseInt(bengaliToEnglish(bengaliValue)) || 1;
         const price = parseInt(bengaliToEnglish(product.price));
         const subTotal = calculateSubTotal(quantity, price);
 
@@ -128,10 +147,9 @@ const ProductListTable = (props) => {
                                                 className={classes.quantityInput}
                                                 size="small"
                                                 type="text"
-                                                value={formatLargeNumber(product.quantity)}
+                                                value={product.quantity ? englishToBengali(product.quantity) : ''}
                                                 onChange={(e) => handleQuantityInputChange(product, e)}
                                                 inputProps={{ 
-                                                    min: "১",
                                                     style: { 
                                                         textAlign: 'center',
                                                         width: '100%'

@@ -74,6 +74,14 @@ const ProductForm = (props) => {
     const resetForm = () => {
         setName('')
         setPrice('')
+        setFormErrors({})
+    }
+
+    const handleCancel = () => {
+        resetForm()
+        if (resetUpdateProd) {
+            resetUpdateProd()
+        }
     }
 
     return (
@@ -109,9 +117,10 @@ const ProductForm = (props) => {
                 </Button>
                 <Button
                     variant='contained'
-                    onClick={() => resetUpdateProd()}
+                    onClick={handleCancel}
+                    type='button'
                 >
-                    Cancel
+                    বাতিল
                 </Button>
             </Box>
         </Box>

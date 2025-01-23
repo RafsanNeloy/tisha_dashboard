@@ -77,9 +77,9 @@ const StatsContainer = (props) => {
             </Grid>
             <Typography variant='h6' className={classes.statsHeader}>Daily Stats</Typography>
             <Grid container spacing={6}>
-                <StatsItem statTitle={'আজকের অর্ডার'} statNumber={englishToBengali(todayBills.length)} />
-                <StatsItem statTitle={'আজকের আয়'} statNumber={calculateTotal(todayBills)} />
-                <StatsItem statTitle={'মোট আয়'} statNumber={calculateTotal(bills)} />
+                <StatsItem statTitle={'আজকের বিল সংখ্যা'} statNumber={englishToBengali(todayBills.length)} />
+                <StatsItem statTitle={'আজকের বিল'} statNumber={calculateTotal(todayBills)} />
+                <StatsItem statTitle={'মোট বিল'} statNumber={calculateTotal(bills)} />
             </Grid>
 
             {/* Daily Product Quantities */}
