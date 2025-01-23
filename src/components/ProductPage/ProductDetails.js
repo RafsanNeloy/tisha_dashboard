@@ -164,8 +164,8 @@ const ProductDetails = (props) => {
                                 <AccordionSummary>
                                     <Box width='100%' display='flex' flexDirection='row' justifyContent='space-between'>
                                         <Typography>{bill.customer.name || 'Unknown Customer'}</Typography>
-                                        <Typography>Qty: {bill.items[0].quantity || 0}</Typography>
-                                        <Typography>Rs.{bill.items[0].subTotal || 0}</Typography>
+                                        <Typography>Qty: {englishToBengali(bill.items[0].quantity || 0)}</Typography>
+                                        <Typography>৳{englishToBengali(bill.items[0].subTotal || 0)}</Typography>
                                     </Box>
                                 </AccordionSummary>
                                 <AccordionDetails>
@@ -182,7 +182,7 @@ const ProductDetails = (props) => {
                                             <strong>Customer Mobile:</strong> {bill.customer.mobile || 'N/A'}
                                         </Typography>
                                         <Typography>
-                                            <strong>Unit Price:</strong> Rs.{bill.items[0].price || 0}
+                                            <strong>Unit Price:</strong>  ৳{englishToBengali(bill.items[0].price || 0)}
                                         </Typography>
                                     </Box>
                                 </AccordionDetails>
