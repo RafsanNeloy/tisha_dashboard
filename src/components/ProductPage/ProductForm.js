@@ -3,7 +3,7 @@ import { TextField, Button, Box } from '@mui/material'
 import { useDispatch } from 'react-redux'
 import { asyncAddProducts, asyncUpdateProducts } from '../../action/productAction'
 import { makeStyles } from '@mui/styles'
-import { englishToBengali, bengaliToEnglish } from '../../utils/bengaliNumerals'
+import { englishToBengali, bengaliToEnglish, isValidMixedNumber, convertMixedInputToNumber } from '../../utils/bengaliNumerals'
 
 const useStyle = makeStyles({
     form: {
@@ -29,19 +29,19 @@ const ProductForm = (props) => {
             setName(e.target.value)
         } else if(e.target.name === 'price') {
             const value = e.target.value;
-            // Convert any English numbers to Bengali
-            const bengaliValue = value.split('').map(char => {
-                if (/[0-9]/.test(char)) {
-                    return englishToBengali(char);
-                }
-                return char;
-            }).join('');
             
-            // Only allow Bengali numbers
-            if (!/^[০-৯]*$/.test(bengaliValue)) {
+            // Allow empty input
+            if (value === '') {
+                setPrice('');
                 return;
             }
-            setPrice(bengaliValue);
+
+            // Validate mixed number input
+            if (!isValidMixedNumber(value)) {
+                return;
+            }
+
+            setPrice(value);
         }
     }
 
@@ -61,7 +61,7 @@ const ProductForm = (props) => {
         if(Object.keys(errors).length === 0) {
             const formData = {
                 name: name[0].toUpperCase() + name.slice(1),
-                price: parseInt(bengaliToEnglish(price))
+                price: convertMixedInputToNumber(price)
             }
             if(_id) {
                 dispatch(asyncUpdateProducts(_id, formData, resetUpdateProd))

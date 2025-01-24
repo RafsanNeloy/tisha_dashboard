@@ -4,7 +4,7 @@ import { makeStyles } from '@mui/styles'
 import RemoveIcon from '@mui/icons-material/Remove'
 import AddIcon from '@mui/icons-material/Add'
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever'
-import { englishToBengali, bengaliToEnglish, formatLargeNumber } from '../../../utils/bengaliNumerals'
+import { englishToBengali, bengaliToEnglish, formatLargeNumber, isValidMixedNumber, convertMixedInputToNumber, formatNumber } from '../../../utils/bengaliNumerals'
 
 const useStyle = makeStyles({
     tableHeaderFooter: {
@@ -30,52 +30,46 @@ const ProductListTable = (props) => {
     const classes = useStyle()
 
     const calculateSubTotal = (quantity, price) => {
-        // Convert to numbers and handle large values
-        const qty = parseInt(quantity.toString().replace(/,/g, ''));
-        const prc = parseInt(price.toString().replace(/,/g, ''));
+        // Convert to numbers and handle decimals properly
+        const qty = convertMixedInputToNumber(quantity);
+        const prc = convertMixedInputToNumber(price);
         return qty * prc;
     };
 
     const calculateTotal = (data) => {
         let total = 0;
         data.forEach(ele => {
-            // Handle large numbers by removing commas and converting to number
-            const subTotal = parseInt(ele.subTotal.toString().replace(/,/g, ''));
+            const subTotal = convertMixedInputToNumber(ele.subTotal);
             total += subTotal;
         });
-        return formatLargeNumber(total);
+        return formatNumber(total, 2); // Format with 2 decimal places
     };
 
     const handleQuantityInputChange = (product, e) => {
         const value = e.target.value;
         
-        // Convert any English numbers to Bengali
-        const bengaliValue = value.split('').map(char => {
-            if (/[0-9]/.test(char)) {
-                return englishToBengali(char);
-            }
-            return char;
-        }).join('');
-
-        // Allow empty string for deletion
-        if (bengaliValue === '') {
+        // Allow empty input for deletion
+        if (value === '') {
             const updatedProduct = {
                 ...product,
-                quantity: 1,  // Default to 1 if empty
+                quantity: 1,
                 subTotal: product.price
             };
             handleChangeQuantity(updatedProduct, 'set');
             return;
         }
 
-        // Only allow Bengali numbers
-        if (!/^[০-৯]*$/.test(bengaliValue)) {
+        // Validate mixed number input
+        if (!isValidMixedNumber(value)) {
             return;
         }
 
-        const quantity = parseInt(bengaliToEnglish(bengaliValue)) || 1;
-        const price = parseInt(bengaliToEnglish(product.price));
-        const subTotal = calculateSubTotal(quantity, price);
+        // Convert input to number
+        const quantity = convertMixedInputToNumber(value);
+        if (quantity <= 0) return;
+
+        const price = convertMixedInputToNumber(product.price);
+        const subTotal = quantity * price;
 
         const updatedProduct = {
             ...product,
@@ -86,8 +80,8 @@ const ProductListTable = (props) => {
     };
 
     const handleIncrement = (product) => {
-        const currentQty = parseInt(bengaliToEnglish(product.quantity));
-        const price = parseInt(bengaliToEnglish(product.price));
+        const currentQty = convertMixedInputToNumber(product.quantity);
+        const price = convertMixedInputToNumber(product.price);
         const quantity = currentQty + 1;
         const subTotal = calculateSubTotal(quantity, price);
 
@@ -99,10 +93,10 @@ const ProductListTable = (props) => {
     };
 
     const handleDecrement = (product) => {
-        const currentQty = parseInt(bengaliToEnglish(product.quantity));
+        const currentQty = convertMixedInputToNumber(product.quantity);
         if (currentQty <= 1) return;
 
-        const price = parseInt(bengaliToEnglish(product.price));
+        const price = convertMixedInputToNumber(product.price);
         const quantity = currentQty - 1;
         const subTotal = calculateSubTotal(quantity, price);
 
@@ -133,13 +127,13 @@ const ProductListTable = (props) => {
                                 <TableRow key={product._id}>
                                     <TableCell>{englishToBengali(index + 1)}</TableCell>
                                     <TableCell>{product.name}</TableCell>
-                                    <TableCell>৳{formatLargeNumber(product.price)}</TableCell>
+                                    <TableCell>৳{formatNumber(product.price, 2)}</TableCell>
                                     <TableCell className={classes.quantityCell}>
                                         <Box display='flex' alignItems='center'>
                                             <IconButton 
                                                 size='small'
                                                 onClick={() => handleDecrement(product)}
-                                                disabled={parseInt(bengaliToEnglish(product.quantity)) <= 1}
+                                                disabled={convertMixedInputToNumber(product.quantity) <= 1}
                                             >
                                                 <RemoveIcon />
                                             </IconButton>
@@ -147,7 +141,7 @@ const ProductListTable = (props) => {
                                                 className={classes.quantityInput}
                                                 size="small"
                                                 type="text"
-                                                value={product.quantity ? englishToBengali(product.quantity) : ''}
+                                                value={formatNumber(product.quantity, 3)}
                                                 onChange={(e) => handleQuantityInputChange(product, e)}
                                                 inputProps={{ 
                                                     style: { 
@@ -164,7 +158,7 @@ const ProductListTable = (props) => {
                                             </IconButton>
                                         </Box>
                                     </TableCell>
-                                    <TableCell>৳{formatLargeNumber(product.subTotal)}</TableCell>
+                                    <TableCell>৳{formatNumber(product.subTotal, 2)}</TableCell>
                                     <TableCell>
                                         <IconButton
                                             size='small'
