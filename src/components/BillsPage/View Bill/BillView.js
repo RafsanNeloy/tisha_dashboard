@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useCallback } from 'react'
-import { useParams } from 'react-router-dom'
-import { Container, IconButton, Typography, Box, Tooltip, Link, CircularProgress } from '@mui/material'
+import { useParams, useNavigate } from 'react-router-dom'
+import { Container, IconButton, Typography, Box, Tooltip, Link, CircularProgress, Button } from '@mui/material'
 import { makeStyles } from '@mui/styles'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
-import { useDispatch } from 'react-redux'
-import { asyncGetBillDetail } from '../../../action/billsAction'
+import { useDispatch, useSelector } from 'react-redux'
+import { asyncGetBillDetail, asyncDeleteBill } from '../../../action/billsAction'
 import { asyncGetCustomers } from '../../../action/customerAction'
 import { asyncGetProducts } from '../../../action/productAction'
 import BillDetail from './BillDetail'
@@ -32,6 +32,9 @@ const BillView = () => {
     const [error, setError] = useState(null)
     const [customerAddress, setCustomerAddress] = useState('')
     const dispatch = useDispatch()
+    const navigate = useNavigate()
+    const user = useSelector(state => state.user)
+    const isAdmin = user?.role === 'admin'
 
     const handleBillDetails = useCallback((data) => {
         if (data) {
@@ -61,6 +64,13 @@ const BillView = () => {
 
     const handleAddressChange = (address) => {
         setCustomerAddress(address)
+    }
+
+    const handleDelete = (id) => {
+        if (isAdmin) {
+            dispatch(asyncDeleteBill(id))
+            navigate('/bills')
+        }
     }
 
     if (isLoading) {
@@ -125,6 +135,15 @@ const BillView = () => {
                     }))} 
                     total={billDetails.total} 
                 />
+            )}
+            {isAdmin && (
+                <Button 
+                    variant="contained" 
+                    color="secondary"
+                    onClick={() => handleDelete(billDetails._id)}
+                >
+                    Delete Bill
+                </Button>
             )}
         </Container>
     )

@@ -39,8 +39,14 @@ const addBill = asyncHandler(async (req, res) => {
 
 // @desc    Delete bill
 // @route   DELETE /api/bills/:id
-// @access  Private
+// @access  Private/Admin only
 const deleteBill = asyncHandler(async (req, res) => {
+  // Check if user is admin (this check is in addition to the isAdmin middleware)
+  if (req.user.role !== 'admin') {
+    res.status(403);
+    throw new Error('Not authorized to delete bills');
+  }
+
   const bill = await Bill.findById(req.params.id);
 
   if (!bill) {
