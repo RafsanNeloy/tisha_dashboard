@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { Typography, Paper, Box, Button, Accordion, AccordionSummary, AccordionDetails, Container } from '@mui/material'
 import { makeStyles } from '@mui/styles'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { asyncDeleteProducts } from '../../action/productAction'
 import moment from 'moment'
 import axios from 'axios'
@@ -52,6 +52,8 @@ const ProductDetails = (props) => {
     const [isLoading, setIsLoading] = useState(false)
     const [error, setError] = useState(null)
     const dispatch = useDispatch()
+    const user = useSelector(state => state.user)
+    const isAdmin = user?.role === 'admin'
 
     useEffect(() => {
         const fetchProductData = async () => {
@@ -198,13 +200,15 @@ const ProductDetails = (props) => {
 
             {/* Actions */}
             <Box display='flex' justifyContent='space-around' mt={3}>
-                <Button
-                    variant='contained'
-                    color='secondary'
-                    onClick={() => handleRemove(productData?.product?._id)}
-                >
-                    Remove
-                </Button>
+                {isAdmin && (
+                    <Button
+                        variant='contained'
+                        color='secondary'
+                        onClick={() => handleRemove(productData?.product?._id)}
+                    >
+                        Remove
+                    </Button>
+                )}
                 <Button
                     variant='contained'
                     onClick={handleClose}

@@ -20,13 +20,14 @@ const registerUser = asyncHandler(async (req, res) => {
   const salt = await bcrypt.genSalt(10);
   const hashedPassword = await bcrypt.hash(password, salt);
 
-  // Create user
+  // Create user with default role
   const user = await User.create({
     username,
     email,
     password: hashedPassword,
     businessName,
-    address
+    address,
+    role: 'user' // Set default role
   });
 
   if (user) {
@@ -35,6 +36,7 @@ const registerUser = asyncHandler(async (req, res) => {
       username: user.username,
       email: user.email,
       businessName: user.businessName,
+      role: user.role,
       token: generateToken(user._id)
     });
   } else {
@@ -58,6 +60,7 @@ const loginUser = asyncHandler(async (req, res) => {
       username: user.username,
       email: user.email,
       businessName: user.businessName,
+      role: user.role,
       token: generateToken(user._id)
     });
   } else {

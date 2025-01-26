@@ -6,7 +6,8 @@ const Bill = require('../models/billModel');
 // @route   GET /api/customers
 // @access  Private
 const getCustomers = asyncHandler(async (req, res) => {
-  const customers = await Customer.find({ user: req.user.id });
+  // Remove user filter to get all customers
+  const customers = await Customer.find();
   res.status(200).json(customers);
 });
 
@@ -22,10 +23,10 @@ const addCustomer = asyncHandler(async (req, res) => {
   }
 
   const customer = await Customer.create({
+    user: req.user.id, // Keep track of who created it
     name,
     mobile,
-    email,
-    user: req.user.id
+    email
   });
 
   res.status(201).json(customer);
@@ -88,12 +89,6 @@ const getCustomer = asyncHandler(async (req, res) => {
     throw new Error('Customer not found');
   }
 
-  // Check for user
-  if (customer.user.toString() !== req.user.id) {
-    res.status(401);
-    throw new Error('User not authorized');
-  }
-
   res.status(200).json(customer);
 });
 
@@ -103,21 +98,17 @@ const getCustomer = asyncHandler(async (req, res) => {
 const getCustomerBills = asyncHandler(async (req, res) => {
   const customerId = req.params.id;
 
-  // First verify if customer exists and belongs to user
-  const customer = await Customer.findOne({
-    _id: customerId,
-    user: req.user.id
-  });
+  // First verify if customer exists
+  const customer = await Customer.findById(customerId);
 
   if (!customer) {
     res.status(404);
     throw new Error('Customer not found');
   }
 
-  // Get all bills for this customer
+  // Get all bills for this customer without user filter
   const bills = await Bill.find({
-    customer: customerId,
-    user: req.user.id
+    customer: customerId
   })
   .populate('items.product', 'name price')
   .sort({ createdAt: -1 });

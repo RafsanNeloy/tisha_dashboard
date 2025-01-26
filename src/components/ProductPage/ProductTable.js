@@ -2,6 +2,7 @@ import React from 'react'
 import { Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material'
 import { makeStyles } from '@mui/styles'
 import { englishToBengali } from '../../utils/bengaliNumerals'
+import { useSelector } from 'react-redux'
 
 const useStyle = makeStyles({
     table: {
@@ -27,6 +28,8 @@ const useStyle = makeStyles({
 const ProductTable = (props) => {
     const { handleDeleteProduct, handleViewProduct, handleUpdateProd, products, resetSearch } = props
     const classes = useStyle()
+    const user = useSelector(state => state.user)
+    const isAdmin = user?.role === 'admin'
 
     return (
         <TableContainer className={classes.table} component={Paper}>
@@ -41,48 +44,46 @@ const ProductTable = (props) => {
                     </TableRow>
                 </TableHead>
                 <TableBody>
-                    {
-                        products.map((prod,index) => {
-                            return (
-                                <TableRow hover key={prod._id}>
-                                    <TableCell> {englishToBengali(index + 1)} </TableCell>
-                                    <TableCell> {prod.name} </TableCell>
-                                    <TableCell> ৳{englishToBengali(prod.price)} </TableCell>
-                                    <TableCell align='center'> 
-                                        <Button 
-                                            variant='contained'
-                                            color='primary' 
-                                            onClick={() => handleViewProduct(prod._id)}   
-                                        >
-                                            View
-                                        </Button>
-                                    </TableCell>
-                                    <TableCell className={classes.tableBtns}> 
-                                        <Button 
-                                            variant='contained'
-                                            color='primary'
-                                            onClick={() => {
-                                                handleUpdateProd(prod)
-                                                resetSearch()
-                                            }}
-                                        >
-                                            Update
-                                        </Button>
-                                        <Button 
-                                            variant='contained'
-                                            color='secondary'   
-                                            onClick={() => {
-                                                handleDeleteProduct(prod._id)
-                                                resetSearch()
-                                            }}
-                                        >
-                                            remove
-                                        </Button>
-                                    </TableCell>
-                                </TableRow>
-                            )
-                        })
-                    }
+                    {products.map((prod,index) => (
+                        <TableRow hover key={prod._id}>
+                            <TableCell> {englishToBengali(index + 1)} </TableCell>
+                            <TableCell> {prod.name} </TableCell>
+                            <TableCell> ৳{englishToBengali(prod.price)} </TableCell>
+                            <TableCell align='center'> 
+                                <Button 
+                                    variant='contained'
+                                    color='primary' 
+                                    onClick={() => handleViewProduct(prod._id)}   
+                                >
+                                    View
+                                </Button>
+                            </TableCell>
+                            <TableCell className={classes.tableBtns}> 
+                                <Button 
+                                    variant='contained'
+                                    color='primary'
+                                    onClick={() => {
+                                        handleUpdateProd(prod)
+                                        resetSearch()
+                                    }}
+                                >
+                                    Update
+                                </Button>
+                                {isAdmin && (
+                                    <Button 
+                                        variant='contained'
+                                        color='secondary'   
+                                        onClick={() => {
+                                            handleDeleteProduct(prod._id)
+                                            resetSearch()
+                                        }}
+                                    >
+                                        remove
+                                    </Button>
+                                )}
+                            </TableCell>
+                        </TableRow>
+                    ))}
                 </TableBody>
             </Table>
         </TableContainer>

@@ -28,13 +28,14 @@ const useStyle = makeStyles({
 
 const ProductPage = (props) => {
     const products = useSelector(state => state.products)
+    const user = useSelector(state => state.user)
+    const isAdmin = user?.role === 'admin'
     const classes = useStyle()
     const dispatch = useDispatch()
     const [ updateProd, setUpdateProd ] = useState({})
     const [ viewProduct, setViewProduct ] = useState('')
     const [ search, setSearch ] = useState('')
     const [ productList, setProductList ] = useState(products)
-
 
     useEffect(() => {
         setProductList(products)
@@ -58,9 +59,11 @@ const ProductPage = (props) => {
         setViewProduct('')
     }
 
-    //deleting product functions
+    //deleting product functions - only for admin
     const handleDeleteProduct = (id) => {
-        dispatch(asyncDeleteProducts(id))
+        if (isAdmin) {
+            dispatch(asyncDeleteProducts(id))
+        }
     }
 
     //search related functions
@@ -87,50 +90,48 @@ const ProductPage = (props) => {
         <Container className={classes.container}>
             <Container disableGutters>
                 <Typography className={classes.title} variant='h3'>Products</Typography>
-                {
-                    Object.keys(updateProd).length > 0 ? (
-                        <EditProduct updateProd={updateProd} resetUpdateProd={resetUpdateProd} />
-                    ) : (
-                        <AddProduct />
-                    )
-                }
+                {Object.keys(updateProd).length > 0 ? (
+                    <EditProduct updateProd={updateProd} resetUpdateProd={resetUpdateProd} />
+                ) : (
+                    <AddProduct />
+                )}
                 <Divider className={classes.divider} />
             </Container>
-                <Grid className={classes.pageContent} spacing={2} container disableGutters>
-                    <Grid item lg={8}>
-                        <Box 
-                            disableGutters 
-                            display='flex' 
-                            flexDirection='row' 
-                            alignItems='baseline' 
-                            justifyContent='space-between'
-                        >
-                            <Typography variant='h5'>List of Products - {products.length} </Typography>
-                            <TextField 
-                                variant='outlined' 
-                                margin='dense' 
-                                label='search product'
-                                value={search}
-                                onChange={handleSearchChange}
-                            />
-                        </Box>
-                        <ProductTable 
-                            products={productList}
-                            resetSearch={resetSearch}
-                            handleDeleteProduct={handleDeleteProduct} 
-                            handleViewProduct={handleViewProduct}
-                            handleUpdateProd={handleUpdateProd}
+            <Grid className={classes.pageContent} spacing={2} container disableGutters>
+                <Grid item lg={8}>
+                    <Box 
+                        disableGutters 
+                        display='flex' 
+                        flexDirection='row' 
+                        alignItems='baseline' 
+                        justifyContent='space-between'
+                    >
+                        <Typography variant='h5'>List of Products - {products.length} </Typography>
+                        <TextField 
+                            variant='outlined' 
+                            margin='dense' 
+                            label='search product'
+                            value={search}
+                            onChange={handleSearchChange}
                         />
-                    </Grid>
-                    <Grid item lg={4} >
-                        <ProductDetails 
-                            productId={viewProduct} 
-                            resetViewProduct={resetViewProduct} 
-                            handleUpdateProd={handleUpdateProd} 
-                        />
-                    </Grid>
+                    </Box>
+                    <ProductTable 
+                        products={productList}
+                        resetSearch={resetSearch}
+                        handleDeleteProduct={handleDeleteProduct} 
+                        handleViewProduct={handleViewProduct}
+                        handleUpdateProd={handleUpdateProd}
+                    />
                 </Grid>
-            </Container>
+                <Grid item lg={4} >
+                    <ProductDetails 
+                        productId={viewProduct} 
+                        resetViewProduct={resetViewProduct} 
+                        handleUpdateProd={handleUpdateProd} 
+                    />
+                </Grid>
+            </Grid>
+        </Container>
     )
 }
 
