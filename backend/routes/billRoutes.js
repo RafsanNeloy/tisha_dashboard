@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { protect, isAdmin } = require('../middleware/authMiddleware');
+const { protect } = require('../middleware/authMiddleware');
 const {
   getBills,
   addBill,
@@ -14,6 +14,6 @@ router.route('/')
 
 router.route('/:id')
   .get(protect, getBill)
-  .delete(protect, isAdmin, deleteBill);
+  .delete(protect, deleteBill);
 
 module.exports = router; 

@@ -22,11 +22,6 @@ const userSchema = new mongoose.Schema({
   address: {
     type: String,
     required: [true, 'Please add an address']
-  },
-  role: {
-    type: String,
-    enum: ['user', 'admin'],
-    default: 'user'
   }
 }, {
   timestamps: true

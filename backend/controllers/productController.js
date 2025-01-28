@@ -6,8 +6,7 @@ const Bill = require('../models/billModel');
 // @route   GET /api/products
 // @access  Private
 const getProducts = asyncHandler(async (req, res) => {
-  // Remove user filter to get all products
-  const products = await Product.find();
+  const products = await Product.find({ user: req.user.id });
   res.status(200).json(products);
 });
 
@@ -23,9 +22,9 @@ const addProduct = asyncHandler(async (req, res) => {
   }
 
   const product = await Product.create({
-    user: req.user.id, // Keep track of who created it
     name,
-    price
+    price,
+    user: req.user.id
   });
 
   res.status(201).json(product);
@@ -88,6 +87,12 @@ const getProduct = asyncHandler(async (req, res) => {
     throw new Error('Product not found');
   }
 
+  // Check for user
+  if (product.user.toString() !== req.user.id) {
+    res.status(401);
+    throw new Error('User not authorized');
+  }
+
   res.status(200).json(product);
 });
 
@@ -97,16 +102,20 @@ const getProduct = asyncHandler(async (req, res) => {
 const getProductBills = asyncHandler(async (req, res) => {
   const productId = req.params.id;
 
-  // First verify if product exists
-  const product = await Product.findById(productId);
+  // First verify if product exists and belongs to user
+  const product = await Product.findOne({
+    _id: productId,
+    user: req.user.id
+  });
 
   if (!product) {
     res.status(404);
     throw new Error('Product not found');
   }
 
-  // Get all bills containing this product without user filter
+  // Get all bills containing this product
   const bills = await Bill.find({
+    user: req.user.id,
     'items.product': productId
   })
   .populate('customer', 'name email mobile')

@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { protect, isAdmin } = require('../middleware/authMiddleware');
+const { protect } = require('../middleware/authMiddleware');
 const {
   getCustomers,
   addCustomer,
@@ -17,7 +17,7 @@ router.route('/')
 router.route('/:id')
   .get(protect, getCustomer)
   .put(protect, updateCustomer)
-  .delete(protect, isAdmin, deleteCustomer);
+  .delete(protect, deleteCustomer);
 
 router.get('/:id/bills', protect, getCustomerBills);
 

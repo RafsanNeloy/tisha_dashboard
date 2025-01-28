@@ -33,12 +33,10 @@ const useStyle = makeStyles({
 })
 
 const BillsTable = (props) => {
-    const { bills, resetSearch } = props
-    const classes = useStyle()
     const dispatch = useDispatch()
-    const user = useSelector(state => state.user)
-    const isAdmin = user?.role === 'admin'
+    const { bills, resetSearch } = props
     const customers = useSelector(state => state.customers)
+    const classes = useStyle()
 
     // Load customers when component mounts
     useEffect(() => {
@@ -71,9 +69,17 @@ const BillsTable = (props) => {
     }
 
     const handleDelete = (id) => {
-        if (isAdmin) {
+        const confirmDelete = window.confirm('Are you sure?')
+        if(confirmDelete){
             dispatch(asyncDeleteBill(id))
-            resetSearch()
+                .then(() => {
+                    dispatch(asyncGetBills())
+                    resetSearch()
+                })
+                .catch(error => {
+                    console.error('Delete failed:', error)
+                    alert('Failed to delete bill. Please try again.')
+                })
         }
     }
 
@@ -131,16 +137,14 @@ const BillsTable = (props) => {
                                             View
                                         </Button>
                                     </Link>
-                                    {isAdmin && (
-                                        <Button 
-                                            size='small' 
-                                            variant='contained' 
-                                            color='secondary'
-                                            onClick={() => handleDelete(bill._id)}
-                                        >
-                                            Delete
-                                        </Button>
-                                    )}
+                                    <Button 
+                                        size='small' 
+                                        variant='contained' 
+                                        color='secondary'
+                                        onClick={() => handleDelete(bill._id)}
+                                    >
+                                        Delete
+                                    </Button>
                                 </TableCell>
                             </TableRow>
                         );
