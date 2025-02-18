@@ -1,37 +1,79 @@
-import React, { useState, useEffect, useCallback } from 'react'
-import { Container, IconButton } from '@mui/material'
+import React, { useState, useEffect } from 'react'
+import { Container, IconButton, CircularProgress, Box, Typography } from '@mui/material'
 import { makeStyles } from '@mui/styles'
-import { useSelector } from 'react-redux'
+import { useDispatch } from 'react-redux'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
-import { Link } from 'react-router-dom'
+import { Link, useParams } from 'react-router-dom'
 import CustomerStats from './CustomerStats'
 import CustomerOrders from './CustomerOrders'
+import axios from 'axios'
 
 const useStyle = makeStyles({
     container: {
         width: '90vw',
         padding: '2vh 1vw'
+    },
+    loading: {
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        minHeight: '200px'
     }
 })
 
-const ViewCustomer = (props) => {
+const ViewCustomer = () => {
     const classes = useStyle()
-    const bills = useSelector(state => state.bills) || []
-    const [ customerBills, setCustomerBills ] = useState([])
-    const id = props.match.params.id
-
-    const getBills = useCallback((id) => {
-        if (!Array.isArray(bills)) return
-        const custBills = bills.filter(bill => bill.customer === id)
-        handleCustomerBills(custBills)
-    }, [bills])
+    const [customerData, setCustomerData] = useState(null)
+    const [isLoading, setIsLoading] = useState(true)
+    const [error, setError] = useState(null)
+    const { id } = useParams()
 
     useEffect(() => {
-        getBills(id)
-    }, [getBills, id])
+        const fetchCustomerData = async () => {
+            setIsLoading(true)
+            try {
+                const token = localStorage.getItem('token')
+                if (!token) {
+                    throw new Error('No authentication token found')
+                }
 
-    const handleCustomerBills = (data) => {
-        setCustomerBills(data)
+                const response = await axios.get(`https://tisha-dashboard-api.onrender.com//api/customers/${id}/bills`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                })
+
+                setCustomerData(response.data)
+            } catch (err) {
+                console.error('Error details:', err.response || err)
+                setError(err.response?.data?.message || 'Could not fetch customer data')
+            } finally {
+                setIsLoading(false)
+            }
+        }
+
+        fetchCustomerData()
+    }, [id])
+
+    if (isLoading) {
+        return (
+            <Container className={classes.container}>
+                <Box className={classes.loading}>
+                    <CircularProgress />
+                </Box>
+            </Container>
+        )
+    }
+
+    if (error) {
+        return (
+            <Container className={classes.container}>
+                <Typography color="error" variant="h6" align="center">
+                    {error}
+                </Typography>
+            </Container>
+        )
     }
 
     return (
@@ -41,8 +83,11 @@ const ViewCustomer = (props) => {
                     <ArrowBackIcon />
                 </IconButton>
             </Link>
-            <CustomerStats id={props.match.params.id} customerBills={customerBills} />
-            <CustomerOrders customerBills={customerBills} />
+            <CustomerStats 
+                customer={customerData?.customer}
+                stats={customerData?.stats}
+            />
+            <CustomerOrders bills={customerData?.bills || []} />
         </Container>
     )
 }

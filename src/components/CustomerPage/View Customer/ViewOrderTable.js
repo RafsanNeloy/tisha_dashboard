@@ -2,6 +2,7 @@ import React from 'react'
 import { Table, TableBody, TableCell, TableContainer, TableFooter, TableHead, TableRow } from '@mui/material'
 import { makeStyles } from '@mui/styles'
 import { useSelector } from 'react-redux'
+import { englishToBengali } from '../../../utils/bengaliNumerals'
 
 const useStyle = makeStyles({
     tableHeaderFooter: {
@@ -15,45 +16,37 @@ const ViewOrderTable = (props) => {
     const products = useSelector(state => state.products)
     const classes = useStyle()
 
-    const getProductName = (id) => {
-        const product = products.find(ele => ele._id === id)
-        return product.name
-    }
-
     return (
         <TableContainer>
             <Table>
                 <TableHead>
                     <TableRow>
-                        <TableCell className={classes.tableHeaderFooter}>S.No</TableCell>
-                        <TableCell className={classes.tableHeaderFooter}>Product Name</TableCell>
-                        <TableCell className={classes.tableHeaderFooter}>Price</TableCell>
-                        <TableCell className={classes.tableHeaderFooter}>Quantity</TableCell>
-                        <TableCell className={classes.tableHeaderFooter}>Sub Total</TableCell>
+                        <TableCell>ক্রমিক</TableCell>
+                        <TableCell>পণ্যের নাম</TableCell>
+                        <TableCell>দাম</TableCell>
+                        <TableCell>পরিমাণ</TableCell>
+                        <TableCell>মোট</TableCell>
                     </TableRow>
                 </TableHead>
                 <TableBody>
-                    {
-                        lineItems.map((list, index) => {
-                            return (
-                                <TableRow key={list._id}>
-                                    <TableCell>{index + 1}</TableCell>
-                                    <TableCell>{getProductName(list.product)}</TableCell>
-                                    <TableCell>{list.price}</TableCell>
-                                    <TableCell>{list.quantity}</TableCell>
-                                    <TableCell>{list.subTotal}</TableCell>
-                                </TableRow>
-                            )
-                        })
-                    }
+                    {lineItems.map((item, index) => {
+                        if (!item || !item.product) return null;
+
+                        return (
+                            <TableRow key={item._id || index}>
+                                <TableCell>{englishToBengali(index + 1)}</TableCell>
+                                <TableCell>{item.product.name}</TableCell>
+                                <TableCell>৳{englishToBengali(item.price)}</TableCell>
+                                <TableCell>{englishToBengali(item.quantity)}</TableCell>
+                                <TableCell>৳{englishToBengali(item.subTotal)}</TableCell>
+                            </TableRow>
+                        )
+                    })}
                 </TableBody>
                 <TableFooter>
                     <TableRow>
-                        <TableCell></TableCell>
-                        <TableCell></TableCell>
-                        <TableCell></TableCell>
-                        <TableCell className={classes.tableHeaderFooter}>Total Amount</TableCell>
-                        <TableCell className={classes.tableHeaderFooter}>{total}</TableCell>
+                        <TableCell colSpan={4} className={classes.tableHeaderFooter}>মোট টাকা</TableCell>
+                        <TableCell className={classes.tableHeaderFooter}>৳{englishToBengali(total)}</TableCell>
                     </TableRow>
                 </TableFooter>
             </Table>

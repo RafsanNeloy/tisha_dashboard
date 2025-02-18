@@ -1,4 +1,6 @@
-import axiosInstance from '../config/axios'
+import axios from 'axios'
+
+const url = 'https://tisha-dashboard-api.onrender.com/api/products'
 
 export const setProducts = (data) => {
     return {
@@ -28,23 +30,35 @@ export const deleteProduct = (data) => {
     }
 }
 
-export const startGetProducts = () => {
+export const asyncGetProducts = () => {
     return (dispatch) => {
-        axiosInstance.get(`/products`)
-            .then((response) => {
-                dispatch(setProducts(response.data))
+        const token = localStorage.getItem('token')
+        const config = {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        }
+        axios.get(url, config)
+            .then(response => {
+                const data = response.data
+                dispatch(setProducts(data))
             })
-            .catch((err) => {
-                console.log(err.message)
-            })
+            .catch(err => alert(err.message))
     }
 }
 
 export const asyncAddProducts = (data, reset) => {
     return (dispatch) => {
-        axiosInstance.post('/products', data)
+        const token = localStorage.getItem('token')
+        const config = {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        }
+        axios.post(url, data, config)
             .then(response => {
-                dispatch(addProduct(response.data))
+                const data = response.data
+                dispatch(addProduct(data))
                 reset()
             })
             .catch(err => alert(err.message))
@@ -53,9 +67,16 @@ export const asyncAddProducts = (data, reset) => {
 
 export const asyncUpdateProducts = (id, data, reset) => {
     return (dispatch) => {
-        axiosInstance.put(`/products/${id}`, data)
+        const token = localStorage.getItem('token')
+        const config = {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        }
+        axios.put(`${url}/${id}`, data, config)
             .then(response => {
-                dispatch(updateProduct(response.data))
+                const data = response.data
+                dispatch(updateProduct(data))
                 reset()
             })
             .catch(err => alert(err.message))
@@ -64,9 +85,16 @@ export const asyncUpdateProducts = (id, data, reset) => {
 
 export const asyncDeleteProducts = (id) => {
     return (dispatch) => {
-        axiosInstance.delete(`/products/${id}`)
+        const token = localStorage.getItem('token')
+        const config = {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        }
+        axios.delete(`${url}/${id}`, config)
             .then(response => {
-                dispatch(deleteProduct(response.data))
+                const data = response.data
+                dispatch(deleteProduct(data))
             })
             .catch(err => alert(err.message))
     }
@@ -74,9 +102,16 @@ export const asyncDeleteProducts = (id) => {
 
 export const asyncProductDetail = (id, stateChange) => {
     return (dispatch) => {
-        axiosInstance.get(`/products/${id}`)
+        const token = localStorage.getItem('token')
+        const config = {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        }
+        axios.get(`${url}/${id}`, config)
             .then(response => {
-                stateChange(response.data)
+                const data = response.data
+                stateChange(data)
             })
             .catch(err => alert(err.message))
     }

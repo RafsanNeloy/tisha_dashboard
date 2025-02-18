@@ -13,7 +13,7 @@ import { useDispatch } from 'react-redux'
 import { setLogout } from '../../action/loginAction'
 import { asyncGetBills } from '../../action/billsAction'
 import { asyncGetCustomers } from '../../action/customerAction'
-import { startGetProducts } from '../../action/productAction'
+import { asyncGetProducts } from '../../action/productAction'
 import { asyncGetUser } from '../../action/userAction'
 
 const useStyle = makeStyles({
@@ -47,7 +47,7 @@ const Drawer = (props) => {
     useEffect(() => {
         dispatch(asyncGetBills())
         dispatch(asyncGetCustomers())
-        dispatch(startGetProducts())
+        dispatch(asyncGetProducts())
         dispatch(asyncGetUser())
     }, [dispatch])
 

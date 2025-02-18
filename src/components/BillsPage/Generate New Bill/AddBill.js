@@ -43,7 +43,6 @@ const AddBill = (props) => {
         if(type === 'add') {
             const newQuantityPlus = {...data, quantity: data.quantity + 1}
             newQuantityPlus.subTotal = newQuantityPlus.price * newQuantityPlus.quantity
-            console.log(newQuantityPlus)
             const newList = lineItems.map(product => {
                 if(product._id === newQuantityPlus._id) {
                     return newQuantityPlus
@@ -55,7 +54,6 @@ const AddBill = (props) => {
         } else if(type === 'minus') {
             const newQuantityMinus = {...data, quantity: data.quantity - 1}
             newQuantityMinus.subTotal = newQuantityMinus.price * newQuantityMinus.quantity
-            console.log(newQuantityMinus)
             const newList = lineItems.map(product => {
                 if(product._id === newQuantityMinus._id) {
                     return newQuantityMinus
@@ -64,7 +62,17 @@ const AddBill = (props) => {
                 }
             })
             setLineItems(newList)
-        } 
+        } else if(type === 'set') {
+            // Handle direct quantity input
+            const newList = lineItems.map(product => {
+                if(product._id === data._id) {
+                    return data
+                } else {
+                    return product
+                }
+            })
+            setLineItems(newList)
+        }
     }
 
     // function related to customerInfo
@@ -76,7 +84,7 @@ const AddBill = (props) => {
         Swal.fire({
             icon: 'error',
             title: 'Bill Generation Failed',
-            text: error.response?.data?.message || 'Network error. Please check your connection and try again.',
+            text: error.response?.data?.message || 'Please check all required fields and try again',
         })
     }
 

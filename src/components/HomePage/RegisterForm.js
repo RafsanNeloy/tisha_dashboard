@@ -3,7 +3,7 @@ import { Box, Grid, TextField, Typography, Button } from '@mui/material'
 import { makeStyles } from '@mui/styles'
 import validator from 'validator'
 import axiosInstance from '../../config/axios'
-import { API_URL } from '../../config/api'
+import { API_BASE_URL } from '../../config/api'
 
 const useStyle = makeStyles({
     formElements: {
@@ -76,7 +76,7 @@ const RegisterForm = (props) => {
                 address: address
             }
             
-            axiosInstance.post(`${API_URL}/users/register`, formData)
+            axiosInstance.post(`${API_BASE_URL}/users/register`, formData)
                 .then((response) => {
                     console.log('Registration successful:', response.data)
                     resetForm()

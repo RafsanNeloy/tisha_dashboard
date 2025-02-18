@@ -6,20 +6,29 @@ import { makeStyles } from '@mui/styles'
 import { asyncDeleteBill, asyncGetBills } from '../../action/billsAction'
 import { asyncGetCustomers } from '../../action/customerAction'
 import moment from 'moment'
+import { englishToBengali, formatLargeNumber } from '../../utils/bengaliNumerals'
 
 const useStyle = makeStyles({
     table: {
-        position: 'fixed',
-        width: '90vw',
+        position: 'relative',
+        width: '100%',
         marginTop: '5px',
-        maxHeight: '380px'
+        maxHeight: '70vh',
+        overflow: 'auto'
     },
     tableHeader: {
         backgroundColor: 'black',
-        color: 'white'
+        color: 'white',
+        position: 'sticky',
+        top: 0,
+        zIndex: 1
     },
     viewLink: {
         textDecoration: 'none'
+    },
+    actionCell: {
+        display: 'flex',
+        gap: '8px'
     }
 })
 
@@ -38,24 +47,25 @@ const BillsTable = (props) => {
     const reversedBills = Array.isArray(bills) ? [...bills].reverse() : []
 
     const getCustomerName = (customer) => {
-        if (!customers || customers.length === 0) return 'Loading...'
+        // Early return if customer is null/undefined
+        if (!customer) return 'Unknown Customer'
         
         // If customer is already an object with name, use that
-        if (typeof customer === 'object' && customer !== null && customer.name) {
+        if (typeof customer === 'object' && customer.name) {
             return customer.name
+        }
+
+        // If customers array is not ready yet
+        if (!customers || !Array.isArray(customers)) {
+            return 'Loading...'
         }
 
         // If customer is an ID, find the customer
         const customerId = typeof customer === 'object' ? customer._id : customer
+        if (!customerId) return 'Unknown Customer'
+
         const customerData = customers.find(cust => cust._id === customerId)
-        
-        if (!customerData) {
-            console.log('Customer not found for ID:', customer)
-            console.log('Available customers:', customers)
-            return 'Loading...'
-        }
-        
-        return customerData.name
+        return customerData?.name || 'Customer Not Found'
     }
 
     const handleDelete = (id) => {
@@ -73,14 +83,20 @@ const BillsTable = (props) => {
         }
     }
 
-    if (!customers || customers.length === 0) {
+    const formatAmount = (amount) => {
+        if (!amount && amount !== 0) return '০';
+        return `৳${formatLargeNumber(amount)}`;
+    };
+
+    // Add validation for bills data
+    if (!Array.isArray(bills) || bills.length === 0) {
         return (
             <TableContainer component={Paper} className={classes.table}>
                 <Table stickyHeader>
                     <TableHead>
                         <TableRow>
                             <TableCell className={classes.tableHeader} colSpan={5} align="center">
-                                <CircularProgress color="secondary" /> Loading Customers...
+                                No bills found
                             </TableCell>
                         </TableRow>
                     </TableHead>
@@ -94,29 +110,29 @@ const BillsTable = (props) => {
             <Table stickyHeader>
                 <TableHead>
                     <TableRow>
-                        <TableCell className={classes.tableHeader}>Date</TableCell>
-                        <TableCell className={classes.tableHeader}>Order ID</TableCell>
-                        <TableCell className={classes.tableHeader}>Customer Name</TableCell>
-                        <TableCell className={classes.tableHeader}>Total Amount</TableCell>
-                        <TableCell className={classes.tableHeader}>Actions</TableCell>
+                        <TableCell className={classes.tableHeader}>তারিখ</TableCell>
+                        <TableCell className={classes.tableHeader}>অর্ডার আইডি</TableCell>
+                        <TableCell className={classes.tableHeader}>গ্রাহকের নাম</TableCell>
+                        <TableCell className={classes.tableHeader}>মোট টাকা</TableCell>
+                        <TableCell className={classes.tableHeader}>অ্যাকশন</TableCell>
                     </TableRow>
                 </TableHead>
                 <TableBody>
                     {reversedBills.map(bill => {
-                        const customerName = getCustomerName(bill.customer)
+                        if (!bill) return null;
+                        const customerName = getCustomerName(bill.customer);
                         return (
-                            <TableRow key={bill._id}>
+                            <TableRow key={bill._id || 'temp-key'}>
                                 <TableCell>{moment(bill.date).format('DD/MM/YYYY, hh:mm A')}</TableCell>
                                 <TableCell>{bill._id}</TableCell>
                                 <TableCell>{customerName}</TableCell>
-                                <TableCell>{bill.total}</TableCell>
-                                <TableCell>
+                                <TableCell>{formatAmount(bill.total)}</TableCell>
+                                <TableCell className={classes.actionCell}>
                                     <Link to={`/bills/${bill._id}`} className={classes.viewLink}>
                                         <Button 
                                             size='small' 
                                             variant='contained' 
                                             color='primary'
-                                            style={{marginRight: '10px'}}
                                         >
                                             View
                                         </Button>
@@ -131,7 +147,7 @@ const BillsTable = (props) => {
                                     </Button>
                                 </TableCell>
                             </TableRow>
-                        )
+                        );
                     })}
                 </TableBody>
             </Table>

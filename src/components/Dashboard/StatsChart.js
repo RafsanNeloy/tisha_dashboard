@@ -11,9 +11,9 @@ const StatsChart = (props) => {
                 <Grid item lg={6}>
                     <LineChart />
                 </Grid>
-                <Grid item lg={6}>
+                {/* <Grid item lg={6}>
                     <BarChart />
-                </Grid>
+                </Grid> */}
             </Grid>
         </>
     )

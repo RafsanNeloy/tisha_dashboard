@@ -25,9 +25,9 @@ const Dashboard = (props) => {
                 <Grid item lg={12}>
                     <StatsContainer />
                 </Grid>
-                <Grid item lg={12}>
+                {/* <Grid item lg={12}>
                     <StatsChart />
-                </Grid>
+                </Grid> */}
             </Grid>
         </Container>
     )

@@ -1,6 +1,7 @@
 import React from 'react'
 import { TableContainer, Paper, Table, TableHead, TableRow, TableCell, TableBody, TableFooter } from '@mui/material'
 import { makeStyles } from '@mui/styles'
+import { englishToBengali } from '../../../utils/bengaliNumerals'
 
 const useStyle = makeStyles({
     tableHeaderFooter: {
@@ -20,20 +21,20 @@ const BillItemtable = (props) => {
                 <TableHead>
                     <TableRow>
                         <TableCell className={classes.tableHeaderFooter}>S.No</TableCell>
-                        <TableCell className={classes.tableHeaderFooter}>Product Name</TableCell>
-                        <TableCell className={classes.tableHeaderFooter}>Price</TableCell>
-                        <TableCell className={classes.tableHeaderFooter}>Quantity</TableCell>
-                        <TableCell className={classes.tableHeaderFooter}>SubTotal</TableCell>
+                        <TableCell className={classes.tableHeaderFooter}><b>মালের নাম</b></TableCell>
+                        <TableCell className={classes.tableHeaderFooter}><b>দাম</b></TableCell>
+                        <TableCell className={classes.tableHeaderFooter}><b>পরিমান</b></TableCell>
+                        <TableCell className={classes.tableHeaderFooter}><b>মোট</b></TableCell>
                     </TableRow>
                 </TableHead>
                 <TableBody>
                     {items.map((item, index) => (
                         <TableRow key={index}>
-                            <TableCell>{index + 1}</TableCell>
+                            <TableCell>{englishToBengali(index + 1)}</TableCell>
                             <TableCell>{item.name}</TableCell>
-                            <TableCell>{item.price}</TableCell>
-                            <TableCell>{item.quantity}</TableCell>
-                            <TableCell>{item.subTotal}</TableCell>
+                            <TableCell>{englishToBengali(item.price)}</TableCell>
+                            <TableCell>{englishToBengali(item.quantity)}</TableCell>
+                            <TableCell>{englishToBengali(item.subTotal)}</TableCell>
                         </TableRow>
                     ))}
                 </TableBody>
@@ -42,8 +43,10 @@ const BillItemtable = (props) => {
                         <TableCell></TableCell>
                         <TableCell></TableCell>
                         <TableCell></TableCell>
-                        <TableCell className={classes.tableHeaderFooter}>Total Amount</TableCell>
-                        <TableCell className={classes.tableHeaderFooter}>{total}</TableCell>
+                        <TableCell className={classes.tableHeaderFooter}>মোট টাকা</TableCell>
+                        <TableCell className={classes.tableHeaderFooter}>
+                            {englishToBengali(total)}
+                        </TableCell>
                     </TableRow>   
                 </TableFooter>
             </Table>
