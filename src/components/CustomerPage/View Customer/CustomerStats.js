@@ -1,9 +1,7 @@
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 import { Container, Grid, Paper, Typography } from '@mui/material'
 import { makeStyles } from '@mui/styles'
-import { useDispatch } from 'react-redux'
-import { asyncCustomerDetail } from '../../../action/customerAction'
-
+ 
 const useStyle = makeStyles({
     custDetail: {
         padding: '16px 0'
