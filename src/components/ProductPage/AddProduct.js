@@ -2,6 +2,7 @@ import React from 'react'
 import { Container, Typography } from '@mui/material'
 import { makeStyles } from '@mui/styles'
 import ProductForm from './ProductForm'
+import { useSelector } from 'react-redux'
 
 const useStyle = makeStyles({
     title:{
@@ -14,11 +15,12 @@ const useStyle = makeStyles({
 
 const AddProduct = (props) => {
     const classes = useStyle()
+    const products = useSelector((state) => state.products)
 
     return (
         <Container className={classes.container}>
             <Typography className={classes.title} variant='h5'>Add Product</Typography>
-            <ProductForm />
+            <ProductForm existingProducts={products} />
         </Container>
     )
 }

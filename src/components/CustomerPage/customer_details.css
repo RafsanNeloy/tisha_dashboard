@@ -1,0 +1,54 @@
+.customer-details-container {
+  padding: 10px;
+}
+
+.table {
+  background-color: white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin-bottom: 0;
+}
+
+.table thead th {
+  background-color: #f8f9fa;
+  border-bottom: 2px solid #dee2e6;
+  text-align: center;
+}
+
+.table tbody td {
+  text-align: center;
+  vertical-align: middle;
+}
+
+.modal-lg {
+  max-width: 90%;
+}
+
+.MuiDialog-paper {
+  min-width: 90vw;
+}
+
+.MuiTableContainer-root {
+  margin: 10px 0;
+}
+
+.MuiTableCell-head {
+  background-color: #f8f9fa;
+  font-weight: bold !important;
+}
+
+.details-page-container {
+  padding: 20px;
+  max-width: 95%;
+  margin: 0 auto;
+}
+
+.details-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.MuiTableCell-root {
+  padding: 12px !important;
+} 

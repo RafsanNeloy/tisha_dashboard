@@ -9,6 +9,8 @@ import LocalOfferIcon from '@mui/icons-material/LocalOffer'
 import ExitToAppIcon from '@mui/icons-material/ExitToApp'
 import ReceiptIcon from '@mui/icons-material/Receipt'
 import BarChartIcon from '@mui/icons-material/BarChart'
+import RecyclingIcon from '@mui/icons-material/Recycling';
+import PercentIcon from '@mui/icons-material/Percent';
 import { useDispatch } from 'react-redux'
 import { setLogout } from '../../action/loginAction'
 import { asyncGetBills } from '../../action/billsAction'
@@ -89,6 +91,16 @@ const Drawer = (props) => {
             name: 'Bills',
             icon: <ReceiptIcon fontSize='large' />,
             link: '/bills'
+        },
+        {
+            name: 'Westage',
+            icon: <RecyclingIcon fontSize='large' />,
+            link: '/westage'
+        },
+        {
+            name: 'Less',
+            icon: <PercentIcon fontSize='large' />,
+            link: '/less'
         }
     ]
 

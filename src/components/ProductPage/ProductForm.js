@@ -16,7 +16,7 @@ const useStyle = makeStyles({
 })
 
 const ProductForm = (props) => {
-    const { name: prodName, price: prodPrice, _id, resetUpdateProd } = props
+    const { name: prodName, price: prodPrice, _id, resetUpdateProd, existingProducts } = props
     const [ name, setName ] = useState(prodName ? prodName : '')
     const [ price, setPrice ] = useState(englishToBengali(prodPrice ? prodPrice : ''))
     const [ formErrors, setFormErrors ] = useState({})
@@ -48,6 +48,15 @@ const ProductForm = (props) => {
     const validate = () => {
         if(name.length === 0) {
             errors.name = "product name can't be blank"
+        } else {
+            // Check for duplicate product name
+            const normalizedName = name.trim().toLowerCase()
+            const isDuplicate = existingProducts?.some(product => 
+                product.name.toLowerCase() === normalizedName && product._id !== _id
+            )
+            if (isDuplicate) {
+                errors.name = "Product with this name already exists"
+            }
         }
         if(price.length === 0) {
             errors.price = "enter valid amount"

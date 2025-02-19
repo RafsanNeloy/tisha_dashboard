@@ -50,6 +50,7 @@ const CustomerTable = (props) => {
                         <TableCell className={classes.tableHeader} align='center'>Mobile</TableCell>
                         <TableCell className={`${classes.emailColumn} ${classes.tableHeader}`} align='center'>Email</TableCell>
                         <TableCell className={classes.tableHeader} align='center'>View</TableCell>
+                        <TableCell className={classes.tableHeader} align='center'>Details</TableCell>
                         <TableCell className={classes.tableHeader} align='center'>Action</TableCell>
                     </TableRow>
                 </TableHead>
@@ -72,28 +73,38 @@ const CustomerTable = (props) => {
                                             </Button>
                                         </Link> 
                                     </TableCell>
-                                    <TableCell className={classes.tableBtns} align='center'> 
+                                    <TableCell align='center'> 
+                                        <Link to={`/customer-details/${cust._id}`} className={classes.viewLink}>
                                             <Button
                                                 variant='contained'
                                                 color='primary'
-                                                onClick={() => {
-                                                    handleUpdateCustomer(cust)
-                                                    resetSearch()
-                                                }}
                                             >
-                                                Update
-                                            </Button> 
-                                            <Button
-                                                variant='contained'
-                                                color='secondary'
-                                                onClick={() => {
-                                                    dispatch(asyncDeleteCustomer(cust._id))
-                                                    resetSearch()
-                                                }}
-                                            >
-                                                Remove
-                                            </Button> 
-                                        </TableCell>
+                                                Details
+                                            </Button>
+                                        </Link>
+                                    </TableCell>
+                                    <TableCell className={classes.tableBtns} align='center'> 
+                                        <Button
+                                            variant='contained'
+                                            color='primary'
+                                            onClick={() => {
+                                                handleUpdateCustomer(cust)
+                                                resetSearch()
+                                            }}
+                                        >
+                                            Update
+                                        </Button> 
+                                        <Button
+                                            variant='contained'
+                                            color='secondary'
+                                            onClick={() => {
+                                                dispatch(asyncDeleteCustomer(cust._id))
+                                                resetSearch()
+                                            }}
+                                        >
+                                            Remove
+                                        </Button> 
+                                    </TableCell>
                                 </TableRow>
                             )
                         })
