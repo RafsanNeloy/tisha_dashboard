@@ -1,57 +1,47 @@
-import React from 'react'
-import { Table, TableBody, TableCell, TableContainer, TableFooter, TableHead, TableRow } from '@mui/material'
+import React, { memo } from 'react'
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material'
 import { makeStyles } from '@mui/styles'
-import { useSelector } from 'react-redux'
-import { englishToBengali } from '../../../utils/bengaliNumerals'
 
 const useStyle = makeStyles({
-    tableHeaderFooter: {
-        color: 'black',
-        fontWeight: 600
+    table: {
+        minWidth: 650
+    },
+    tableHeader: {
+        backgroundColor: '#f5f5f5'
     }
-})
+});
 
-const ViewOrderTable = (props) => {
-    const { lineItems, total } = props
-    const products = useSelector(state => state.products)
+const ViewOrderTable = memo(({ lineItems, total }) => {
     const classes = useStyle()
 
     return (
-        <TableContainer>
-            <Table>
+        <TableContainer component={Paper}>
+            <Table className={classes.table} size="small">
                 <TableHead>
                     <TableRow>
-                        <TableCell>ক্রমিক</TableCell>
-                        <TableCell>পণ্যের নাম</TableCell>
-                        <TableCell>দাম</TableCell>
-                        <TableCell>পরিমাণ</TableCell>
-                        <TableCell>মোট</TableCell>
+                        <TableCell className={classes.tableHeader}>Product Name</TableCell>
+                        <TableCell className={classes.tableHeader} align="right">Price</TableCell>
+                        <TableCell className={classes.tableHeader} align="right">Quantity</TableCell>
+                        <TableCell className={classes.tableHeader} align="right">Subtotal</TableCell>
                     </TableRow>
                 </TableHead>
                 <TableBody>
-                    {lineItems.map((item, index) => {
-                        if (!item || !item.product) return null;
-
-                        return (
-                            <TableRow key={item._id || index}>
-                                <TableCell>{englishToBengali(index + 1)}</TableCell>
-                                <TableCell>{item.product.name}</TableCell>
-                                <TableCell>৳{englishToBengali(item.price)}</TableCell>
-                                <TableCell>{englishToBengali(item.quantity)}</TableCell>
-                                <TableCell>৳{englishToBengali(item.subTotal)}</TableCell>
-                            </TableRow>
-                        )
-                    })}
-                </TableBody>
-                <TableFooter>
+                    {lineItems.map((item, index) => (
+                        <TableRow key={index}>
+                            <TableCell>{item.product.name}</TableCell>
+                            <TableCell align="right">{item.price}</TableCell>
+                            <TableCell align="right">{item.quantity}</TableCell>
+                            <TableCell align="right">{item.subTotal}</TableCell>
+                        </TableRow>
+                    ))}
                     <TableRow>
-                        <TableCell colSpan={4} className={classes.tableHeaderFooter}>মোট টাকা</TableCell>
-                        <TableCell className={classes.tableHeaderFooter}>৳{englishToBengali(total)}</TableCell>
+                        <TableCell colSpan={3} align="right"><strong>Total</strong></TableCell>
+                        <TableCell align="right"><strong>{total}</strong></TableCell>
                     </TableRow>
-                </TableFooter>
+                </TableBody>
             </Table>
         </TableContainer>
     )
-}
+});
 
 export default ViewOrderTable

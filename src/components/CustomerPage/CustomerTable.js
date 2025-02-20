@@ -7,20 +7,19 @@ import { makeStyles } from '@mui/styles'
 
 const useStyle = makeStyles({
     table: {
-        position: 'fixed',
         width: '90vw',
         marginTop: '5px',
         maxHeight: '380px'
     },
-    nameColumn:{
+    nameColumn: {
         width: '25%'
     },
-    emailColumn:{
+    emailColumn: {
         width: '25%'
     },
-    tableBtns:{
+    tableBtns: {
         display: 'flex',
-        flexDirection:'row',
+        flexDirection: 'row',
         justifyContent: 'space-evenly'
     },
     tableHeader: {
@@ -28,7 +27,7 @@ const useStyle = makeStyles({
         color: 'white'
     },
     headerName: {
-        color:'white'
+        color: 'white'
     },
     viewLink: {
         textDecoration: 'none'

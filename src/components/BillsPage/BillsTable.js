@@ -10,7 +10,6 @@ import { englishToBengali, formatLargeNumber } from '../../utils/bengaliNumerals
 
 const useStyle = makeStyles({
     table: {
-        position: 'relative',
         width: '100%',
         marginTop: '5px',
         maxHeight: '70vh',

@@ -6,18 +6,21 @@ import CustomerDetails from './components/CustomerPage/customer_details'
 import { Routes, Route } from 'react-router-dom'
 import WestageForm from './components/WestagePage/WestageForm'
 import LessForm from './components/LessPage/LessForm'
-
-const theme = createTheme()
+import CollectionForm from './components/CustomerPage/Collections/CollectionForm'
+import CssBaseline from '@mui/material/CssBaseline'
+import { theme } from './theme/theme'
 
 const App = (props) => {
 
   return (
     <ThemeProvider theme={theme}>
+      <CssBaseline />
       <NavBar {...props} />
       <Routes>
         <Route path="/customer-details/:customerId" element={<CustomerDetails />} />
         <Route path="/westage" element={<WestageForm />} />
         <Route path="/less" element={<LessForm />} />
+        <Route path="/collections" element={<CollectionForm />} />
       </Routes>
     </ThemeProvider>
   )

@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { memo } from 'react'
 import { Typography, Container, Box, Accordion, AccordionSummary, AccordionDetails } from '@mui/material'
 import { makeStyles } from '@mui/styles'
 import ViewOrderTable from './ViewOrderTable'
@@ -8,44 +8,33 @@ const useStyles = makeStyles({
     accordion: {
         border: '1px solid rgba(0, 0, 0, .125)',
         boxShadow: 'none',
-        '&:not(:last-child)': {
-            borderBottom: 0,
-        },
-        '&:before': {
-            display: 'none',
-        },
-        '&$expanded': {
-            margin: 'auto',
-        },
+        margin: '4px 0'
     },
     accordionSummary: {
-        backgroundColor: 'rgba(0, 0, 0, .03)',
-        borderBottom: '1px solid rgba(0, 0, 0, .125)',
-        marginBottom: -1,
-        minHeight: 56,
-        '&$expanded': {
-            minHeight: 56,
-        },
+        backgroundColor: '#f5f5f5',
+        minHeight: 56
     },
-    accordionDetails: {
-        padding: '16px'  // equivalent to theme.spacing(2)
-    },
-    expanded: {},
     orderInfo: {
-        width: '100%',
         display: 'flex',
-        flexDirection: 'row',
-        justifyContent: 'space-between'
+        justifyContent: 'space-between',
+        width: '100%',
+        alignItems: 'center'
     }
-})
+});
 
-const CustomerOrders = (props) => {
-    const { bills } = props
+const CustomerOrders = memo(({ bills }) => {
     const classes = useStyles()
+
+    if (!bills || bills.length === 0) {
+        return <Typography>No orders found</Typography>
+    }
 
     return (
         <>
-            <Typography variant='h5' align='center'>List of Orders - {bills.length}</Typography>
+            <Typography variant='h5' align='center' gutterBottom>
+                List of Orders - {bills.length}
+            </Typography>
+            
             {bills.map(bill => (
                 <Accordion 
                     key={bill._id}
@@ -55,26 +44,24 @@ const CustomerOrders = (props) => {
                         className={classes.accordionSummary}
                     >
                         <Box className={classes.orderInfo}>
-                            <Typography variant='h6'>
+                            <Typography>
                                 {moment(bill.date).format('DD/MM/YYYY, hh:mm A')}
                             </Typography>
-                            <Typography variant='h6'>
+                            <Typography>
                                 Order ID - {bill._id}
                             </Typography>
-                            <Typography variant='h6'>
+                            <Typography>
                                 Total - {bill.total} ৳
                             </Typography>
                         </Box>
                     </AccordionSummary>
-                    <AccordionDetails className={classes.accordionDetails}>
-                        <Container>
-                            <ViewOrderTable lineItems={bill.items} total={bill.total} />
-                        </Container>
+                    <AccordionDetails>
+                        <ViewOrderTable lineItems={bill.items} total={bill.total} />
                     </AccordionDetails>
                 </Accordion>
             ))}
         </>
     )
-}
+});
 
 export default CustomerOrders
