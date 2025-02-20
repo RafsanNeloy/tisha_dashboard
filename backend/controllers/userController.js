@@ -7,7 +7,7 @@ const User = require('../models/userModel');
 // @route   POST /api/users/register
 // @access  Public
 const registerUser = asyncHandler(async (req, res) => {
-  const { username, email, password, businessName, address } = req.body;
+  const { username, email, password, businessName, address, role } = req.body;
 
   // Check if user exists
   const userExists = await User.findOne({ email });
@@ -26,7 +26,8 @@ const registerUser = asyncHandler(async (req, res) => {
     email,
     password: hashedPassword,
     businessName,
-    address
+    address,
+    role: role || 'user' // Default to 'user' if role not specified
   });
 
   if (user) {
@@ -35,6 +36,7 @@ const registerUser = asyncHandler(async (req, res) => {
       username: user.username,
       email: user.email,
       businessName: user.businessName,
+      role: user.role,
       token: generateToken(user._id)
     });
   } else {
@@ -58,6 +60,7 @@ const loginUser = asyncHandler(async (req, res) => {
       username: user.username,
       email: user.email,
       businessName: user.businessName,
+      role: user.role,
       token: generateToken(user._id)
     });
   } else {
@@ -70,7 +73,14 @@ const loginUser = asyncHandler(async (req, res) => {
 // @route   GET /api/users/account
 // @access  Private
 const getUser = asyncHandler(async (req, res) => {
-  res.status(200).json(req.user);
+  const user = await User.findById(req.user.id).select('-password');
+  res.status(200).json({
+    _id: user._id,
+    username: user.username,
+    email: user.email,
+    businessName: user.businessName,
+    role: user.role
+  });
 });
 
 // Generate JWT

@@ -9,28 +9,40 @@ import CustomerTable from './CustomerTable'
 
 const useStyle = makeStyles({
     container: {
-        width: '100vw',
-        padding: '2vh 2vw',
+        width: '100%',
+        padding: '2rem',
         marginLeft: '50px',
         display: 'flex',
-        flexDirection : 'row',
-        justifyContent: 'center'
+        flexDirection: 'row',
+        justifyContent: 'flex-start',
+        gap: '2rem'
     },
-    title:{
-        fontWeight: '700'
+    title: {
+        fontWeight: '700',
+        marginBottom: '1.5rem'
     },
-    tableContainer:{
+    tableContainer: {
         position: 'fixed',
-        marginTop: '175px'
-    }, 
-    divider:{
-        width: '90vw'
+        marginTop: '175px',
+        maxWidth: '1200px',
+        width: '100%'
     },
-    tableContainerTitle:{
-        width: '90vw'
+    divider: {
+        width: '100%',
+        margin: '2rem 0'
     },
-    searchField:{
-        width: '35%'
+    tableContainerTitle: {
+        width: '100%',
+        marginBottom: '1rem',
+        backgroundColor: '#f5f5f5',
+        padding: '1rem',
+        borderRadius: '8px'
+    },
+    searchField: {
+        width: '350px',
+        '& .MuiOutlinedInput-root': {
+            backgroundColor: '#ffffff'
+        }
     }
 })
 
@@ -94,24 +106,32 @@ const CustomerPage = (props) => {
             </Container>
             
             <Box className={classes.tableContainer}>
-                    <Box 
-                        disableGutters 
-                        display='flex' 
-                        flexDirection='row' 
-                        alignItems='baseline' 
-                        justifyContent='space-between' 
-                        className={classes.tableContainerTitle} 
+                <Box 
+                    disableGutters 
+                    display='flex' 
+                    flexDirection='row' 
+                    alignItems='center'
+                    justifyContent='space-between' 
+                    className={classes.tableContainerTitle} 
+                >
+                    <Typography 
+                        variant='h5' 
+                        sx={{ 
+                            fontWeight: 500,
+                            color: '#1a237e'
+                        }}
                     >
-                        <Typography variant='h5'>List of Customers - {customers.length}</Typography>
-                        <TextField 
-                            className={classes.searchField} 
-                            variant='outlined' 
-                            margin='dense' 
-                            value={search}
-                            label='search customer by name, mobile or email' 
-                            onChange={handleSearchChange}
-                        />
-                    </Box>
+                        List of Customers - {customers.length}
+                    </Typography>
+                    <TextField 
+                        className={classes.searchField} 
+                        variant='outlined' 
+                        size="small"
+                        value={search}
+                        label='Search customer by name, mobile or email' 
+                        onChange={handleSearchChange}
+                    />
+                </Box>
                 <CustomerTable 
                     customers={customerList}
                     resetSearch={resetSearch}

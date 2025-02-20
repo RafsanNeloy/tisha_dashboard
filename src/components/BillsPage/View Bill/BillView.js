@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react'
-import { useParams } from 'react-router-dom'
-import { Container, IconButton, Typography, Box, Tooltip, Link, CircularProgress } from '@mui/material'
+import { useParams, useNavigate } from 'react-router-dom'
+import { Container, IconButton, Typography, Box, Tooltip, Link, CircularProgress, Button } from '@mui/material'
 import { makeStyles } from '@mui/styles'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import { useDispatch } from 'react-redux'
@@ -10,6 +10,7 @@ import { asyncGetProducts } from '../../../action/productAction'
 import BillDetail from './BillDetail'
 import BillItemtable from './BillItemTable'
 import PrintBill from './PrintBill'
+import axios from 'axios'
 
 const useStyle = makeStyles({
     container: {
@@ -27,66 +28,60 @@ const useStyle = makeStyles({
 const BillView = () => {
     const classes = useStyle()
     const { id } = useParams()
-    const [billDetails, setBillDetails] = useState(null)
-    const [isLoading, setIsLoading] = useState(true)
+    const [bill, setBill] = useState(null)
     const [error, setError] = useState(null)
-    const [customerAddress, setCustomerAddress] = useState('')
+    const navigate = useNavigate()
     const dispatch = useDispatch()
 
-    const handleBillDetails = useCallback((data) => {
-        if (data) {
-            setBillDetails(data)
-            setCustomerAddress(data.customer?.address || '')
-        }
-        setIsLoading(false)
-    }, [])
-
     useEffect(() => {
-        const fetchBillDetails = async () => {
-            setIsLoading(true)
-            setError(null)
+        const fetchBill = async () => {
             try {
-                await dispatch(asyncGetBillDetail(id, handleBillDetails))
+                const token = localStorage.getItem('token')
+                if (!token) {
+                    navigate('/login-or-register')
+                    return
+                }
+                
+                const response = await axios.get(`http://localhost:5000/api/bills/${id}`, {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                })
+                setBill(response.data)
             } catch (err) {
                 console.error('Error fetching bill:', err)
-                setError(err.message || 'Failed to load bill details')
-                setIsLoading(false)
+                setError(err.response?.data?.message || 'Error loading bill')
+                if (err.response?.status === 401) {
+                    navigate('/login-or-register')
+                }
             }
         }
-
-        if (id) {
-            fetchBillDetails()
-        }
-    }, [dispatch, id, handleBillDetails])
+        fetchBill()
+    }, [id, navigate])
 
     const handleAddressChange = (address) => {
-        setCustomerAddress(address)
-    }
-
-    if (isLoading) {
-        return (
-            <Container className={classes.loadingContainer}>
-                <CircularProgress />
-            </Container>
-        )
+        setBill(prevBill => ({
+            ...prevBill,
+            customer: {
+                ...prevBill.customer,
+                address: address
+            }
+        }))
     }
 
     if (error) {
         return (
-            <Container className={classes.container}>
-                <Typography color="error" align="center">
-                    {error}
-                </Typography>
+            <Container>
+                <Typography color="error">{error}</Typography>
+                <Button onClick={() => navigate('/bills')}>Back to Bills</Button>
             </Container>
         )
     }
 
-    if (!billDetails || !billDetails.items) {
+    if (!bill) {
         return (
-            <Container className={classes.container}>
-                <Typography color="error" align="center">
-                    Bill not found or has no items
-                </Typography>
+            <Container>
+                <Typography>Loading...</Typography>
             </Container>
         )
     }
@@ -103,27 +98,27 @@ const BillView = () => {
                 </Tooltip>
                 <PrintBill 
                     id={id} 
-                    bill={billDetails} 
-                    customer={billDetails.customer}
-                    customerAddress={customerAddress} 
-                    items={billDetails.items || []} 
+                    bill={bill} 
+                    customer={bill.customer}
+                    customerAddress={bill.customer?.address || ''} 
+                    items={bill.items || []} 
                 />
             </Box>
             <Typography variant='h5' align='center'><strong>বিল ইনভয়েস</strong></Typography>
             <BillDetail 
                 id={id} 
-                bill={billDetails} 
-                customer={billDetails.customer}
+                bill={bill} 
+                customer={bill.customer}
                 onAddressChange={handleAddressChange}
             />
-            {billDetails.items && billDetails.items.length > 0 && (
+            {bill.items && bill.items.length > 0 && (
                 <BillItemtable 
-                    items={billDetails.items.map(item => ({
+                    items={bill.items.map(item => ({
                         ...item,
                         product: item.product._id,
                         name: item.product.name
                     }))} 
-                    total={billDetails.total} 
+                    total={bill.total} 
                 />
             )}
         </Container>

@@ -16,7 +16,7 @@ const BillDetail = (props) => {
 
     return (
         <Box sx={{ my: 2 }}>
-            <Typography variant='h6'><strong>অর্ডার আইডি:</strong> {id}</Typography>
+            <Typography variant='h6'><strong>বিল নং:</strong> {englishToBengali(bill?.billNumber)}</Typography>
             <Typography variant='h6'><strong>গ্রাহকের নাম:</strong> {customer?.name || 'Loading...'}</Typography>
             <Box sx={{ my: 2 }}>
                 <TextField

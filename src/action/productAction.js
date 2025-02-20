@@ -86,17 +86,17 @@ export const asyncUpdateProducts = (id, data, reset) => {
 export const asyncDeleteProducts = (id) => {
     return (dispatch) => {
         const token = localStorage.getItem('token')
-        const config = {
+        axios.delete(`${url}/${id}`, {
             headers: {
                 Authorization: `Bearer ${token}`
             }
-        }
-        axios.delete(`${url}/${id}`, config)
-            .then(response => {
-                const data = response.data
-                dispatch(deleteProduct(data))
+        })
+            .then((response) => {
+                dispatch(deleteProduct(response.data))
             })
-            .catch(err => alert(err.message))
+            .catch((err) => {
+                alert(err.response?.data?.message || err.message)
+            })
     }
 }
 

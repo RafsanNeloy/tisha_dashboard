@@ -13,6 +13,12 @@ const productSchema = new mongoose.Schema({
   price: {
     type: Number,
     required: [true, 'Please add a price']
+  },
+  product_type: {
+    type: Number,
+    required: [true, 'Please specify product type'],
+    enum: [0, 1], // Only allow 0 (mama) or 1 (motu)
+    default: 0
   }
 }, {
   timestamps: true

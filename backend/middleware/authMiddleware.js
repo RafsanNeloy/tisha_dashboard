@@ -13,8 +13,9 @@ const protect = asyncHandler(async (req, res, next) => {
       // Verify token
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-      // Get user from token
-      req.user = await User.findById(decoded.id).select('-password');
+      // Get user from token with all fields except password
+      req.user = await User.findById(decoded.id)
+        .select('-password');
 
       next();
     } catch (error) {
@@ -30,4 +31,14 @@ const protect = asyncHandler(async (req, res, next) => {
   }
 });
 
-module.exports = { protect }; 
+// Admin middleware
+const admin = asyncHandler(async (req, res, next) => {
+  if (req.user && req.user.role === 'admin') {
+    next();
+  } else {
+    res.status(403);
+    throw new Error('Not authorized as an admin');
+  }
+});
+
+module.exports = { protect, admin }; 

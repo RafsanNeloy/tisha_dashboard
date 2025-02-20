@@ -14,7 +14,7 @@ const PrintBill = (props) => {
         const element = billRef.current
         const opt = {
             margin: 15,
-            filename: `${id}.pdf`,
+            filename: `Bill-${bill.billNumber}.pdf`,
             image: { type: 'jpeg', quality: 0.98 },
             html2canvas: { scale: 2 },
             jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
@@ -127,7 +127,7 @@ const PrintBill = (props) => {
                             <p>{customerAddress}</p>
                         </div>
                         <div>
-                            <p><strong>Invoice No:</strong> {id}</p>
+                            <p><strong>Invoice No:</strong> {englishToBengali(bill.billNumber)}</p>
                             <p><strong>Date:</strong> {moment(bill.createdAt).format('DD/MM/YYYY')}</p>
                         </div>
                     </div>

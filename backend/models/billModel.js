@@ -6,6 +6,10 @@ const billSchema = new mongoose.Schema({
     required: true,
     ref: 'User'
   },
+  billNumber: {
+    type: Number,
+    required: true,
+  },
   customer: {
     type: mongoose.Schema.Types.ObjectId,
     required: true,

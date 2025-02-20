@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, CircularProgress } from '@mui/material'
 import { makeStyles } from '@mui/styles'
 import { asyncDeleteBill, asyncGetBills } from '../../action/billsAction'
@@ -33,9 +33,10 @@ const useStyle = makeStyles({
 
 const BillsTable = (props) => {
     const dispatch = useDispatch()
-    const { bills, resetSearch } = props
+    const { bills, resetSearch, handleDeleteBill, isAdmin } = props
     const customers = useSelector(state => state.customers)
     const classes = useStyle()
+    const navigate = useNavigate()
 
     // Load customers when component mounts
     useEffect(() => {
@@ -105,49 +106,44 @@ const BillsTable = (props) => {
     }
 
     return (
-        <TableContainer component={Paper} className={classes.table}>
-            <Table stickyHeader>
+        <TableContainer className={classes.table} component={Paper}>
+            <Table stickyHeader size='small'>
                 <TableHead>
                     <TableRow>
-                        <TableCell className={classes.tableHeader}>তারিখ</TableCell>
-                        <TableCell className={classes.tableHeader}>অর্ডার আইডি</TableCell>
-                        <TableCell className={classes.tableHeader}>গ্রাহকের নাম</TableCell>
-                        <TableCell className={classes.tableHeader}>মোট টাকা</TableCell>
-                        <TableCell className={classes.tableHeader}>অ্যাকশন</TableCell>
+                        <TableCell className={classes.tableHeader} align='center'>ক্রমিক</TableCell>
+                        <TableCell className={classes.tableHeader} align='center'>বিল নং</TableCell>
+                        <TableCell className={classes.tableHeader} align='center'>গ্রাহক</TableCell>
+                        <TableCell className={classes.tableHeader} align='center'>মোট</TableCell>
+                        <TableCell className={classes.tableHeader} align='center'>Action</TableCell>
                     </TableRow>
                 </TableHead>
                 <TableBody>
-                    {reversedBills.map(bill => {
-                        if (!bill) return null;
-                        const customerName = getCustomerName(bill.customer);
-                        return (
-                            <TableRow key={bill._id || 'temp-key'}>
-                                <TableCell>{moment(bill.date).format('DD/MM/YYYY, hh:mm A')}</TableCell>
-                                <TableCell>{bill._id}</TableCell>
-                                <TableCell>{customerName}</TableCell>
-                                <TableCell>{formatAmount(bill.total)}</TableCell>
-                                <TableCell className={classes.actionCell}>
-                                    <Link to={`/bills/${bill._id}`} className={classes.viewLink}>
-                                        <Button 
-                                            size='small' 
-                                            variant='contained' 
-                                            color='primary'
-                                        >
-                                            View
-                                        </Button>
-                                    </Link>
-                                    <Button 
-                                        size='small' 
-                                        variant='contained' 
+                    {bills.map((bill, index) => (
+                        <TableRow hover key={bill._id}>
+                            <TableCell align='center'>{englishToBengali(index + 1)}</TableCell>
+                            <TableCell align='center'>{englishToBengali(bill.billNumber)}</TableCell>
+                            <TableCell align='center'>{bill.customer.name}</TableCell>
+                            <TableCell align='center'>৳{englishToBengali(bill.total)}</TableCell>
+                            <TableCell className={classes.tableBtns}>
+                                <Button
+                                    variant='contained'
+                                    color='primary'
+                                    onClick={() => navigate(`/bills/${bill._id}`)}
+                                >
+                                    View
+                                </Button>
+                                {isAdmin && (
+                                    <Button
+                                        variant='contained'
                                         color='secondary'
-                                        onClick={() => handleDelete(bill._id)}
+                                        onClick={() => handleDeleteBill(bill._id)}
                                     >
-                                        Delete
+                                        remove
                                     </Button>
-                                </TableCell>
-                            </TableRow>
-                        );
-                    })}
+                                )}
+                            </TableCell>
+                        </TableRow>
+                    ))}
                 </TableBody>
             </Table>
         </TableContainer>

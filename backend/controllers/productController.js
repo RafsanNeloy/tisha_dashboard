@@ -6,7 +6,8 @@ const Bill = require('../models/billModel');
 // @route   GET /api/products
 // @access  Private
 const getProducts = asyncHandler(async (req, res) => {
-  const products = await Product.find({ user: req.user.id });
+  // Remove user filter to show all products
+  const products = await Product.find();
   res.status(200).json(products);
 });
 
@@ -14,16 +15,23 @@ const getProducts = asyncHandler(async (req, res) => {
 // @route   POST /api/products
 // @access  Private
 const addProduct = asyncHandler(async (req, res) => {
-  const { name, price } = req.body;
+  const { name, price, product_type } = req.body;
 
-  if (!name || !price) {
+  if (!name || !price || product_type === undefined) {
     res.status(400);
     throw new Error('Please add all fields');
+  }
+
+  // Validate product_type is either 0 or 1
+  if (product_type !== 0 && product_type !== 1) {
+    res.status(400);
+    throw new Error('Product type must be either 0 (mama) or 1 (motu)');
   }
 
   const product = await Product.create({
     name,
     price,
+    product_type,
     user: req.user.id
   });
 
@@ -41,12 +49,7 @@ const updateProduct = asyncHandler(async (req, res) => {
     throw new Error('Product not found');
   }
 
-  // Check for user
-  if (product.user.toString() !== req.user.id) {
-    res.status(401);
-    throw new Error('User not authorized');
-  }
-
+  // Allow any logged-in user to update products
   const updatedProduct = await Product.findByIdAndUpdate(req.params.id, req.body, {
     new: true,
   });
@@ -56,7 +59,7 @@ const updateProduct = asyncHandler(async (req, res) => {
 
 // @desc    Delete product
 // @route   DELETE /api/products/:id
-// @access  Private
+// @access  Private/Admin
 const deleteProduct = asyncHandler(async (req, res) => {
   const product = await Product.findById(req.params.id);
 
@@ -65,14 +68,13 @@ const deleteProduct = asyncHandler(async (req, res) => {
     throw new Error('Product not found');
   }
 
-  // Check for user
-  if (product.user.toString() !== req.user.id) {
-    res.status(401);
-    throw new Error('User not authorized');
+  // Only allow admins to delete products
+  if (req.user.role !== 'admin') {
+    res.status(403);
+    throw new Error('Not authorized to delete products');
   }
 
   await product.deleteOne();
-
   res.status(200).json(product);
 });
 
