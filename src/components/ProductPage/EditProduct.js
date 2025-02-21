@@ -100,8 +100,8 @@ const EditProduct = (props) => {
                             value={productType}
                             onChange={handleChange}
                         >
-                            <FormControlLabel value="0" control={<Radio />} label="মামা" />
-                            <FormControlLabel value="1" control={<Radio />} label="মোটু" />
+                            <FormControlLabel value="0" control={<Radio />} label="ডজন" />
+                            <FormControlLabel value="1" control={<Radio />} label="পিস" />
                         </RadioGroup>
                     </FormControl>
                     <Button

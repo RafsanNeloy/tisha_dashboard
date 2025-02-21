@@ -32,7 +32,7 @@ const ProductTable = (props) => {
     const isAdmin = auth?.user?.role === 'admin'
 
     const getProductType = (type) => {
-        return type === 0 ? 'মামা' : 'মোটু'
+        return type === 0 ? 'ডজন' : 'পিস'
     }
 
     return (
