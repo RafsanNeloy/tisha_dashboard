@@ -37,7 +37,7 @@ const CustomerOrders = memo(({ bills }) => {
             
             {bills.map(bill => (
                 <Accordion 
-                    key={bill._id}
+                    key={bill.billNumber}
                     className={classes.accordion}
                 >
                     <AccordionSummary
@@ -48,7 +48,7 @@ const CustomerOrders = memo(({ bills }) => {
                                 {moment(bill.date).format('DD/MM/YYYY, hh:mm A')}
                             </Typography>
                             <Typography>
-                                Order ID - {bill._id}
+                                Bill ID - {bill.billNumber}
                             </Typography>
                             <Typography>
                                 Total - {bill.total} ৳

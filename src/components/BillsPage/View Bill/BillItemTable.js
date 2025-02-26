@@ -34,6 +34,7 @@ const BillItemtable = (props) => {
                             <TableCell>{item.name}</TableCell>
                             <TableCell>{englishToBengali(item.price)}</TableCell>
                             <TableCell>{englishToBengali(item.quantity)}</TableCell>
+                            
                             <TableCell>{englishToBengali(item.subTotal)}</TableCell>
                         </TableRow>
                     ))}
