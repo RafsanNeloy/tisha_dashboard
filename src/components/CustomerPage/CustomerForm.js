@@ -34,10 +34,10 @@ const useStyle = makeStyles({
 })
 
 const CustomerForm = (props) => {
-    const { name: custName, mobile: custMobile, email: custEmail, _id, resetUpdateCust, handleClose } = props
+    const { name: custName, mobile: custMobile, address: custAddress, _id, resetUpdateCust, handleClose } = props
     const [ name, setName ] = useState(custName ? custName : '')
     const [ mobile, setMobile ] = useState(custMobile ? custMobile : '')
-    const [ email, setEmail ] = useState(custEmail ? custEmail : '')
+    const [ address, setAddress ] = useState(custAddress ? custAddress : '')
     const [ formErrors, setFormErrors ] = useState({})
     const errors = {}
     const dispatch = useDispatch()
@@ -52,8 +52,8 @@ const CustomerForm = (props) => {
                     setMobile(e.target.value)
                 }
             }
-        } else if(e.target.name==='email') {
-            setEmail(e.target.value.split(' ').join(''))
+        } else if(e.target.name==='address') {
+            setAddress(e.target.value)
         }
     }
 
@@ -64,15 +64,15 @@ const CustomerForm = (props) => {
         if(mobile.length !== 10){
             errors.mobile = "enter valid mobile number"
         }
-        if(!validator.isEmail(email)){
-            errors.email = 'enter valid email id'
+        if(address.length === 0){
+            errors.address = 'address cannot be empty'
         }
         setFormErrors(errors)
     }
 
     const resetForm = () => {
         setName('')
-        setEmail('')
+        setAddress('')
         setMobile('')
         if(handleClose){
             handleClose()
@@ -86,7 +86,7 @@ const CustomerForm = (props) => {
             const formData = {
                 name: name[0].toUpperCase() + name.slice(1),
                 mobile: mobile,
-                email: email
+                address: address
             }
             if(_id) {
                 dispatch(asyncUpdateCustomer(_id, formData, resetUpdateCust))
@@ -123,14 +123,16 @@ const CustomerForm = (props) => {
                     />
                     <TextField 
                         className={classes.formField}
-                        name='email'
-                        label='Email Id'
-                        value={email}
+                        name='address'
+                        label='Address'
+                        value={address}
                         onChange={handleChange}
-                        error={formErrors.email ? true : false}
-                        helperText={formErrors.email ? formErrors.email : null}
+                        error={formErrors.address ? true : false}
+                        helperText={formErrors.address ? formErrors.address : null}
                         variant='outlined'
                         margin='dense'
+                        multiline
+                        rows={3}
                     />
                     {
                         _id ? (
@@ -163,7 +165,7 @@ const CustomerForm = (props) => {
                                         add
                                     </Button>
                                     {
-                                        (name.length>0 || email.length>0 || mobile.length>0) && (
+                                        (name.length>0 || address.length>0 || mobile.length>0) && (
                                             <Button 
                                                 className={classes.cancelBtn}
                                                 onClick = {resetForm} 

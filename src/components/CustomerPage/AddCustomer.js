@@ -18,7 +18,9 @@ const AddCustomer = (props) => {
     return (
         <Container className={classes.container}>
             <Typography className={classes.title} variant='h5'>Add Customer</Typography>
-            <CustomerForm />
+            <CustomerForm 
+                handleClose={props.handleClose}
+            />
         </Container>
     )
 }

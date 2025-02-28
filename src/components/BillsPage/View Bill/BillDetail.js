@@ -18,6 +18,7 @@ const BillDetail = (props) => {
         <Box sx={{ my: 2 }}>
             <Typography variant='h6'><strong>বিল নং:</strong> {englishToBengali(bill?.billNumber)}</Typography>
             <Typography variant='h6'><strong>গ্রাহকের নাম:</strong> {customer?.name || 'Loading...'}</Typography>
+            
             <Box sx={{ my: 2 }}>
                 <TextField
                     fullWidth
@@ -30,6 +31,7 @@ const BillDetail = (props) => {
                     variant="outlined"
                 />
             </Box>
+            
             <Typography variant='h6'>
                 <strong>অর্ডারের তারিখ ও সময়:</strong> {moment(bill?.createdAt).format('DD/MM/YYYY, hh:mm A')}
             </Typography>

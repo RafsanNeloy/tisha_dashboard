@@ -20,7 +20,11 @@ const ProductSuggestion = (props) => {
 
     const handleValueChange = (e, newValue) => {
         setValue(newValue)
-        const productData = {...newValue, quantity: 1}
+        const productData = {
+            ...newValue, 
+            quantity: 1,
+            product_type: newValue.product_type
+        }
         productData.subTotal = productData.quantity * productData.price
         if(newValue) {
             handleAddLineItem(productData)

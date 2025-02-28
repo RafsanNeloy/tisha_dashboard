@@ -15,6 +15,10 @@ const BillItemtable = (props) => {
     const { items, total } = props
     const classes = useStyle()
 
+    const getProductType = (type) => {
+        return type === 0 ? 'ডজন' : 'পিস';
+    }
+
     return (
         <TableContainer component={Paper}>
             <Table size='small'>
@@ -24,6 +28,7 @@ const BillItemtable = (props) => {
                         <TableCell className={classes.tableHeaderFooter}><b>মালের নাম</b></TableCell>
                         <TableCell className={classes.tableHeaderFooter}><b>দাম</b></TableCell>
                         <TableCell className={classes.tableHeaderFooter}><b>পরিমান</b></TableCell>
+                        <TableCell className={classes.tableHeaderFooter}><b>ধরন</b></TableCell>
                         <TableCell className={classes.tableHeaderFooter}><b>মোট</b></TableCell>
                     </TableRow>
                 </TableHead>
@@ -34,7 +39,7 @@ const BillItemtable = (props) => {
                             <TableCell>{item.name}</TableCell>
                             <TableCell>{englishToBengali(item.price)}</TableCell>
                             <TableCell>{englishToBengali(item.quantity)}</TableCell>
-                            
+                            <TableCell>{getProductType(item.product_type)}</TableCell>
                             <TableCell>{englishToBengali(item.subTotal)}</TableCell>
                         </TableRow>
                     ))}

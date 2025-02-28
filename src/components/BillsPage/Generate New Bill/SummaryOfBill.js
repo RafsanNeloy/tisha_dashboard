@@ -41,6 +41,7 @@ const SummaryOfBill = (props) => {
             product: item._id,
             quantity: item.quantity,
             price: item.price,
+            product_type: item.product_type,
             subTotal: item.subTotal
         }));
 

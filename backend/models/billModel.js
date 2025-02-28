@@ -33,6 +33,11 @@ const billSchema = new mongoose.Schema({
       type: Number,
       required: true
     },
+    product_type: {
+      type: Number,
+      required: true,
+      enum: [0, 1] // 0 for ডজন (dozen), 1 for পিস (piece)
+    },
     subTotal: {
       type: Number,
       required: true

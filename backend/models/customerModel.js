@@ -1,22 +1,33 @@
 const mongoose = require('mongoose');
+const Schema = mongoose.Schema;
 
-const customerSchema = new mongoose.Schema({
+const customerSchema = new Schema({
   user: {
     type: mongoose.Schema.Types.ObjectId,
     required: true,
     ref: 'User'
   },
+  organization: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Organization'
+  },
+  shared: {
+    type: Boolean,
+    default: false
+  },
   name: {
     type: String,
-    required: [true, 'Please add a customer name']
+    required: [true, 'name is required']
   },
   mobile: {
     type: String,
-    required: [true, 'Please add a mobile number']
+    required: [true, 'mobile number is required'],
+    minlength: [10, 'invalid mobile number'],
+    maxlength: [10, 'invalid mobile number']
   },
-  email: {
+  address: {
     type: String,
-    required: [true, 'Please add an email']
+    required: [true, 'address is required']
   }
 }, {
   timestamps: true

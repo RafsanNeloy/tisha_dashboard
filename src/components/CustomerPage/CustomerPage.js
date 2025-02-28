@@ -49,23 +49,24 @@ const useStyle = makeStyles({
 const CustomerPage = (props) => {
     const classes = useStyle()
     const customers = useSelector(state => state.customers)
+    const { user } = useSelector(state => state.auth)
     const dispatch = useDispatch()
     const [ search, setSearch ] = useState('')
     const [ customerList, setCustomerList ] = useState(customers)
     const [ updateCust, setUpdateCust ] = useState({})
 
     useEffect(() => {
-        setCustomerList(customers)
-    }, [customers])
-
-    useEffect(() => {
         dispatch(asyncGetCustomers())
     }, [dispatch])
+
+    useEffect(() => {
+        setCustomerList(customers)
+    }, [customers])
 
     const filterCustomers = (value) => {
         if(value.length > 0) {
             const filteredCustomer = customers.filter(ele => {
-                return ele.name.toLowerCase().includes(value.toLowerCase()) || ele.mobile.includes(value) || ele.email.toLowerCase().includes(value.toLowerCase())
+                return ele.name.toLowerCase().includes(value.toLowerCase()) || ele.mobile.includes(value) || ele.address.toLowerCase().includes(value.toLowerCase())
             })
             setCustomerList(filteredCustomer)
         } else {
@@ -89,6 +90,11 @@ const CustomerPage = (props) => {
     const resetSearch = () => {
         setSearch('')
         filterCustomers('')
+    }
+
+    const handleEdit = (customer) => {
+        const { _id, name, mobile, address } = customer
+        // ... rest of edit handling
     }
 
     return (
@@ -128,7 +134,7 @@ const CustomerPage = (props) => {
                         variant='outlined' 
                         size="small"
                         value={search}
-                        label='Search customer by name, mobile or email' 
+                        label='Search customer by name, mobile or address' 
                         onChange={handleSearchChange}
                     />
                 </Box>

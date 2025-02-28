@@ -48,23 +48,23 @@ export const asyncCustomerDetail = (id, handleChange) => {
 }
 
 export const asyncGetCustomers = () => {
-    return (dispatch) => {
-        const token = localStorage.getItem('token')
-        const config = {
-            headers: {
-                Authorization: `Bearer ${token}`
-            }
-        }
-        axios.get(url, config)
-            .then(response => {
-                const data = response.data
-                dispatch(setCustomers(data))
+    return async (dispatch) => {
+        try {
+            const response = await axios.get('http://localhost:5000/api/customers', {
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                }
             })
-            .catch(err => alert(err.message))
+            dispatch(setCustomers(response.data))
+            return response; // Return the response for chaining
+        } catch (error) {
+            console.log('Error fetching customers', error)
+            throw error;
+        }
     }
 }
 
-export const asyncAddCustomer = (data, reset, closeModal) => {
+export const asyncAddCustomer = (formData, resetForm, handleClose) => {
     return (dispatch) => {
         const token = localStorage.getItem('token')
         const config = {
@@ -72,37 +72,43 @@ export const asyncAddCustomer = (data, reset, closeModal) => {
                 Authorization: `Bearer ${token}`
             }
         }
-        axios.post(url, data, config)
-            .then(response => {
-                const data = response.data
-                dispatch(addCustomer(data))
-                reset()
-                if(closeModal) {
-                    closeModal()
+        
+        axios.post(url, formData, config)
+            .then((response) => {
+                const customer = response.data
+                dispatch(addCustomer(customer))
+                resetForm()
+                if(handleClose){
+                    handleClose()
                 }
             })
-            .catch(err => alert(err.message))
+            .catch((err) => {
+                alert(err.message)
+            })
     }
 }
 
 export const asyncDeleteCustomer = (id) => {
-    return (dispatch) => {
-        const token = localStorage.getItem('token')
-        const config = {
-            headers: {
-                Authorization: `Bearer ${token}`
-            }
+    return async (dispatch) => {
+        try {
+            const token = localStorage.getItem('token');
+            const config = {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            };
+            
+            const response = await axios.delete(`${url}/${id}`, config);
+            dispatch(deleteCustomer(response.data));
+            return response; // Return the response for chaining
+        } catch (error) {
+            console.error('Error deleting customer:', error);
+            throw error;
         }
-        axios.delete(`${url}/${id}`, config)
-            .then(response => {
-                const data = response.data
-                dispatch(deleteCustomer(data))
-            })
-            .catch(err => alert(err.message))
-    }
+    };
 }
 
-export const asyncUpdateCustomer = (id, data, reset) => {
+export const asyncUpdateCustomer = (_id, formData, resetUpdateCust) => {
     return (dispatch) => {
         const token = localStorage.getItem('token')
         const config = {
@@ -110,12 +116,15 @@ export const asyncUpdateCustomer = (id, data, reset) => {
                 Authorization: `Bearer ${token}`
             }
         }
-        axios.put(`${url}/${id}`, data, config)
-            .then(response => {
-                const data = response.data
-                dispatch(updateCustomer(data))
-                reset()
+
+        axios.put(`${url}/${_id}`, formData, config)
+            .then((response) => {
+                const customer = response.data
+                dispatch(updateCustomer(customer))
+                resetUpdateCust()
             })
-            .catch(err => alert(err.message))
+            .catch((err) => {
+                alert(err.message)
+            })
     }
 }

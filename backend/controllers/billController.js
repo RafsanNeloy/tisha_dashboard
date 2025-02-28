@@ -32,11 +32,23 @@ const addBill = asyncHandler(async (req, res) => {
   // Set the new bill number
   const billNumber = lastBill ? lastBill.billNumber + 1 : 1;
 
+  // Get product types for each item
+  const itemsWithProductType = await Promise.all(items.map(async (item) => {
+    const product = await Product.findById(item.product);
+    if (!product) {
+      throw new Error(`Product not found: ${item.product}`);
+    }
+    return {
+      ...item,
+      product_type: product.product_type
+    };
+  }));
+
   const bill = await Bill.create({
     user: req.user.id,
     billNumber,
     customer,
-    items,
+    items: itemsWithProductType,
     total
   });
 
@@ -73,7 +85,7 @@ const deleteBill = asyncHandler(async (req, res) => {
 // @access  Private
 const getBill = asyncHandler(async (req, res) => {
   const bill = await Bill.findById(req.params.id)
-    .populate('customer', 'name')
+    .populate('customer', 'name address')
     .populate('items.product', 'name price');
 
   if (!bill) {

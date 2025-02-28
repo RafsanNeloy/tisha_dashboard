@@ -47,6 +47,7 @@ const BillView = () => {
                         Authorization: `Bearer ${token}`
                     }
                 })
+
                 setBill(response.data)
             } catch (err) {
                 console.error('Error fetching bill:', err)

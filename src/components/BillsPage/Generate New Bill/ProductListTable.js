@@ -107,6 +107,10 @@ const ProductListTable = (props) => {
         }, 'set');
     };
 
+    const getProductType = (type) => {
+        return type === 0 ? 'ডজন' : 'পিস';
+    }
+
     return (
         <Container disableGutters>
             {items.length > 0 && (
@@ -118,6 +122,7 @@ const ProductListTable = (props) => {
                                 <TableCell className={classes.tableHeaderFooter}>মালের নাম</TableCell>
                                 <TableCell className={classes.tableHeaderFooter}>দাম</TableCell>
                                 <TableCell className={`${classes.tableHeaderFooter} ${classes.quantityCell}`}>পরিমান</TableCell>
+                                <TableCell className={classes.tableHeaderFooter}>ধরন</TableCell>
                                 <TableCell className={classes.tableHeaderFooter}>মোট</TableCell>
                                 <TableCell className={classes.tableHeaderFooter}>বাতিল</TableCell>
                             </TableRow>
@@ -158,6 +163,7 @@ const ProductListTable = (props) => {
                                             </IconButton>
                                         </Box>
                                     </TableCell>
+                                    <TableCell>{getProductType(product.product_type)}</TableCell>
                                     <TableCell>৳{formatNumber(product.subTotal, 2)}</TableCell>
                                     <TableCell>
                                         <IconButton
