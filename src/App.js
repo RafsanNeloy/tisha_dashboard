@@ -5,13 +5,25 @@ import { ThemeProvider } from '@mui/material/styles'
 import CssBaseline from '@mui/material/CssBaseline'
 import { theme } from './theme/theme'
 import { useDispatch } from 'react-redux'
-import { asyncGetUser } from './action/userAction'
+import { asyncGetUser, setLogout } from './action/userAction'
+import { isTokenExpired } from './utils/authUtils'
 
 const App = (props) => {
   const dispatch = useDispatch()
 
   useEffect(() => {
     dispatch(asyncGetUser())
+  }, [dispatch])
+
+  useEffect(() => {
+    const checkTokenInterval = setInterval(() => {
+        if (isTokenExpired()) {
+            dispatch(setLogout())
+            localStorage.removeItem('token')
+        }
+    }, 60000)
+
+    return () => clearInterval(checkTokenInterval)
   }, [dispatch])
 
   return (

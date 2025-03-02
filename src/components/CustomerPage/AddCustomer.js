@@ -1,7 +1,10 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { Container, Typography } from '@mui/material'
 import { makeStyles } from '@mui/styles'
 import CustomerForm from './CustomerForm'
+import { useNavigate } from 'react-router-dom'
+
+import { checkAuthAndRedirect } from '../../utils/authUtils'
 
 const useStyle = makeStyles({
     title:{
@@ -14,6 +17,11 @@ const useStyle = makeStyles({
 
 const AddCustomer = (props) => {
     const classes = useStyle()
+    const navigate = useNavigate()
+
+    useEffect(() => {
+        checkAuthAndRedirect(navigate, () => navigate('/customers'))
+    }, [navigate])
 
     return (
         <Container className={classes.container}>

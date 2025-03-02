@@ -12,27 +12,29 @@ export const setUser = (data) => {
     }
 }
 
+export const setLogout = () => {
+    return {
+        type: 'LOGOUT_USER'
+    }
+}
+
 export const asyncGetUser = () => {
     return (dispatch) => {
         const token = localStorage.getItem('token')
-        if (!token) {
-            return; // Don't make the request if there's no token
+        if(token) {
+            axios.get('http://localhost:5000/api/users/account', {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            })
+                .then((response) => {
+                    const result = response.data
+                    dispatch(setUser(result))
+                })
+                .catch((err) => {
+                    alert(err.message)
+                })
         }
-        
-        axios.get(`${url}/account`, {
-            headers:{
-                Authorization: `Bearer ${token}`
-            }
-        })
-            .then(response => {
-                const data = response.data
-                console.log('User Data from API:', data)
-                dispatch(setUser(data)) // Store the entire user object
-            })
-            .catch(err => {
-                console.error('Error fetching user:', err)
-                alert(err.message)
-            })
     }
 }
 

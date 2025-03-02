@@ -11,6 +11,11 @@ const PrintBill = (props) => {
     const { customer, customerAddress, bill, id, items } = props
     const billRef = useRef(null)
 
+    // Add validation check
+    if (!customer || !bill || !items) {
+        return null // Or return a loading state
+    }
+
     const generatePdf = () => {
         const element = billRef.current
         const opt = {
@@ -169,12 +174,12 @@ const PrintBill = (props) => {
                     marginBottom: '8mm'
                 }}>
                     <div>
-                        <span style={{ fontWeight: 'bold' }}>ক্রেতার নাম:</span> {customer.name}<br />
-                        <span style={{ fontWeight: 'bold' }}>ঠিকানা:</span> {customerAddress}
+                        <span style={{ fontWeight: 'bold' }}>ক্রেতার নাম:</span> {customer?.name || 'N/A'}<br />
+                        <span style={{ fontWeight: 'bold' }}>ঠিকানা:</span> {customerAddress || 'N/A'}
                     </div>
                     <div>
-                        <span style={{ fontWeight: 'bold' }}>বিল নং:</span> {englishToBengali(bill.billNumber)}<br />
-                        <span style={{ fontWeight: 'bold' }}>তারিখ:</span> {moment(bill.createdAt).format('DD/MM/YYYY')}
+                        <span style={{ fontWeight: 'bold' }}>বিল নং:</span> {englishToBengali(bill?.billNumber || '')}<br />
+                        <span style={{ fontWeight: 'bold' }}>তারিখ:</span> {bill?.createdAt ? moment(bill.createdAt).format('DD/MM/YYYY') : 'N/A'}
                     </div>
                 </div>
 
@@ -183,7 +188,7 @@ const PrintBill = (props) => {
                     width: '100%', 
                     borderCollapse: 'collapse',
                     marginBottom: '4mm',
-                    fontSize: '10px' // Increased from 7px
+                    fontSize: '10px'
                 }}>
                     <thead>
                         <tr style={{ backgroundColor: '#3498db', color: 'white' }}>
@@ -195,20 +200,22 @@ const PrintBill = (props) => {
                         </tr>
                     </thead>
                     <tbody>
-                        {items.map((item, i) => (
+                        {(items || []).map((item, i) => (
                             <tr key={i}>
                                 <td style={{ padding: '2mm', border: '0.5px solid #bdc3c7', textAlign: 'center' }}>
                                     {englishToBengali(i + 1)}
                                 </td>
-                                <td style={{ padding: '2mm', border: '0.5px solid #bdc3c7' }}>{item.product.name}</td>
+                                <td style={{ padding: '2mm', border: '0.5px solid #bdc3c7' }}>
+                                    {item?.product?.name || 'N/A'}
+                                </td>
                                 <td style={{ padding: '2mm', border: '0.5px solid #bdc3c7', textAlign: 'right' }}>
-                                    ৳{englishToBengali(item.price)}
+                                    ৳{englishToBengali(item?.price || 0)}
                                 </td>
                                 <td style={{ padding: '2mm', border: '0.5px solid #bdc3c7', textAlign: 'center' }}>
-                                    {englishToBengali(item.quantity)}
+                                    {englishToBengali(item?.quantity || 0)}
                                 </td>
                                 <td style={{ padding: '2mm', border: '0.5px solid #bdc3c7', textAlign: 'right' }}>
-                                    ৳{englishToBengali(item.subTotal)}
+                                    ৳{englishToBengali(item?.subTotal || 0)}
                                 </td>
                             </tr>
                         ))}
@@ -219,7 +226,7 @@ const PrintBill = (props) => {
                                 <strong>Total Amount:</strong>
                             </td>
                             <td style={{ padding: '2mm', border: '0.5px solid #bdc3c7', textAlign: 'right' }}>
-                                <strong>৳{englishToBengali(bill.total)}</strong>
+                                <strong>৳{englishToBengali(bill?.total || 0)}</strong>
                             </td>
                         </tr>
                     </tfoot>
