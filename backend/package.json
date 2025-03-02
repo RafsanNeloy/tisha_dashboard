@@ -1,5 +1,5 @@
 {
-  "name": "pos-backend",
+  "name": "tisha-plastic-backend",
   "version": "1.0.0",
   "description": "Backend for POS application",
   "main": "server.js",
