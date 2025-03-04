@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Container, Typography, Box, Grid } from '@mui/material'
 import { makeStyles } from '@mui/styles'
 import { useNavigate } from 'react-router-dom'
@@ -7,6 +7,7 @@ import ProductListTable from './ProductListTable'
 import SummaryOfBill from './SummaryOfBill'
 import AddCustomerModal from './AddCustomerModal'
 import Swal from 'sweetalert2'
+import { checkAuthAndRedirect } from '../../../utils/authUtils'
 
 const useStyle = makeStyles({
     title:{
@@ -27,6 +28,10 @@ const AddBill = (props) => {
     const [ lineItems, setLineItems ] = useState([])
     const [ customerInfo, setCustomerInfo ] = useState([])
     const [isLoading, setIsLoading] = useState(false)
+
+    useEffect(() => {
+        checkAuthAndRedirect(navigate, () => navigate('/bills'))
+    }, [navigate])
 
     // functions related to lineitems
     const handleAddLineItem = (data) => {
