@@ -33,8 +33,12 @@ const PrintBill = (props) => {
 
         html2pdf().from(element).set(opt).save()
     }
+    const getProductType = (type) => {
+        return type === 0 ? 'ডজন' : 'পিস';
+    }
 
-    const BillTemplate = ({ copyType }) => (
+
+    const BillTemplate = ({ copyType, pageItems, pageNumber, totalPages, isLastPage }) => (
         <div style={{ 
             width: '148mm',  // A5 width
             height: '210mm',  // A5 height
@@ -42,7 +46,7 @@ const PrintBill = (props) => {
             boxSizing: 'border-box',
             backgroundColor: 'white',
             position: 'relative',
-            pageBreakAfter: copyType === 'MAIN COPY' ? 'always' : 'avoid',
+            pageBreakAfter: (copyType === 'MAIN COPY' && pageNumber === totalPages) ? 'always' : 'always',
             overflow: 'hidden'
         }}>
             {/* Center Logo Watermark */}
@@ -50,7 +54,7 @@ const PrintBill = (props) => {
                 position: 'absolute',
                 top: '50%',
                 left: '50%',
-                transform: 'translate(-50%, -50%) rotate(-45deg)',
+                transform: 'translate(-50%, -50%)',
                 zIndex: 0,
                 opacity: 0.07,
                 pointerEvents: 'none',
@@ -178,12 +182,24 @@ const PrintBill = (props) => {
                     </div>
                 </div>
 
+                {/* Page Number Indicator */}
+                <div style={{
+                    position: 'absolute',
+                    top: '3mm',
+                    left: '3mm',
+                    fontSize: '8px',
+                    padding: '1px 3px',
+                    border: '1px solid #000'
+                }}>
+                    Page {englishToBengali(pageNumber)} of {englishToBengali(totalPages)}
+                </div>
+
                 {/* Items Table */}
                 <table style={{ 
                     width: '100%', 
                     borderCollapse: 'collapse',
                     marginBottom: '4mm',
-                    fontSize: '10px' // Increased from 7px
+                    fontSize: '10px'
                 }}>
                     <thead>
                         <tr style={{ backgroundColor: '#3498db', color: 'white' }}>
@@ -195,17 +211,17 @@ const PrintBill = (props) => {
                         </tr>
                     </thead>
                     <tbody>
-                        {items.map((item, i) => (
+                        {pageItems.map((item, i) => (
                             <tr key={i}>
                                 <td style={{ padding: '2mm', border: '0.5px solid #bdc3c7', textAlign: 'center' }}>
-                                    {englishToBengali(i + 1)}
+                                    {englishToBengali(((pageNumber - 1) * 14) + i + 1)}
                                 </td>
                                 <td style={{ padding: '2mm', border: '0.5px solid #bdc3c7' }}>{item.product.name}</td>
                                 <td style={{ padding: '2mm', border: '0.5px solid #bdc3c7', textAlign: 'right' }}>
                                     ৳{englishToBengali(item.price)}
                                 </td>
                                 <td style={{ padding: '2mm', border: '0.5px solid #bdc3c7', textAlign: 'center' }}>
-                                    {englishToBengali(item.quantity)}
+                                    {englishToBengali(item.quantity)} {getProductType(item.product_type)}
                                 </td>
                                 <td style={{ padding: '2mm', border: '0.5px solid #bdc3c7', textAlign: 'right' }}>
                                     ৳{englishToBengali(item.subTotal)}
@@ -216,45 +232,72 @@ const PrintBill = (props) => {
                     <tfoot>
                         <tr style={{ backgroundColor: '#f8f9fa' }}>
                             <td colSpan="4" style={{ padding: '2mm', border: '0.5px solid #bdc3c7', textAlign: 'right' }}>
-                                <strong>Total Amount:</strong>
+                                <strong>{isLastPage ? 'Total Amount:' : 'Page Total:'}</strong>
                             </td>
                             <td style={{ padding: '2mm', border: '0.5px solid #bdc3c7', textAlign: 'right' }}>
-                                <strong>৳{englishToBengali(bill.total)}</strong>
+                                <strong>৳{englishToBengali(isLastPage ? bill.total : pageItems.reduce((sum, item) => sum + item.subTotal, 0))}</strong>
                             </td>
                         </tr>
                     </tfoot>
                 </table>
 
-                {/* Signatures */}
-                <div style={{ 
-                    display: 'flex', 
-                    justifyContent: 'space-between',
-                    marginTop: '10mm', // Increased spacing
-                    fontSize: '10px', // Increased from 7px
-                    padding: '0 10mm' // Added horizontal padding
-                }}>
-                    <div style={{ textAlign: 'center' }}>
-                        <div style={{ borderTop: '0.5px solid #000', width: '35mm', margin: '0 auto' }}></div>
-                        <p style={{ margin: '2mm 0 0 0' }}>Customer's Signature</p>
-                    </div>
-                    <div style={{ textAlign: 'center' }}>
-                        <div style={{ borderTop: '0.5px solid #000', width: '35mm', margin: '0 auto' }}></div>
-                        <p style={{ margin: '2mm 0 0 0' }}>Seller's Signature</p>
-                    </div>
-                </div>
+                {/* Only show signatures on the last page */}
+                {isLastPage && (
+                    <>
+                        {/* Signatures section */}
+                        <div style={{ 
+                            display: 'flex', 
+                            justifyContent: 'space-between',
+                            marginTop: '10mm',
+                            fontSize: '10px',
+                            padding: '0 10mm'
+                        }}>
+                            <div style={{ textAlign: 'center' }}>
+                                <div style={{ borderTop: '0.5px solid #000', width: '35mm', margin: '0 auto' }}></div>
+                                <p style={{ margin: '2mm 0 0 0' }}>Customer's Signature</p>
+                            </div>
+                            <div style={{ textAlign: 'center' }}>
+                                <div style={{ borderTop: '0.5px solid #000', width: '35mm', margin: '0 auto' }}></div>
+                                <p style={{ margin: '2mm 0 0 0' }}>Seller's Signature</p>
+                            </div>
+                        </div>
 
-                {/* Footer */}
-                <div style={{ 
-                    textAlign: 'center', 
-                    marginTop: '6mm',
-                    color: '#7f8c8d',
-                    fontSize: '9px' // Increased from 6px
-                }}>
-                    <p style={{ margin: '0' }}>Thank you for your business!</p>
-                </div>
+                        {/* Footer */}
+                        <div style={{ 
+                            textAlign: 'center', 
+                            marginTop: '6mm',
+                            color: '#7f8c8d',
+                            fontSize: '9px'
+                        }}>
+                            <p style={{ margin: '0' }}>Thank you for your business!</p>
+                        </div>
+                    </>
+                )}
             </div>
         </div>
     )
+
+    const renderBillPages = (items, copyType) => {
+        const ITEMS_PER_PAGE = 14;
+        const totalPages = Math.ceil(items.length / ITEMS_PER_PAGE);
+        
+        return Array.from({ length: totalPages }, (_, i) => {
+            const pageNumber = i + 1;
+            const startIdx = i * ITEMS_PER_PAGE;
+            const pageItems = items.slice(startIdx, startIdx + ITEMS_PER_PAGE);
+            
+            return (
+                <BillTemplate 
+                    key={`${copyType}-page-${pageNumber}`}
+                    copyType={copyType}
+                    pageItems={pageItems}
+                    pageNumber={pageNumber}
+                    totalPages={totalPages}
+                    isLastPage={pageNumber === totalPages}
+                />
+            );
+        });
+    };
 
     return (
         <>
@@ -269,8 +312,8 @@ const PrintBill = (props) => {
 
             <div style={{ display: 'none' }}>
                 <div ref={billRef}>
-                    <BillTemplate copyType="MAIN COPY" />
-                    <BillTemplate copyType="CUSTOMER COPY" />
+                    {renderBillPages(items, "MAIN COPY")}
+                    {renderBillPages(items, "CUSTOMER COPY")}
                 </div>
             </div>
         </>

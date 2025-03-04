@@ -30,8 +30,19 @@ const AddBill = (props) => {
 
     // functions related to lineitems
     const handleAddLineItem = (data) => {
-        const newList = [...lineItems, data]
-        setLineItems(newList)
+        // Check if the product already exists in the lineItems
+        const productExists = lineItems.some(product => product._id === data._id);
+        if (productExists) {
+            // Show warning message if product already exists
+            Swal.fire({
+                icon: 'warning',
+                title: 'Product Already Added',
+                text: 'This product is already in the bill. You can update the quantity instead.',
+            });
+            return;
+        }
+        const newList = [...lineItems, data];
+        setLineItems(newList);
     }
 
     const handleRemoveLineItem = (data) => {
