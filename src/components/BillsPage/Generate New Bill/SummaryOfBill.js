@@ -73,7 +73,6 @@ const SummaryOfBill = (props) => {
 
         props.setIsLoading(true);
 
-        // Format line items properly
         const formattedLineItems = lineItems.map(item => ({
             product: item._id,
             quantity: Number(item.quantity),
@@ -82,7 +81,6 @@ const SummaryOfBill = (props) => {
             subTotal: Number(item.subTotal)
         }));
 
-        // Calculate remaining amount
         const total = Number(finalTotal);
         const wastage = Number(wastageAmount) || 0;
         const less = Number(lessAmount) || 0;
@@ -99,15 +97,11 @@ const SummaryOfBill = (props) => {
             remainingAmount: remaining
         };
 
-        console.log('Submitting bill data:', billData);
-
         dispatch(asyncAddBill(billData))
             .then(response => {
-                console.log('Bill created successfully:', response);
                 props.onGenerateSuccess(response.data._id);
             })
             .catch(error => {
-                console.error('Error creating bill:', error);
                 props.onGenerateError(error);
             })
             .finally(() => {

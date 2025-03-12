@@ -19,9 +19,6 @@ const getBills = asyncHandler(async (req, res) => {
 // @access  Private
 const addBill = asyncHandler(async (req, res) => {
   try {
-    console.log('Received bill data:', req.body);
-    console.log('User data:', req.user); // Add this to debug user data
-
     const { customer, items, total, wastageAmount, lessAmount, collectionAmount } = req.body;
 
     // Validate required fields
@@ -40,8 +37,6 @@ const addBill = asyncHandler(async (req, res) => {
     const lastBill = await Bill.findOne().sort({ billNumber: -1 }).limit(1);
     const billNumber = lastBill ? lastBill.billNumber + 1 : 1;
 
-    console.log('Processing items:', items);
-
     // Get product types
     const itemsWithProductType = await Promise.all(items.map(async (item) => {
       const product = await Product.findById(item.product);
@@ -58,7 +53,7 @@ const addBill = asyncHandler(async (req, res) => {
     const remainingAmount = total - (wastageAmount || 0) - (lessAmount || 0) - (collectionAmount || 0);
 
     const billData = {
-      user: req.user._id, // Use _id instead of id
+      user: req.user._id,
       billNumber,
       customer,
       items: itemsWithProductType,
@@ -69,23 +64,15 @@ const addBill = asyncHandler(async (req, res) => {
       remainingAmount
     };
 
-    console.log('Creating bill with data:', billData);
-
     const bill = await Bill.create(billData);
 
     const populatedBill = await Bill.findById(bill._id)
       .populate('customer', 'name')
       .populate('items.product', 'name price');
 
-    console.log('Bill created successfully:', populatedBill);
     res.status(201).json(populatedBill);
 
   } catch (error) {
-    console.error('Detailed error in bill creation:', {
-      message: error.message,
-      stack: error.stack,
-      name: error.name
-    });
     res.status(500);
     throw new Error(`Error creating bill: ${error.message}`);
   }

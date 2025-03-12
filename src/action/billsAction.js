@@ -48,9 +48,6 @@ export const asyncAddBill = (data) => {
         }
 
         try {
-            console.log('Token:', token); // Debug log
-            console.log('Request data:', data); // Debug log
-
             const response = await axios.post('http://localhost:5000/api/bills', data, {
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -61,7 +58,6 @@ export const asyncAddBill = (data) => {
             dispatch(addBill(response.data));
             return response;
         } catch (error) {
-            console.error('Bill creation error:', error.response?.data || error);
             throw error;
         }
     };
