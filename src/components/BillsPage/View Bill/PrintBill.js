@@ -43,245 +43,286 @@ const PrintBill = (props) => {
     }
 
 
-    const BillTemplate = ({ copyType, pageItems, pageNumber, totalPages, isLastPage }) => (
-        <div style={{ 
-            width: '148mm',  // A5 width
-            height: '210mm',  // A5 height
-            padding: '8mm',
-            boxSizing: 'border-box',
-            backgroundColor: 'white',
-            position: 'relative',
-            pageBreakAfter: (copyType === 'MAIN COPY' && pageNumber === totalPages) ? 'always' : 'always',
-            overflow: 'hidden'
-        }}>
-            {/* Center Logo Watermark */}
-            <div style={{
-                position: 'absolute',
-                top: '50%',
-                left: '50%',
-                transform: 'translate(-50%, -50%)',
-                zIndex: 0,
-                opacity: 0.07,
-                pointerEvents: 'none',
-                textAlign: 'center'
-            }}>
-                <img 
-                    src={logo}
-                    alt="Logo Watermark"
-                    style={{
-                        width: '80mm',
-                        height: 'auto'
-                    }}
-                />
-            </div>
+    const BillTemplate = ({ copyType, pageItems, pageNumber, totalPages, isLastPage }) => {
+        // Calculate the total of all items (not just current page)
+        const calculateTotalAmount = () => {
+            return items.reduce((sum, item) => sum + item.subTotal, 0);
+        };
 
-            {/* Bottom Plastic Watermark */}
-            <div style={{
-                position: 'absolute',
-                bottom: '5mm',
-                left: '50%',
-                transform: 'translateX(-50%)',
-                zIndex: 0,
-                opacity: 0.1,
-                pointerEvents: 'none',
-                textAlign: 'center'
-            }}>
-                <img 
-                    src={plasticWatermark}
-                    alt="Plastic Watermark"
-                    style={{
-                        width: '40mm',
-                        height: 'auto'
-                    }}
-                />
-            </div>
+        // Get the full subtotal and discount only for the last page
+        const fullSubtotal = calculateTotalAmount();
+        const discountAmount = fullSubtotal - bill.total;
 
-            {/* Content Container - ensures content stays above watermarks */}
-            <div style={{ position: 'relative', zIndex: 1 }}>
-                {/* Copy Type Indicator */}
+        return (
+            <div style={{ 
+                width: '148mm',
+                height: '210mm',
+                padding: '8mm',
+                boxSizing: 'border-box',
+                backgroundColor: 'white',
+                position: 'relative',
+                pageBreakAfter: (copyType === 'MAIN COPY' && pageNumber === totalPages) ? 'always' : 'always',
+                overflow: 'hidden'
+            }}>
+                {/* Center Logo Watermark */}
                 <div style={{
                     position: 'absolute',
-                    top: '3mm',
-                    right: '3mm',
-                    fontSize: '8px',
-                    padding: '1px 3px',
-                    border: '1px solid #000'
+                    top: '50%',
+                    left: '50%',
+                    transform: 'translate(-50%, -50%)',
+                    zIndex: 0,
+                    opacity: 0.07,
+                    pointerEvents: 'none',
+                    textAlign: 'center'
                 }}>
-                    {copyType}
+                    <img 
+                        src={logo}
+                        alt="Logo Watermark"
+                        style={{
+                            width: '80mm',
+                            height: 'auto'
+                        }}
+                    />
                 </div>
 
-                {/* Green Line */}
+                {/* Bottom Plastic Watermark */}
                 <div style={{
-                    borderTop: '2px solid green',
-                    width: '100%',
-                    marginBottom: '5mm'
-                }}></div>
-
-                {/* Header Content */}
-                <div style={{
-                    textAlign: 'center',
-                    marginBottom: '5mm'
+                    position: 'absolute',
+                    bottom: '5mm',
+                    left: '50%',
+                    transform: 'translateX(-50%)',
+                    zIndex: 0,
+                    opacity: 0.1,
+                    pointerEvents: 'none',
+                    textAlign: 'center'
                 }}>
+                    <img 
+                        src={plasticWatermark}
+                        alt="Plastic Watermark"
+                        style={{
+                            width: '40mm',
+                            height: 'auto'
+                        }}
+                    />
+                </div>
+
+                {/* Content Container - ensures content stays above watermarks */}
+                <div style={{ position: 'relative', zIndex: 1 }}>
+                    {/* Copy Type Indicator */}
                     <div style={{
-                        fontSize: '10px',
-                        marginBottom: '3mm'
+                        position: 'absolute',
+                        top: '3mm',
+                        right: '3mm',
+                        fontSize: '8px',
+                        padding: '1px 3px',
+                        border: '1px solid #000'
                     }}>
-                        নিত্যপ্রয়োজনীয় প্লাস্টিকের সামগ্রী
+                        {copyType}
                     </div>
 
-                    {/* Logo and Company Name */}
+                    {/* Green Line */}
+                    <div style={{
+                        borderTop: '2px solid green',
+                        width: '100%',
+                        marginBottom: '5mm'
+                    }}></div>
+
+                    {/* Header Content */}
+                    <div style={{
+                        textAlign: 'center',
+                        marginBottom: '5mm'
+                    }}>
+                        <div style={{
+                            fontSize: '10px',
+                            marginBottom: '3mm'
+                        }}>
+                            নিত্যপ্রয়োজনীয় প্লাস্টিকের সামগ্রী
+                        </div>
+
+                        {/* Logo and Company Name */}
+                        <div style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            gap: '5mm',
+                            marginBottom: '3mm'
+                        }}>
+                            <img 
+                                src={logo} 
+                                alt="Logo" 
+                                style={{
+                                    width: '25px',
+                                    height: 'auto'
+                                }}
+                            />
+                            <h1 style={{
+                                margin: '0',
+                                fontSize: '18px',
+                                fontWeight: 'bold'
+                            }}>
+                                TISHA PLASTIC PRODUCTS
+                            </h1>
+                        </div>
+
+                        {/* Address */}
+                        <div style={{
+                            fontSize: '10px',
+                            marginBottom: '3mm'
+                        }}>
+                            ৬/৭/৭/১, চাম্পাতলী লেন, সয়ারিঘাট, ঢাকা
+                        </div>
+                    </div>
+
+                    {/* Blue Line */}
+                    <div style={{
+                        borderTop: '2px solid blue',
+                        width: '100%',
+                        marginBottom: '8mm'
+                    }}></div>
+
+                    {/* Customer Info */}
                     <div style={{
                         display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        gap: '5mm',
-                        marginBottom: '3mm'
-                    }}>
-                        <img 
-                            src={logo} 
-                            alt="Logo" 
-                            style={{
-                                width: '25px',
-                                height: 'auto'
-                            }}
-                        />
-                        <h1 style={{
-                            margin: '0',
-                            fontSize: '18px',
-                            fontWeight: 'bold'
-                        }}>
-                            TISHA PLASTIC PRODUCTS
-                        </h1>
-                    </div>
-
-                    {/* Address */}
-                    <div style={{
+                        justifyContent: 'space-between',
                         fontSize: '10px',
-                        marginBottom: '3mm'
+                        marginBottom: '8mm'
                     }}>
-                        ৬/৭/৭/১, চাম্পাতলী লেন, সয়ারিঘাট, ঢাকা
+                        <div>
+                            <span style={{ fontWeight: 'bold' }}>ক্রেতার নাম:</span> {customer?.name || 'N/A'}<br />
+                            <span style={{ fontWeight: 'bold' }}>ঠিকানা:</span> {customerAddress || 'N/A'}
+                        </div>
+                        <div>
+                            <span style={{ fontWeight: 'bold' }}>বিল নং:</span> {englishToBengali(bill?.billNumber || '')}<br />
+                            <span style={{ fontWeight: 'bold' }}>তারিখ:</span> {bill?.createdAt ? moment(bill.createdAt).format('DD/MM/YYYY') : 'N/A'}
+                        </div>
                     </div>
-                </div>
 
-                {/* Blue Line */}
-                <div style={{
-                    borderTop: '2px solid blue',
-                    width: '100%',
-                    marginBottom: '8mm'
-                }}></div>
-
-                {/* Customer Info */}
-                <div style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    fontSize: '10px',
-                    marginBottom: '8mm'
-                }}>
-                    <div>
-                        <span style={{ fontWeight: 'bold' }}>ক্রেতার নাম:</span> {customer?.name || 'N/A'}<br />
-                        <span style={{ fontWeight: 'bold' }}>ঠিকানা:</span> {customerAddress || 'N/A'}
+                    {/* Page Number Indicator */}
+                    <div style={{
+                        position: 'absolute',
+                        top: '3mm',
+                        left: '3mm',
+                        fontSize: '8px',
+                        padding: '1px 3px',
+                        border: '1px solid #000'
+                    }}>
+                        Page {englishToBengali(pageNumber)} of {englishToBengali(totalPages)}
                     </div>
-                    <div>
-                        <span style={{ fontWeight: 'bold' }}>বিল নং:</span> {englishToBengali(bill?.billNumber || '')}<br />
-                        <span style={{ fontWeight: 'bold' }}>তারিখ:</span> {bill?.createdAt ? moment(bill.createdAt).format('DD/MM/YYYY') : 'N/A'}
-                    </div>
-                </div>
 
-                {/* Page Number Indicator */}
-                <div style={{
-                    position: 'absolute',
-                    top: '3mm',
-                    left: '3mm',
-                    fontSize: '8px',
-                    padding: '1px 3px',
-                    border: '1px solid #000'
-                }}>
-                    Page {englishToBengali(pageNumber)} of {englishToBengali(totalPages)}
-                </div>
-
-                {/* Items Table */}
-                <table style={{ 
-                    width: '100%', 
-                    borderCollapse: 'collapse',
-                    marginBottom: '4mm',
-                    fontSize: '10px'
-                    fontSize: '10px'
-                }}>
-                    <thead>
-                        <tr style={{ backgroundColor: '#3498db', color: 'white' }}>
-                            <th style={{ padding: '2mm', border: '0.5px solid #bdc3c7', width: '8%' }}>SL</th>
-                            <th style={{ padding: '2mm', border: '0.5px solid #bdc3c7', width: '40%' }}>মালের নাম</th>
-                            <th style={{ padding: '2mm', border: '0.5px solid #bdc3c7', width: '17%' }}>দাম</th>
-                            <th style={{ padding: '2mm', border: '0.5px solid #bdc3c7', width: '15%' }}>পরিমান</th>
-                            <th style={{ padding: '2mm', border: '0.5px solid #bdc3c7', width: '20%' }}>মোট</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {pageItems.map((item, i) => (
-                            <tr key={i}>
-                                <td style={{ padding: '2mm', border: '0.5px solid #bdc3c7', textAlign: 'center' }}>
-                                    {englishToBengali(((pageNumber - 1) * 14) + i + 1)}
-                                </td>
-                                <td style={{ padding: '2mm', border: '0.5px solid #bdc3c7' }}>{item.product.name}</td>
-                                <td style={{ padding: '2mm', border: '0.5px solid #bdc3c7', textAlign: 'right' }}>
-                                    ৳{englishToBengali(item?.price || 0)}
-                                </td>
-                                <td style={{ padding: '2mm', border: '0.5px solid #bdc3c7', textAlign: 'center' }}>
-                                    {englishToBengali(item.quantity)} {getProductType(item.product_type)}
-                                </td>
-                                <td style={{ padding: '2mm', border: '0.5px solid #bdc3c7', textAlign: 'right' }}>
-                                    ৳{englishToBengali(item?.subTotal || 0)}
-                                </td>
+                    {/* Items Table */}
+                    <table style={{ 
+                        width: '100%', 
+                        borderCollapse: 'collapse',
+                        marginBottom: '4mm',
+                        fontSize: '10px'
+                    }}>
+                        <thead>
+                            <tr style={{ backgroundColor: '#3498db', color: 'white' }}>
+                                <th style={{ padding: '2mm', border: '0.5px solid #bdc3c7', width: '8%' }}>SL</th>
+                                <th style={{ padding: '2mm', border: '0.5px solid #bdc3c7', width: '40%' }}>মালের নাম</th>
+                                <th style={{ padding: '2mm', border: '0.5px solid #bdc3c7', width: '17%' }}>দাম</th>
+                                <th style={{ padding: '2mm', border: '0.5px solid #bdc3c7', width: '15%' }}>পরিমান</th>
+                                <th style={{ padding: '2mm', border: '0.5px solid #bdc3c7', width: '20%' }}>মোট</th>
                             </tr>
-                        ))}
-                    </tbody>
-                    <tfoot>
-                        <tr style={{ backgroundColor: '#f8f9fa' }}>
-                            <td colSpan="4" style={{ padding: '2mm', border: '0.5px solid #bdc3c7', textAlign: 'right' }}>
-                                <strong>{isLastPage ? 'Total Amount:' : 'Page Total:'}</strong>
-                            </td>
-                            <td style={{ padding: '2mm', border: '0.5px solid #bdc3c7', textAlign: 'right' }}>
-                                <strong>৳{englishToBengali(isLastPage ? bill.total : pageItems.reduce((sum, item) => sum + item.subTotal, 0))}</strong>
-                            </td>
-                        </tr>
-                    </tfoot>
-                </table>
+                        </thead>
+                        <tbody>
+                            {pageItems.map((item, i) => (
+                                <tr key={i}>
+                                    <td style={{ padding: '2mm', border: '0.5px solid #bdc3c7', textAlign: 'center' }}>
+                                        {englishToBengali(((pageNumber - 1) * 14) + i + 1)}
+                                    </td>
+                                    <td style={{ padding: '2mm', border: '0.5px solid #bdc3c7' }}>{item.product.name}</td>
+                                    <td style={{ padding: '2mm', border: '0.5px solid #bdc3c7', textAlign: 'right' }}>
+                                        ৳{englishToBengali(item.price)}
+                                    </td>
+                                    <td style={{ padding: '2mm', border: '0.5px solid #bdc3c7', textAlign: 'center' }}>
+                                        {englishToBengali(item.quantity)} {getProductType(item.product_type)}
+                                    </td>
+                                    <td style={{ padding: '2mm', border: '0.5px solid #bdc3c7', textAlign: 'right' }}>
+                                        ৳{englishToBengali(item.subTotal)}
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                        <tfoot>
+                            {isLastPage ? (
+                                <>
+                                    <tr style={{ backgroundColor: '#f8f9fa' }}>
+                                        <td colSpan="4" style={{ padding: '2mm', border: '0.5px solid #bdc3c7', textAlign: 'right' }}>
+                                            <strong>Subtotal:</strong>
+                                        </td>
+                                        <td style={{ padding: '2mm', border: '0.5px solid #bdc3c7', textAlign: 'right' }}>
+                                            <strong>৳{englishToBengali(fullSubtotal)}</strong>
+                                        </td>
+                                    </tr>
+                                    {discountAmount > 0 && (
+                                        <tr style={{ backgroundColor: '#f8f9fa' }}>
+                                            <td colSpan="4" style={{ padding: '2mm', border: '0.5px solid #bdc3c7', textAlign: 'right' }}>
+                                                <strong>(-) Discount:</strong>
+                                            </td>
+                                            <td style={{ padding: '2mm', border: '0.5px solid #bdc3c7', textAlign: 'right' }}>
+                                                <strong>৳{englishToBengali(discountAmount)}</strong>
+                                            </td>
+                                        </tr>
+                                    )}
+                                    <tr style={{ backgroundColor: '#f8f9fa' }}>
+                                        <td colSpan="4" style={{ padding: '2mm', border: '0.5px solid #bdc3c7', textAlign: 'right', borderTop: '2px solid #000' }}>
+                                            <strong>Total Amount:</strong>
+                                        </td>
+                                        <td style={{ padding: '2mm', border: '0.5px solid #bdc3c7', textAlign: 'right', borderTop: '2px solid #000' }}>
+                                            <strong>৳{englishToBengali(bill.total)}</strong>
+                                        </td>
+                                    </tr>
+                                </>
+                            ) : (
+                                <tr style={{ backgroundColor: '#f8f9fa' }}>
+                                    <td colSpan="4" style={{ padding: '2mm', border: '0.5px solid #bdc3c7', textAlign: 'right' }}>
+                                        <strong>Page Total:</strong>
+                                    </td>
+                                    <td style={{ padding: '2mm', border: '0.5px solid #bdc3c7', textAlign: 'right' }}>
+                                        <strong>৳{englishToBengali(pageItems.reduce((sum, item) => sum + item.subTotal, 0))}</strong>
+                                    </td>
+                                </tr>
+                            )}
+                        </tfoot>
+                    </table>
 
-                {/* Only show signatures on the last page */}
-                {isLastPage && (
-                    <>
-                        {/* Signatures section */}
-                        <div style={{ 
-                            display: 'flex', 
-                            justifyContent: 'space-between',
-                            marginTop: '10mm',
-                            fontSize: '10px',
-                            padding: '0 10mm'
-                        }}>
-                            <div style={{ textAlign: 'center' }}>
-                                <div style={{ borderTop: '0.5px solid #000', width: '35mm', margin: '0 auto' }}></div>
-                                <p style={{ margin: '2mm 0 0 0' }}>Customer's Signature</p>
+                    {/* Only show signatures on the last page */}
+                    {isLastPage && (
+                        <>
+                            {/* Signatures section */}
+                            <div style={{ 
+                                display: 'flex', 
+                                justifyContent: 'space-between',
+                                marginTop: '10mm',
+                                fontSize: '10px',
+                                padding: '0 10mm'
+                            }}>
+                                <div style={{ textAlign: 'center' }}>
+                                    <div style={{ borderTop: '0.5px solid #000', width: '35mm', margin: '0 auto' }}></div>
+                                    <p style={{ margin: '2mm 0 0 0' }}>Customer's Signature</p>
+                                </div>
+                                <div style={{ textAlign: 'center' }}>
+                                    <div style={{ borderTop: '0.5px solid #000', width: '35mm', margin: '0 auto' }}></div>
+                                    <p style={{ margin: '2mm 0 0 0' }}>Seller's Signature</p>
+                                </div>
                             </div>
-                            <div style={{ textAlign: 'center' }}>
-                                <div style={{ borderTop: '0.5px solid #000', width: '35mm', margin: '0 auto' }}></div>
-                                <p style={{ margin: '2mm 0 0 0' }}>Seller's Signature</p>
-                            </div>
-                        </div>
 
-                        {/* Footer */}
-                        <div style={{ 
-                            textAlign: 'center', 
-                            marginTop: '6mm',
-                            color: '#7f8c8d',
-                            fontSize: '9px'
-                        }}>
-                            <p style={{ margin: '0' }}>Thank you for your business!</p>
-                        </div>
-                    </>
-                )}
+                            {/* Footer */}
+                            <div style={{ 
+                                textAlign: 'center', 
+                                marginTop: '6mm',
+                                color: '#7f8c8d',
+                                fontSize: '9px'
+                            }}>
+                                <p style={{ margin: '0' }}>Thank you for your business!</p>
+                            </div>
+                        </>
+                    )}
+                </div>
             </div>
-        </div>
-    )
+        )
+    }
 
     const renderBillPages = (items, copyType) => {
         const ITEMS_PER_PAGE = 14;

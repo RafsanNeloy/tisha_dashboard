@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Typography, TextField, Box } from '@mui/material'
+import { Typography, TextField, Box, Divider } from '@mui/material'
 import moment from 'moment'
 import { englishToBengali } from '../../../utils/bengaliNumerals'
 
@@ -13,6 +13,15 @@ const BillDetail = (props) => {
             onAddressChange(e.target.value)
         }
     }
+
+    // Calculate subtotal and discount
+    const calculateSubtotal = () => {
+        if (!bill?.items) return 0;
+        return bill.items.reduce((sum, item) => sum + item.subTotal, 0);
+    }
+
+    const subtotal = calculateSubtotal();
+    const discountAmount = subtotal - (bill?.total || 0);
 
     return (
         <Box sx={{ my: 2 }}>
@@ -35,7 +44,20 @@ const BillDetail = (props) => {
             <Typography variant='h6'>
                 <strong>অর্ডারের তারিখ ও সময়:</strong> {moment(bill?.createdAt).format('DD/MM/YYYY, hh:mm A')}
             </Typography>
+
+            <Divider sx={{ my: 2 }} />
+            
             <Typography variant='h6'>
+                <strong>সাবটোটাল:</strong> ৳{englishToBengali(subtotal)}
+            </Typography>
+            
+            {discountAmount > 0 && (
+                <Typography variant='h6' sx={{ color: 'green' }}>
+                    <strong>(-) ডিসকাউন্ট:</strong> ৳{englishToBengali(discountAmount)}
+                </Typography>
+            )}
+            
+            <Typography variant='h6' sx={{ fontWeight: 'bold', mt: 1 }}>
                 <strong>মোট টাকা:</strong> ৳{englishToBengali(bill?.total || 0)}
             </Typography>
         </Box>
