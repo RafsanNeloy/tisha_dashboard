@@ -10,15 +10,19 @@ const {
   getCustomerBills
 } = require('../controllers/customerController');
 
+// Public route - no authentication required
+router.get('/:id/bills', getCustomerBills);
+
+// Protected routes - require authentication
+router.use(protect); // Apply protect middleware to all routes below this
+
 router.route('/')
-  .get(protect, getCustomers)
-  .post(protect, addCustomer);
+  .get(getCustomers)
+  .post(addCustomer);
 
 router.route('/:id')
-  .get(protect, getCustomer)
-  .put(protect, updateCustomer)
-  .delete(protect, deleteCustomer);
-
-router.get('/:id/bills', protect, getCustomerBills);
+  .get(getCustomer)
+  .put(updateCustomer)
+  .delete(deleteCustomer);
 
 module.exports = router; 

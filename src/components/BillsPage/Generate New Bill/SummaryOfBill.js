@@ -1,12 +1,12 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Paper, Typography, Divider, Button, Container, TextField, Box } from '@mui/material'
+import { Paper, Typography, Divider, Button, Container, TextField, Box, Grid } from '@mui/material'
 import { makeStyles } from '@mui/styles'
 import CustomerSuggestion from './CustomerSuggestion'
 import OrderDetails from './OrderDetails'
 import { useDispatch } from 'react-redux'
 import { asyncAddBill } from '../../../action/billsAction'
-import { englishToBengali, bengaliToEnglish, isValidMixedNumber, convertMixedInputToNumber } from '../../../utils/bengaliNumerals'
+import { englishToBengali, bengaliToEnglish, isValidMixedNumber, convertMixedInputToNumber, formatLargeNumber } from '../../../utils/bengaliNumerals'
 
 const useStyle = makeStyles({
     summaryContainer: {
@@ -32,6 +32,9 @@ const SummaryOfBill = (props) => {
     const dispatch = useDispatch()
     const navigate = useNavigate()
     const [discountPercentage, setDiscountPercentage] = useState('')
+    const [wastageAmount, setWastageAmount] = useState(0)
+    const [lessAmount, setLessAmount] = useState(0)
+    const [collectionAmount, setCollectionAmount] = useState(0)
 
     // Calculate totals
     const subtotal = lineItems.reduce((sum, item) => sum + item.subTotal, 0)
@@ -59,8 +62,7 @@ const SummaryOfBill = (props) => {
     }
 
     const handleGenerateBill = () => {
-        // Validate required fields
-        if (!customerInfo._id || lineItems.length === 0) {
+        if (!customerInfo?._id || lineItems.length === 0) {
             props.onGenerateError({ 
                 response: { 
                     data: { message: 'Please select a customer and add at least one product' }
@@ -71,27 +73,41 @@ const SummaryOfBill = (props) => {
 
         props.setIsLoading(true);
 
-        // Format line items with required fields from the model
+        // Format line items properly
         const formattedLineItems = lineItems.map(item => ({
             product: item._id,
-            quantity: item.quantity,
-            price: item.price,
-            product_type: item.product_type,
-            subTotal: item.subTotal
+            quantity: Number(item.quantity),
+            price: Number(item.price),
+            product_type: Number(item.product_type),
+            subTotal: Number(item.subTotal)
         }));
 
+        // Calculate remaining amount
+        const total = Number(finalTotal);
+        const wastage = Number(wastageAmount) || 0;
+        const less = Number(lessAmount) || 0;
+        const collection = Number(collectionAmount) || 0;
+        const remaining = total - wastage - less - collection;
+
         const billData = {
-            date: new Date(),
             customer: customerInfo._id,
             items: formattedLineItems,
-            total: finalTotal // Use the discounted total
+            total,
+            wastageAmount: wastage,
+            lessAmount: less,
+            collectionAmount: collection,
+            remainingAmount: remaining
         };
 
-        dispatch(asyncAddBill(billData, navigate))
+        console.log('Submitting bill data:', billData);
+
+        dispatch(asyncAddBill(billData))
             .then(response => {
+                console.log('Bill created successfully:', response);
                 props.onGenerateSuccess(response.data._id);
             })
             .catch(error => {
+                console.error('Error creating bill:', error);
                 props.onGenerateError(error);
             })
             .finally(() => {
@@ -137,6 +153,41 @@ const SummaryOfBill = (props) => {
                         <strong>Final Total:</strong> ৳{englishToBengali(finalTotal)}
                     </Typography>
                 </Box>
+                
+                <Grid container spacing={2} sx={{ mt: 2 }}>
+                    <Grid item xs={12} sm={3}>
+                        <TextField
+                            fullWidth
+                            label="Wastage Amount"
+                            type="number"
+                            value={wastageAmount}
+                            onChange={(e) => setWastageAmount(Number(e.target.value))}
+                        />
+                    </Grid>
+                    <Grid item xs={12} sm={3}>
+                        <TextField
+                            fullWidth
+                            label="Less Amount"
+                            type="number"
+                            value={lessAmount}
+                            onChange={(e) => setLessAmount(Number(e.target.value))}
+                        />
+                    </Grid>
+                    <Grid item xs={12} sm={3}>
+                        <TextField
+                            fullWidth
+                            label="Collection Amount"
+                            type="number"
+                            value={collectionAmount}
+                            onChange={(e) => setCollectionAmount(Number(e.target.value))}
+                        />
+                    </Grid>
+                    <Grid item xs={12} sm={3}>
+                        <Typography variant="h6">
+                            Remaining: ৳{formatLargeNumber(finalTotal - wastageAmount - lessAmount - collectionAmount)}
+                        </Typography>
+                    </Grid>
+                </Grid>
                 
                 <Button 
                     variant='contained' 

@@ -40,28 +40,31 @@ export const asyncGetBills = () => {
     }
 }
 
-export const asyncAddBill = (data, navigate) => {
-    return (dispatch) => {
-        const token = localStorage.getItem('token')
-        const config = {
-            headers: {
-                Authorization: `Bearer ${token}`
-            }
+export const asyncAddBill = (data) => {
+    return async (dispatch) => {
+        const token = localStorage.getItem('token');
+        if (!token) {
+            throw new Error('No authentication token found');
         }
-        
-        return new Promise((resolve, reject) => {
-            axios.post(url, data, config)
-                .then(response => {
-                    const responseData = response.data
-                    dispatch(addBill(responseData))
-                    resolve(response)
-                })
-                .catch(err => {
-                    console.error('Bill generation error:', err);
-                    reject(err)
-                })
-        })
-    }
+
+        try {
+            console.log('Token:', token); // Debug log
+            console.log('Request data:', data); // Debug log
+
+            const response = await axios.post('http://localhost:5000/api/bills', data, {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            dispatch(addBill(response.data));
+            return response;
+        } catch (error) {
+            console.error('Bill creation error:', error.response?.data || error);
+            throw error;
+        }
+    };
 }
 
 export const asyncDeleteBill = (id) => {
@@ -110,3 +113,60 @@ export const asyncGetBillDetail = (id, handleChange) => {
         })
     }
 }
+
+export const updateBillWastage = (billNumber, amount) => {
+    return async (dispatch) => {
+        const token = localStorage.getItem('token');
+        try {
+            const response = await axios.put(`${url}/${billNumber}/wastage`, { amount }, {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+            dispatch({ type: 'UPDATE_BILL', payload: response.data });
+            return response;
+        } catch (error) {
+            console.error('Error updating wastage:', error);
+            throw error;
+        }
+    };
+};
+
+export const updateBillLess = (billNumber, amount) => {
+    return async (dispatch) => {
+        const token = localStorage.getItem('token');
+        try {
+            const response = await axios.put(`${url}/${billNumber}/less`, { amount }, {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+            dispatch({ type: 'UPDATE_BILL', payload: response.data });
+            return response;
+        } catch (error) {
+            console.error('Error updating less amount:', error);
+            throw error;
+        }
+    };
+};
+
+export const updateBillCollection = (billNumber, amount) => {
+    return async (dispatch) => {
+        const token = localStorage.getItem('token');
+        try {
+            const response = await axios.put(`${url}/${billNumber}/collection`, { amount }, {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+            dispatch({ type: 'UPDATE_BILL', payload: response.data });
+            return response;
+        } catch (error) {
+            console.error('Error updating collection:', error);
+            throw error;
+        }
+    };
+};

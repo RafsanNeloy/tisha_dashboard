@@ -106,25 +106,33 @@ const BillsTable = (props) => {
     }
 
     return (
-        <TableContainer className={classes.table} component={Paper}>
-            <Table stickyHeader size='small'>
+        <TableContainer component={Paper} className={classes.table}>
+            <Table stickyHeader>
                 <TableHead>
                     <TableRow>
-                        <TableCell className={classes.tableHeader} align='center'>ক্রমিক</TableCell>
-                        <TableCell className={classes.tableHeader} align='center'>বিল নং</TableCell>
-                        <TableCell className={classes.tableHeader} align='center'>গ্রাহক</TableCell>
-                        <TableCell className={classes.tableHeader} align='center'>মোট</TableCell>
-                        <TableCell className={classes.tableHeader} align='center'>Action</TableCell>
+                        <TableCell className={classes.tableHeader}>Date</TableCell>
+                        <TableCell className={classes.tableHeader}>Bill No</TableCell>
+                        <TableCell className={classes.tableHeader}>Customer</TableCell>
+                        <TableCell className={classes.tableHeader}>Bill Amount</TableCell>
+                        <TableCell className={classes.tableHeader}>Wastage</TableCell>
+                        <TableCell className={classes.tableHeader}>Less</TableCell>
+                        <TableCell className={classes.tableHeader}>Collection</TableCell>
+                        <TableCell className={classes.tableHeader}>Remaining</TableCell>
+                        <TableCell className={classes.tableHeader}>Actions</TableCell>
                     </TableRow>
                 </TableHead>
                 <TableBody>
-                    {bills.map((bill, index) => (
-                        <TableRow hover key={bill._id}>
-                            <TableCell align='center'>{englishToBengali(index + 1)}</TableCell>
-                            <TableCell align='center'>{englishToBengali(bill.billNumber)}</TableCell>
-                            <TableCell align='center'>{bill.customer.name}</TableCell>
-                            <TableCell align='center'>৳{englishToBengali(bill.total)}</TableCell>
-                            <TableCell className={classes.tableBtns}>
+                    {bills.map((bill) => (
+                        <TableRow key={bill._id}>
+                            <TableCell>{new Date(bill.date).toLocaleDateString('bn-BD')}</TableCell>
+                            <TableCell>{bill.billNumber}</TableCell>
+                            <TableCell>{getCustomerName(bill.customer)}</TableCell>
+                            <TableCell>{formatAmount(bill.total)}</TableCell>
+                            <TableCell>{formatAmount(bill.wastageAmount)}</TableCell>
+                            <TableCell>{formatAmount(bill.lessAmount)}</TableCell>
+                            <TableCell>{formatAmount(bill.collectionAmount)}</TableCell>
+                            <TableCell>{formatAmount(bill.remainingAmount)}</TableCell>
+                            <TableCell className={classes.actionCell}>
                                 <Button
                                     variant='contained'
                                     color='primary'

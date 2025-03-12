@@ -92,11 +92,7 @@ const CustomerPage = (props) => {
         filterCustomers('')
     }
 
-    const handleEdit = (customer) => {
-        const { _id, name, mobile, address } = customer
-        // ... rest of edit handling
-    }
-
+ 
     return (
         <Container className={classes.container} >
             <Container disableGutters>

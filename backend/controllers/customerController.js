@@ -92,41 +92,41 @@ const getCustomer = asyncHandler(async (req, res) => {
   res.status(200).json(customer);
 });
 
-// @desc    Get customer bills and stats
+// @desc    Get customer bills
 // @route   GET /api/customers/:id/bills
-// @access  Private
+// @access  Public
 const getCustomerBills = asyncHandler(async (req, res) => {
-  const customerId = req.params.id;
+    try {
+        const customer = await Customer.findById(req.params.id);
+        if (!customer) {
+            res.status(404);
+            throw new Error('Customer not found');
+        }
 
-  // First verify if customer exists
-  const customer = await Customer.findById(customerId);
+        const bills = await Bill.find({ customer: req.params.id })
+            .sort({ date: -1 })
+            .populate('customer', 'name')
+            .populate('items.product', 'name price');
 
-  if (!customer) {
-    res.status(404);
-    throw new Error('Customer not found');
-  }
+        // Calculate statistics
+        const stats = {
+            totalBillAmount: bills.reduce((sum, bill) => sum + bill.total, 0),
+            totalCollection: bills.reduce((sum, bill) => sum + bill.collectionAmount, 0),
+            totalWastage: bills.reduce((sum, bill) => sum + bill.wastageAmount, 0),
+            totalLess: bills.reduce((sum, bill) => sum + bill.lessAmount, 0),
+            totalRemaining: bills.reduce((sum, bill) => sum + bill.remainingAmount, 0)
+        };
 
-  // Get all bills for this customer
-  // Only show bills created by the requesting user
-  const bills = await Bill.find({
-    customer: customerId,
-    user: req.user._id
-  })
-  .populate('items.product', 'name price')
-  .sort({ createdAt: -1 });
-
-  // Calculate statistics
-  const totalOrders = bills.length;
-  const totalAmount = bills.reduce((sum, bill) => sum + bill.total, 0);
-
-  res.status(200).json({
-    customer,
-    stats: {
-      totalOrders,
-      totalAmount
-    },
-    bills
-  });
+        res.status(200).json({
+            customer,
+            bills,
+            stats
+        });
+    } catch (error) {
+        console.error('Error in getCustomerBills:', error);
+        res.status(500);
+        throw new Error('Error fetching customer bills');
+    }
 });
 
 module.exports = {
