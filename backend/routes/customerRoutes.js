@@ -7,7 +7,9 @@ const {
   updateCustomer,
   deleteCustomer,
   getCustomer,
-  getCustomerBills
+  getCustomerBills,
+  addPayment,
+  getPaymentHistory
 } = require('../controllers/customerController');
 
 // Public route - no authentication required
@@ -24,5 +26,9 @@ router.route('/:id')
   .get(getCustomer)
   .put(updateCustomer)
   .delete(deleteCustomer);
+
+// Payment routes
+router.get('/:id/payments', getPaymentHistory);
+router.post('/:id/payment', addPayment);
 
 module.exports = router; 

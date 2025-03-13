@@ -48,6 +48,7 @@ export const asyncAddBill = (data) => {
         }
 
         try {
+            console.log('Sending Bill Data:', data);  // Add logging
             const response = await axios.post('http://localhost:5000/api/bills', data, {
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -55,9 +56,11 @@ export const asyncAddBill = (data) => {
                 }
             });
 
+            console.log('Bill Creation Response:', response.data);  // Add logging
             dispatch(addBill(response.data));
             return response;
         } catch (error) {
+            console.error('Bill Creation Error:', error.response?.data || error.message);
             throw error;
         }
     };

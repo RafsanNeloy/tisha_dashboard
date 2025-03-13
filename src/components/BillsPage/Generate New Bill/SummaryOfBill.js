@@ -81,7 +81,12 @@ const SummaryOfBill = (props) => {
             subTotal: Number(item.subTotal)
         }));
 
-        const total = Number(finalTotal);
+        // Ensure total is calculated correctly
+        const total = lineItems.reduce((sum, item) => sum + item.subTotal, 0) - 
+                      (discountPercentage ? 
+                        Math.floor(subtotal * (convertMixedInputToNumber(discountPercentage) / 100)) : 
+                        0);
+
         const wastage = Number(wastageAmount) || 0;
         const less = Number(lessAmount) || 0;
         const collection = Number(collectionAmount) || 0;
@@ -90,12 +95,14 @@ const SummaryOfBill = (props) => {
         const billData = {
             customer: customerInfo._id,
             items: formattedLineItems,
-            total,
+            total: total,  // Ensure this is the final total after discount
             wastageAmount: wastage,
             lessAmount: less,
             collectionAmount: collection,
             remainingAmount: remaining
         };
+
+        console.log('Bill Data:', billData);  // Add logging
 
         dispatch(asyncAddBill(billData))
             .then(response => {

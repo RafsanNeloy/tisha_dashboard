@@ -129,11 +129,94 @@ const getCustomerBills = asyncHandler(async (req, res) => {
     }
 });
 
+// @desc    Add payment (wastage/less/collection)
+// @route   POST /api/customers/:id/payment
+// @access  Private
+const addPayment = asyncHandler(async (req, res) => {
+  const { type, amount } = req.body;
+  
+  if (!type || !amount) {
+    res.status(400);
+    throw new Error('Please provide payment type and amount');
+  }
+
+  const customer = await Customer.findById(req.params.id);
+  if (!customer) {
+    res.status(404);
+    throw new Error('Customer not found');
+  }
+
+  // Add payment info
+  customer.paymentInfo.push({
+    type,
+    amount,
+    date: new Date()
+  });
+
+  // Update remaining amount
+  customer.remainingAmount -= amount;
+
+  const updatedCustomer = await customer.save();
+
+  res.status(200).json(updatedCustomer);
+});
+
+// @desc    Get customer payment history
+// @route   GET /api/customers/:id/payments
+// @access  Private
+const getPaymentHistory = asyncHandler(async (req, res) => {
+  const customer = await Customer.findById(req.params.id)
+    .populate('bills')
+    .select('name mobile address totalAmount remainingAmount paymentInfo bills');
+
+  if (!customer) {
+    res.status(404);
+    throw new Error('Customer not found');
+  }
+
+  // Calculate payment type totals
+  const paymentTypeTotals = customer.paymentInfo.reduce((totals, payment) => {
+    if (!totals[payment.type]) {
+      totals[payment.type] = 0;
+    }
+    totals[payment.type] += payment.amount;
+    return totals;
+  }, {});
+
+  res.status(200).json({
+    ...customer.toObject(),
+    paymentTypeTotals
+  });
+});
+
+// Update the addBill controller to update customer's totalAmount
+const addBill = asyncHandler(async (req, res) => {
+  const { customer: customerId, total } = req.body;
+
+  const customer = await Customer.findById(customerId);
+  if (!customer) {
+    res.status(404);
+    throw new Error('Customer not found');
+  }
+
+  const bill = await Bill.create(req.body);
+
+  // Update customer's bills and amounts
+  customer.bills.push(bill._id);
+  customer.totalAmount += total;
+  customer.remainingAmount += total;
+  await customer.save();
+
+  res.status(201).json(bill);
+});
+
 module.exports = {
   getCustomers,
   addCustomer,
   updateCustomer,
   deleteCustomer,
   getCustomer,
-  getCustomerBills
+  getCustomerBills,
+  addPayment,
+  getPaymentHistory
 }; 

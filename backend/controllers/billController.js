@@ -19,7 +19,13 @@ const getBills = asyncHandler(async (req, res) => {
 // @access  Private
 const addBill = asyncHandler(async (req, res) => {
   try {
-    const { customer, items, total, wastageAmount, lessAmount, collectionAmount } = req.body;
+    const { customer, items, total } = req.body;
+
+    console.log('Bill Creation Request:', {
+      customerId: customer,
+      total,
+      items: items.length
+    });
 
     // Validate required fields
     if (!customer || !items || !total) {
@@ -49,23 +55,41 @@ const addBill = asyncHandler(async (req, res) => {
       };
     }));
 
-    // Calculate remaining amount
-    const remainingAmount = total - (wastageAmount || 0) - (lessAmount || 0) - (collectionAmount || 0);
-
+    // Create bill
     const billData = {
       user: req.user._id,
       billNumber,
       customer,
       items: itemsWithProductType,
-      total,
-      wastageAmount: wastageAmount || 0,
-      lessAmount: lessAmount || 0,
-      collectionAmount: collectionAmount || 0,
-      remainingAmount
+      total
     };
 
     const bill = await Bill.create(billData);
 
+    // Update customer's total amount and bills
+    const customerToUpdate = await Customer.findById(customer);
+    if (!customerToUpdate) {
+      res.status(404);
+      throw new Error('Customer not found');
+    }
+
+    console.log('Before Update:', {
+      currentTotalAmount: customerToUpdate.totalAmount,
+      currentRemainingAmount: customerToUpdate.remainingAmount
+    });
+
+    customerToUpdate.bills.push(bill._id);
+    customerToUpdate.totalAmount += total;
+    customerToUpdate.remainingAmount += total;
+    
+    const updatedCustomer = await customerToUpdate.save();
+
+    console.log('After Update:', {
+      newTotalAmount: updatedCustomer.totalAmount,
+      newRemainingAmount: updatedCustomer.remainingAmount
+    });
+
+    // Populate and return bill
     const populatedBill = await Bill.findById(bill._id)
       .populate('customer', 'name')
       .populate('items.product', 'name price');
@@ -73,6 +97,7 @@ const addBill = asyncHandler(async (req, res) => {
     res.status(201).json(populatedBill);
 
   } catch (error) {
+    console.error('Error creating bill:', error);
     res.status(500);
     throw new Error(`Error creating bill: ${error.message}`);
   }
@@ -268,19 +293,24 @@ const updateLess = asyncHandler(async (req, res) => {
       throw new Error('Bill not found');
     }
 
-    const newRemainingAmount = bill.total - bill.wastageAmount - amount - bill.collectionAmount;
+    const customer = await Customer.findById(bill.customer);
+    if (!customer) {
+      res.status(404);
+      throw new Error('Customer not found');
+    }
 
-    const updatedBill = await Bill.findOneAndUpdate(
-      { billNumber },
-      {
-        lessAmount: amount,
-        remainingAmount: newRemainingAmount
-      },
-      { new: true }
-    ).populate('customer', 'name')
-     .populate('items.product', 'name price');
+    // Add payment info
+    customer.paymentInfo.push({
+      type: 'less',
+      amount,
+      date: new Date()
+    });
 
-    res.status(200).json(updatedBill);
+    // Update remaining amount
+    customer.remainingAmount -= amount;
+    await customer.save();
+
+    res.status(200).json(customer);
   } catch (error) {
     console.error('Error updating less amount:', error);
     res.status(500);
@@ -307,19 +337,24 @@ const updateCollection = asyncHandler(async (req, res) => {
       throw new Error('Bill not found');
     }
 
-    const newRemainingAmount = bill.total - bill.wastageAmount - bill.lessAmount - amount;
+    const customer = await Customer.findById(bill.customer);
+    if (!customer) {
+      res.status(404);
+      throw new Error('Customer not found');
+    }
 
-    const updatedBill = await Bill.findOneAndUpdate(
-      { billNumber },
-      {
-        collectionAmount: amount,
-        remainingAmount: newRemainingAmount
-      },
-      { new: true }
-    ).populate('customer', 'name')
-     .populate('items.product', 'name price');
+    // Add payment info
+    customer.paymentInfo.push({
+      type: 'collection',
+      amount,
+      date: new Date()
+    });
 
-    res.status(200).json(updatedBill);
+    // Update remaining amount
+    customer.remainingAmount -= amount;
+    await customer.save();
+
+    res.status(200).json(customer);
   } catch (error) {
     console.error('Error updating collection:', error);
     res.status(500);

@@ -128,3 +128,52 @@ export const asyncUpdateCustomer = (_id, formData, resetUpdateCust) => {
             })
     }
 }
+
+// Add payment (wastage/less/collection)
+export const addCustomerPayment = (customerId, paymentData) => {
+  return async (dispatch) => {
+    const token = localStorage.getItem('token');
+    try {
+      const response = await axios.post(
+        `${url}/${customerId}/payment`,
+        paymentData,
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+      
+      // Update customer in state
+      dispatch({
+        type: 'UPDATE_CUSTOMER',
+        payload: response.data
+      });
+
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  };
+};
+
+// Get customer payment history
+export const getCustomerPayments = (customerId) => {
+  return async (dispatch) => {
+    const token = localStorage.getItem('token');
+    try {
+      const response = await axios.get(
+        `${url}/${customerId}/payments`,
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        }
+      );
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  };
+};

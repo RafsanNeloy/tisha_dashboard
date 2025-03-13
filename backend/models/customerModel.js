@@ -1,6 +1,22 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
+const paymentInfoSchema = new Schema({
+  type: {
+    type: String,
+    enum: ['wastage', 'less', 'collection'],
+    required: true
+  },
+  amount: {
+    type: Number,
+    required: true
+  },
+  date: {
+    type: Date,
+    default: Date.now
+  }
+});
+
 const customerSchema = new Schema({
   user: {
     type: mongoose.Schema.Types.ObjectId,
@@ -17,17 +33,28 @@ const customerSchema = new Schema({
   },
   name: {
     type: String,
-    required: [true, 'name is required']
+    required: [true, 'Please add a name']
   },
   mobile: {
     type: String,
-    required: [true, 'mobile number is required'],
-    minlength: [10, 'invalid mobile number'],
-    maxlength: [10, 'invalid mobile number']
+    required: [true, 'Please add a mobile number']
   },
   address: {
     type: String,
-    required: [true, 'address is required']
+    required: [true, 'Please add an address']
+  },
+  bills: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Bill'
+  }],
+  totalAmount: {
+    type: Number,
+    default: 0
+  },
+  paymentInfo: [paymentInfoSchema],
+  remainingAmount: {
+    type: Number,
+    default: 0
   }
 }, {
   timestamps: true

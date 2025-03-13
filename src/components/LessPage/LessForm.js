@@ -8,20 +8,25 @@ import {
     Paper,
     Alert,
     Snackbar,
-    CircularProgress
+    Grid,
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableHead,
+    TableRow
 } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { useDispatch } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
 import CustomerSuggestion from '../BillsPage/Generate New Bill/CustomerSuggestion';
-import BillSelector from '../common/BillSelector';
-import { updateBillLess } from '../../action/billsAction';
+import { addCustomerPayment, getCustomerPayments } from '../../action/customerAction';
+import { formatLargeNumber } from '../../utils/bengaliNumerals';
+import AmountHighlight from '../common/AmountHighlight';
 
 const useStyle = makeStyles({
     container: {
         padding: '2vh 2vw',
-        maxWidth: '600px',
+        maxWidth: '1200px',
         margin: '20px auto'
     },
     title: {
@@ -32,70 +37,35 @@ const useStyle = makeStyles({
         display: 'flex',
         flexDirection: 'column',
         gap: '20px'
-    },
-    submitButton: {
-        marginTop: '20px'
     }
 });
 
 const LessForm = () => {
     const classes = useStyle();
     const dispatch = useDispatch();
-    const navigate = useNavigate();
-    const [formData, setFormData] = useState({
-        amount: ''
-    });
     const [customerInfo, setCustomerInfo] = useState(null);
-    const [customerBills, setCustomerBills] = useState([]);
-    const [selectedBill, setSelectedBill] = useState(null);
+    const [amount, setAmount] = useState('');
     const [loading, setLoading] = useState(false);
     const [alert, setAlert] = useState({ open: false, message: '', severity: 'success' });
+    const [customerData, setCustomerData] = useState(null);
 
     useEffect(() => {
         if (customerInfo?._id) {
-            fetchCustomerBills(customerInfo._id);
-        } else {
-            setCustomerBills([]);
-            setSelectedBill(null);
+            fetchCustomerData();
         }
     }, [customerInfo]);
 
-    const fetchCustomerBills = async (customerId) => {
+    const fetchCustomerData = async () => {
         try {
-            const token = localStorage.getItem('token');
-            const response = await axios.get(
-                `http://localhost:5000/api/customers/${customerId}/bills`,
-                {
-                    headers: { Authorization: `Bearer ${token}` }
-                }
-            );
-            setCustomerBills(response.data.bills);
+            const data = await dispatch(getCustomerPayments(customerInfo._id));
+            setCustomerData(data);
         } catch (error) {
-            console.error('Error fetching bills:', error);
             setAlert({
                 open: true,
-                message: 'Error fetching customer bills',
+                message: 'Error fetching customer data',
                 severity: 'error'
             });
         }
-    };
-
-    const handleCustomerInfo = (customer) => {
-        setCustomerInfo(customer);
-        setSelectedBill(null);
-        setFormData({ amount: '' });
-    };
-
-    const handleBillSelect = (billNumber) => {
-        setSelectedBill(billNumber);
-    };
-
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        setFormData(prev => ({
-            ...prev,
-            [name]: value
-        }));
     };
 
     const handleSubmit = async (e) => {
@@ -103,26 +73,24 @@ const LessForm = () => {
         setLoading(true);
 
         try {
-            await dispatch(updateBillLess(selectedBill, Number(formData.amount)));
+            await dispatch(addCustomerPayment(customerInfo._id, {
+                type: 'less',
+                amount: Number(amount)
+            }));
             
             setAlert({
                 open: true,
-                message: 'Less amount updated successfully',
+                message: 'Less amount added successfully',
                 severity: 'success'
             });
 
-            // Refresh bills list
-            if (customerInfo?._id) {
-                fetchCustomerBills(customerInfo._id);
-            }
-
-            // Reset form
-            setFormData({ amount: '' });
-            setSelectedBill(null);
+            // Refresh customer data
+            fetchCustomerData();
+            setAmount('');
         } catch (error) {
             setAlert({
                 open: true,
-                message: error.response?.data?.message || 'Error updating less amount',
+                message: error.response?.data?.message || 'Error adding less amount',
                 severity: 'error'
             });
         } finally {
@@ -132,48 +100,110 @@ const LessForm = () => {
 
     return (
         <Container className={classes.container}>
-            <Paper elevation={3} sx={{ padding: '20px' }}>
-                <Typography variant="h4" className={classes.title}>
-                    লেস এন্ট্রি
-                </Typography>
-                
-                <form onSubmit={handleSubmit} className={classes.form}>
-                    <Box>
-                        <Typography variant="subtitle1" gutterBottom>
-                            গ্রাহক নির্বাচন করুন
+            <Grid container spacing={3}>
+                <Grid item xs={12} md={4}>
+                    <Paper elevation={3} sx={{ p: 3 }}>
+                        <Typography variant="h5" className={classes.title}>
+                            লেস এন্ট্রি
                         </Typography>
-                        <CustomerSuggestion handleCustomerInfo={handleCustomerInfo} />
-                    </Box>
+                        
+                        <form onSubmit={handleSubmit} className={classes.form}>
+                            <CustomerSuggestion 
+                                handleCustomerInfo={(customer) => {
+                                    setCustomerInfo(customer);
+                                    setAmount('');
+                                }} 
+                            />
 
-                    {customerInfo && (
-                        <BillSelector
-                            bills={customerBills}
-                            selectedBill={selectedBill}
-                            onBillSelect={handleBillSelect}
-                        />
+                            <TextField
+                                name="amount"
+                                label="টাকার পরিমাণ"
+                                type="number"
+                                value={amount}
+                                onChange={(e) => setAmount(e.target.value)}
+                                fullWidth
+                                required
+                            />
+
+                            <Button 
+                                type="submit"
+                                variant="contained"
+                                color="primary"
+                                disabled={loading || !customerInfo || !amount}
+                            >
+                                {loading ? 'Updating...' : 'সম্পন্ন করুন'}
+                            </Button>
+                        </form>
+                    </Paper>
+                </Grid>
+
+                <Grid item xs={12} md={8}>
+                    {customerData && (
+                        <Paper elevation={3} sx={{ p: 3 }}>
+                            <AmountHighlight 
+                                total={customerData.totalAmount} 
+                                remaining={customerData.remainingAmount} 
+                            />
+
+                            <Typography variant="h6" gutterBottom>
+                                Bills History
+                            </Typography>
+                            <TableContainer>
+                                <Table size="small">
+                                    <TableHead>
+                                        <TableRow>
+                                            <TableCell>Date</TableCell>
+                                            <TableCell>Bill Number</TableCell>
+                                            <TableCell align="right">Amount</TableCell>
+                                        </TableRow>
+                                    </TableHead>
+                                    <TableBody>
+                                        {customerData.bills.map((bill) => (
+                                            <TableRow key={bill._id}>
+                                                <TableCell>
+                                                    {new Date(bill.date).toLocaleDateString('bn-BD')}
+                                                </TableCell>
+                                                <TableCell>{bill.billNumber}</TableCell>
+                                                <TableCell align="right">
+                                                    ৳{formatLargeNumber(bill.total)}
+                                                </TableCell>
+                                            </TableRow>
+                                        ))}
+                                    </TableBody>
+                                </Table>
+                            </TableContainer>
+
+                            <Typography variant="h6" sx={{ mt: 3, mb: 2 }}>
+                                Payment History
+                            </Typography>
+                            <TableContainer>
+                                <Table size="small">
+                                    <TableHead>
+                                        <TableRow>
+                                            <TableCell>Date</TableCell>
+                                            <TableCell>Type</TableCell>
+                                            <TableCell align="right">Amount</TableCell>
+                                        </TableRow>
+                                    </TableHead>
+                                    <TableBody>
+                                        {customerData.paymentInfo.map((payment, index) => (
+                                            <TableRow key={index}>
+                                                <TableCell>
+                                                    {new Date(payment.date).toLocaleDateString('bn-BD')}
+                                                </TableCell>
+                                                <TableCell>{payment.type}</TableCell>
+                                                <TableCell align="right">
+                                                    ৳{formatLargeNumber(payment.amount)}
+                                                </TableCell>
+                                            </TableRow>
+                                        ))}
+                                    </TableBody>
+                                </Table>
+                            </TableContainer>
+                        </Paper>
                     )}
-
-                    <TextField
-                        name="amount"
-                        label="টাকার পরিমাণ"
-                        type="number"
-                        value={formData.amount}
-                        onChange={handleChange}
-                        fullWidth
-                        required
-                    />
-
-                    <Button 
-                        type="submit"
-                        variant="contained"
-                        color="primary"
-                        className={classes.submitButton}
-                        disabled={loading || !customerInfo || !selectedBill || !formData.amount}
-                    >
-                        {loading ? 'Updating...' : 'সম্পন্ন করুন'}
-                    </Button>
-                </form>
-            </Paper>
+                </Grid>
+            </Grid>
 
             <Snackbar
                 open={alert.open}

@@ -46,22 +46,6 @@ const billSchema = new mongoose.Schema({
   total: {
     type: Number,
     required: true
-  },
-  wastageAmount: {
-    type: Number,
-    default: 0
-  },
-  lessAmount: {
-    type: Number,
-    default: 0
-  },
-  collectionAmount: {
-    type: Number,
-    default: 0
-  },
-  remainingAmount: {
-    type: Number,
-    required: true
   }
 }, {
   timestamps: true
