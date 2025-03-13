@@ -3,9 +3,11 @@ import moment from 'moment'
 import React, { useRef } from 'react'
 import html2pdf from 'html2pdf.js'
 import GetAppIcon from '@mui/icons-material/GetApp'
-import logo from '../../../images/tpp.jpg'
+import logo from '../../../images/tppr.png'
 import { englishToBengali } from '../../../utils/bengaliNumerals'
 import plasticWatermark from '../../../images/plastic.png'
+
+import PhoneIcon from '@mui/icons-material/Phone';
 
 const PrintBill = (props) => {
     const { customer, customerAddress, bill, id, items } = props
@@ -151,16 +153,16 @@ const PrintBill = (props) => {
                                 src={logo} 
                                 alt="Logo" 
                                 style={{
-                                    width: '25px',
+                                    width: '45px',
                                     height: 'auto'
                                 }}
                             />
                             <h1 style={{
                                 margin: '0',
-                                fontSize: '18px',
+                                fontSize: '28px',
                                 fontWeight: 'bold'
                             }}>
-                                TISHA PLASTIC PRODUCTS
+                                TISHA   PLASTIC
                             </h1>
                         </div>
 
@@ -171,6 +173,10 @@ const PrintBill = (props) => {
                         }}>
                             ৬/৭/৭/১, চাম্পাতলী লেন, সয়ারিঘাট, ঢাকা
                         </div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+        <PhoneIcon style={{ fontSize: '12px' }} />
+        <span>01674281440</span>
+    </div>
                     </div>
 
                     {/* Blue Line */}
