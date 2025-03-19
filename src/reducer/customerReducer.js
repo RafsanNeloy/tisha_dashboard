@@ -3,7 +3,7 @@ const initialCustomerState = []
 const customerReducer = (state = initialCustomerState, action) => {
     switch(action.type) {
         case 'SET_CUSTOMERS':
-            return [...action.payload]
+            return Array.isArray(action.payload) ? [...action.payload] : state
         case 'ADD_CUSTOMER':
             return [...state, action.payload]
         case 'DELETE_CUSTOMER':

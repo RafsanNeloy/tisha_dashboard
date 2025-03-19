@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { TextField, Button, Box, FormControl, FormLabel, RadioGroup, FormControlLabel, Radio } from '@mui/material'
 import { makeStyles } from '@mui/styles'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { asyncAddProducts } from '../../action/productAction'
 
 const useStyle = makeStyles({
@@ -21,6 +21,7 @@ const AddProduct = (props) => {
     const [productType, setProductType] = useState('0') // Default to 'mama' (0)
     const [formErrors, setFormErrors] = useState({})
     const dispatch = useDispatch()
+    const products = useSelector(state => state.products) // Get existing products
     const errors = {}
 
     const handleChange = (e) => {
@@ -39,25 +40,34 @@ const AddProduct = (props) => {
     const validate = () => {
         if (name.length === 0) {
             errors.name = "name can't be blank"
+        } else {
+            // Check for duplicate product name (case-insensitive)
+            const isDuplicate = products.some(product => 
+                product.name.toLowerCase() === name.trim().toLowerCase()
+            )
+            if (isDuplicate) {
+                errors.name = "A product with this name already exists"
+            }
         }
         if (price.length === 0) {
             errors.price = "price can't be blank"
         }
         setFormErrors(errors)
+        return Object.keys(errors).length === 0
     }
 
     const resetForm = () => {
         setName('')
         setPrice('')
         setProductType('0')
+        setFormErrors({})
     }
 
     const handleSubmit = (e) => {
         e.preventDefault()
-        validate()
-        if (Object.keys(errors).length === 0) {
+        if (validate()) {
             const formData = {
-                name: name[0].toUpperCase() + name.slice(1),
+                name: name[0].toUpperCase() + name.slice(1).trim(),
                 price: Number(price),
                 product_type: Number(productType)
             }

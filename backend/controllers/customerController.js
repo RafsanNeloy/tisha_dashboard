@@ -14,7 +14,7 @@ const getCustomers = asyncHandler(async (req, res) => {
 // @route   POST /api/customers
 // @access  Private
 const addCustomer = asyncHandler(async (req, res) => {
-  const { name, mobile, address } = req.body;
+  const { name, mobile, address, previousAmount } = req.body;
 
   if (!name || !mobile || !address) {
     res.status(400);
@@ -25,6 +25,7 @@ const addCustomer = asyncHandler(async (req, res) => {
     name,
     mobile,
     address,
+    previousAmount: previousAmount || 0,
     user: req.user._id
   });
 
@@ -46,6 +47,11 @@ const updateCustomer = asyncHandler(async (req, res) => {
   if (customer.user.toString() !== req.user._id.toString() && req.user.role !== 'admin') {
     res.status(403);
     throw new Error('Not authorized to update this customer');
+  }
+
+  // For previousAmount, just set it directly
+  if (req.body.previousAmount !== undefined) {
+    req.body.previousAmount = parseFloat(req.body.previousAmount) || 0;
   }
 
   const updatedCustomer = await Customer.findByIdAndUpdate(req.params.id, req.body, {
@@ -108,17 +114,50 @@ const getCustomerBills = asyncHandler(async (req, res) => {
             .populate('customer', 'name')
             .populate('items.product', 'name price');
 
+        // Get the latest previousAmount directly from the customer document
+        const previousAmountValue = customer.previousAmount || 0;
+
         // Calculate statistics
+        const totalBillAmount = bills.reduce((sum, bill) => sum + (bill.total || 0), 0);
+        
+        // Calculate totals from paymentInfo array
+        const payments = customer.paymentInfo || [];
+        const totalCollection = payments.reduce((sum, payment) => 
+            payment.type === 'collection' ? sum + payment.amount : sum, 0);
+        const totalWastage = payments.reduce((sum, payment) => 
+            payment.type === 'wastage' ? sum + payment.amount : sum, 0);
+        const totalLess = payments.reduce((sum, payment) => 
+            payment.type === 'less' ? sum + payment.amount : sum, 0);
+
+        // Calculate total remaining using the formula
+        const totalRemaining = previousAmountValue + totalBillAmount - (totalCollection + totalLess + totalWastage);
+
         const stats = {
-            totalBillAmount: bills.reduce((sum, bill) => sum + bill.total, 0),
-            totalCollection: bills.reduce((sum, bill) => sum + bill.collectionAmount, 0),
-            totalWastage: bills.reduce((sum, bill) => sum + bill.wastageAmount, 0),
-            totalLess: bills.reduce((sum, bill) => sum + bill.lessAmount, 0),
-            totalRemaining: bills.reduce((sum, bill) => sum + bill.remainingAmount, 0)
+            previousAmount: previousAmountValue,
+            totalBillAmount,
+            totalCollection,
+            totalWastage,
+            totalLess,
+            totalRemaining
         };
 
+        // Add debug logging
+        console.log('Customer Data:', {
+            customerId: customer._id,
+            previousAmount: previousAmountValue,
+            totalBillAmount,
+            totalCollection,
+            totalWastage,
+            totalLess,
+            totalRemaining,
+            stats
+        });
+
         res.status(200).json({
-            customer,
+            customer: {
+                ...customer.toObject(),
+                previousAmount: previousAmountValue
+            },
             bills,
             stats
         });
@@ -153,12 +192,38 @@ const addPayment = asyncHandler(async (req, res) => {
     date: new Date()
   });
 
-  // Update remaining amount
-  customer.remainingAmount -= amount;
+  // Calculate new remaining amount using the same formula as getCustomerBills
+  const bills = await Bill.find({ customer: req.params.id });
+  const previousAmount = customer.previousAmount || 0;
+  const totalBillAmount = bills.reduce((sum, bill) => sum + (bill.total || 0), 0);
+  
+  // Get all payments including the new one
+  const payments = [...customer.paymentInfo];
+  const totalCollection = payments.reduce((sum, payment) => 
+    payment.type === 'collection' ? sum + payment.amount : sum, 0);
+  const totalWastage = payments.reduce((sum, payment) => 
+    payment.type === 'wastage' ? sum + payment.amount : sum, 0);
+  const totalLess = payments.reduce((sum, payment) => 
+    payment.type === 'less' ? sum + payment.amount : sum, 0);
 
+  // Calculate remaining using the same formula
+  const totalRemaining = previousAmount + (totalBillAmount - (totalCollection + totalLess + totalWastage));
+
+  // Save the customer with updated payment info
   const updatedCustomer = await customer.save();
 
-  res.status(200).json(updatedCustomer);
+  // Return full customer data with stats
+  res.status(200).json({
+    customer: updatedCustomer,
+    stats: {
+      previousAmount,
+      totalBillAmount,
+      totalCollection,
+      totalWastage,
+      totalLess,
+      totalRemaining
+    }
+  });
 });
 
 // @desc    Get customer payment history
@@ -204,7 +269,6 @@ const addBill = asyncHandler(async (req, res) => {
   // Update customer's bills and amounts
   customer.bills.push(bill._id);
   customer.totalAmount += total;
-  customer.remainingAmount += total;
   await customer.save();
 
   res.status(201).json(bill);

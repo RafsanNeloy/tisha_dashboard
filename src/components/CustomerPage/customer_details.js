@@ -31,6 +31,7 @@ import DetailsIcon from '@mui/icons-material/RemoveRedEye';
 import { formatLargeNumber } from '../../utils/bengaliNumerals';
 import AmountHighlight from '../common/AmountHighlight';
 import './customer_details.css';
+import { useSelector } from 'react-redux';
 
 const PaymentDetailsDialog = ({ open, onClose, paymentInfo }) => {
   const getChipColor = (type) => {
@@ -90,10 +91,12 @@ const PaymentDetailsDialog = ({ open, onClose, paymentInfo }) => {
 const CustomerDetails = () => {
   const navigate = useNavigate();
   const { customerId } = useParams();
+  const { user } = useSelector(state => state.auth);
   const [customerData, setCustomerData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [previousAmount, setPreviousAmount] = useState(0);
   const [editFormData, setEditFormData] = useState({
     name: '',
     mobile: '',
@@ -114,7 +117,7 @@ const CustomerDetails = () => {
       }
 
       const response = await axios.get(
-        `http://localhost:5000/api/customers/${customerId}/payments`, 
+        `http://localhost:5000/api/customers/${customerId}/bills`, 
         {
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -125,49 +128,27 @@ const CustomerDetails = () => {
       
       console.log('Fetched Customer Data:', response.data);
       
+      // Get previousAmount directly from the API response
+      const previousAmountValue = response.data.customer.previousAmount || 0;
+      
+      // Update all state at once with the API data
       setCustomerData({
-        customer: response.data,
-        bills: response.data.bills,
-        paymentInfo: response.data.paymentInfo,
-        stats: {
-          totalBillAmount: response.data.bills.reduce((sum, bill) => sum + bill.total, 0),
-          totalCollection: response.data.paymentInfo
-            .filter(p => p.type === 'collection')
-            .reduce((sum, p) => sum + p.amount, 0),
-          totalWastage: response.data.paymentInfo
-            .filter(p => p.type === 'wastage')
-            .reduce((sum, p) => sum + p.amount, 0),
-          totalLess: response.data.paymentInfo
-            .filter(p => p.type === 'less')
-            .reduce((sum, p) => sum + p.amount, 0),
-          totalRemaining: response.data.remainingAmount
-        }
+        customer: response.data.customer,
+        bills: response.data.bills || [],
+        stats: response.data.stats
       });
 
+      // Update the input field with the API value
+      setPreviousAmount(previousAmountValue);
+      
       setEditFormData({
-        name: response.data.name,
-        mobile: response.data.mobile,
-        address: response.data.address
+        name: response.data.customer.name || '',
+        mobile: response.data.customer.mobile || '',
+        address: response.data.customer.address || ''
       });
     } catch (error) {
       console.error('Error fetching customer data:', error);
-      
-      // More detailed error handling
-      if (error.response) {
-        // The request was made and the server responded with a status code
-        // that falls out of the range of 2xx
-        console.error('Error response:', error.response.data);
-        console.error('Error status:', error.response.status);
-        setError(error.response.data.message || 'Failed to fetch customer data');
-      } else if (error.request) {
-        // The request was made but no response was received
-        console.error('No response received:', error.request);
-        setError('No response from server');
-      } else {
-        // Something happened in setting up the request that triggered an Error
-        console.error('Error setting up request:', error.message);
-        setError(error.message);
-      }
+      setError(error.response?.data?.message || 'Failed to fetch customer data');
     } finally {
       setLoading(false);
     }
@@ -176,9 +157,15 @@ const CustomerDetails = () => {
   const handleEdit = async () => {
     try {
       const token = localStorage.getItem('token');
-      await axios.put(
+      const updatedData = {
+        ...editFormData
+      };
+
+      console.log('Updating customer with data:', updatedData);
+
+      const response = await axios.put(
         `http://localhost:5000/api/customers/${customerId}`,
-        editFormData,
+        updatedData,
         {
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -187,12 +174,12 @@ const CustomerDetails = () => {
         }
       );
       
-      // Refresh customer data
-      fetchCustomerData();
+      console.log('Update response:', response.data);
+      
+      await fetchCustomerData();
       setEditDialogOpen(false);
     } catch (error) {
       console.error('Error updating customer:', error);
-      // You might want to show an error message to the user
     }
   };
 
@@ -200,7 +187,7 @@ const CustomerDetails = () => {
     const { name, value } = e.target;
     setEditFormData(prev => ({
       ...prev,
-      [name]: value
+      [name]: name === 'previousAmount' ? (value === '' ? 0 : parseFloat(value)) : value
     }));
   };
 
@@ -244,6 +231,45 @@ const CustomerDetails = () => {
     ? customerData.paymentInfo.filter(p => p.type === selectedPaymentType)
     : [];
 
+  const handlePreviousAmountSubmit = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const newPreviousAmount = parseFloat(previousAmount) || 0;
+      
+      // Send only the previousAmount update
+      const updatedData = {
+        previousAmount: newPreviousAmount
+      };
+
+      console.log('Updating previous amount:', updatedData);
+
+      const response = await axios.put(
+        `http://localhost:5000/api/customers/${customerId}`,
+        updatedData,
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+      
+      if (response.data) {
+        console.log('Update response:', response.data);
+        
+        // Fetch fresh data from the API to ensure consistency
+        await fetchCustomerData();
+
+        // Show success message
+        alert('Previous amount updated successfully!');
+      }
+
+    } catch (error) {
+      console.error('Error updating previous amount:', error);
+      alert('Failed to update previous amount. Please try again.');
+    }
+  };
+
   if (loading) {
     return (
       <Box display="flex" justifyContent="center" alignItems="center" minHeight="200px">
@@ -272,6 +298,45 @@ const CustomerDetails = () => {
 
   return (
     <Container maxWidth="lg" sx={{ py: 3 }}>
+      {/* Previous Amount Input Box */}
+      <Paper sx={{ p: 3, mb: 4, backgroundColor: '#f8f9fa' }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+          {user?.role === 'admin' ? (
+            <>
+              <TextField
+                label="Previous Amount"
+                type="number"
+                value={previousAmount}
+                onChange={(e) => setPreviousAmount(e.target.value === '' ? 0 : parseFloat(e.target.value))}
+                onBlur={(e) => {
+                  const value = e.target.value;
+                  setPreviousAmount(value === '' ? 0 : parseFloat(value));
+                }}
+                inputProps={{
+                  min: 0,
+                  step: "0.01"
+                }}
+                InputProps={{
+                  startAdornment: <span style={{ marginRight: 8 }}>৳</span>
+                }}
+                sx={{ width: 200 }}
+              />
+              <Button 
+                variant="contained" 
+                color="primary"
+                onClick={handlePreviousAmountSubmit}
+              >
+                Update Previous Amount
+              </Button>
+            </>
+          ) : (
+            <Typography variant="h6">
+              Previous Amount: ৳{formatLargeNumber(previousAmount)}
+            </Typography>
+          )}
+        </Box>
+      </Paper>
+
       {/* Customer Header */}
       <Paper sx={{ p: 3, mb: 4, backgroundColor: '#f8f9fa' }}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
@@ -310,19 +375,39 @@ const CustomerDetails = () => {
 
         {/* Customer Stats */}
         <Grid container spacing={3} sx={{ mt: 2 }}>
-          <Grid item xs={12} md={4}>
+          <Grid item xs={12} md={2.4}>
+            <Paper sx={{ p: 2, textAlign: 'center', backgroundColor: 'white' }}>
+              <Typography variant="subtitle2" color="textSecondary">Previous Amount</Typography>
+              <Typography variant="h6" color="error.main">
+                ৳{formatLargeNumber(customerData.stats.previousAmount)}
+              </Typography>
+            </Paper>
+          </Grid>
+          <Grid item xs={12} md={2.4}>
             <Paper sx={{ p: 2, textAlign: 'center', backgroundColor: 'white' }}>
               <Typography variant="subtitle2" color="textSecondary">Total Bill Amount</Typography>
-              <Typography variant="h6">৳{formatLargeNumber(customerData.stats.totalBillAmount)}</Typography>
+              <Typography variant="h6">
+                ৳{formatLargeNumber(customerData.stats.totalBillAmount)}
+              </Typography>
             </Paper>
           </Grid>
-          <Grid item xs={12} md={4}>
+          <Grid item xs={12} md={2.4}>
             <Paper sx={{ p: 2, textAlign: 'center', backgroundColor: 'white' }}>
               <Typography variant="subtitle2" color="textSecondary">Total Collection</Typography>
-              <Typography variant="h6">৳{formatLargeNumber(customerData.stats.totalCollection)}</Typography>
+              <Typography variant="h6" color="success.main">
+                ৳{formatLargeNumber(customerData.stats.totalCollection)}
+              </Typography>
             </Paper>
           </Grid>
-          <Grid item xs={12} md={4}>
+          <Grid item xs={12} md={2.4}>
+            <Paper sx={{ p: 2, textAlign: 'center', backgroundColor: 'white' }}>
+              <Typography variant="subtitle2" color="textSecondary">Total Less</Typography>
+              <Typography variant="h6" color="warning.main">
+                ৳{formatLargeNumber(customerData.stats.totalLess)}
+              </Typography>
+            </Paper>
+          </Grid>
+          <Grid item xs={12} md={2.4}>
             <Paper sx={{ p: 2, textAlign: 'center', backgroundColor: 'white' }}>
               <Typography variant="subtitle2" color="textSecondary">Total Remaining</Typography>
               <Typography variant="h6" color="error.main">

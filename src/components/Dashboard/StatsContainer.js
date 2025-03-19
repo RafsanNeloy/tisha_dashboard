@@ -38,6 +38,23 @@ const StatsContainer = (props) => {
         return englishToBengali(total)
     }
 
+    const calculateTodayCollections = () => {
+        if (!Array.isArray(customers)) return '০'
+        
+        let todayTotal = 0
+        customers.forEach(customer => {
+            if (customer.paymentInfo && Array.isArray(customer.paymentInfo)) {
+                const todayCollections = customer.paymentInfo.filter(payment => 
+                    payment.type === 'collection' && 
+                    moment(payment.date).isBetween(moment().startOf('day'), moment())
+                )
+                todayTotal += todayCollections.reduce((sum, payment) => sum + (payment.amount || 0), 0)
+            }
+        })
+        
+        return englishToBengali(todayTotal)
+    }
+
     // Calculate daily quantities for each product
     const getDailyProductQuantities = () => {
         const productQuantities = {};
@@ -79,6 +96,7 @@ const StatsContainer = (props) => {
             <Grid container spacing={6}>
                 <StatsItem statTitle={'আজকের বিল সংখ্যা'} statNumber={englishToBengali(todayBills.length)} />
                 <StatsItem statTitle={'আজকের বিল'} statNumber={calculateTotal(todayBills)} />
+                <StatsItem statTitle={'আজকের কালেকশন'} statNumber={calculateTodayCollections()} />
                 <StatsItem statTitle={'মোট বিল'} statNumber={calculateTotal(bills)} />
             </Grid>
 

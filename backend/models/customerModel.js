@@ -43,6 +43,10 @@ const customerSchema = new Schema({
     type: String,
     required: [true, 'Please add an address']
   },
+  previousAmount: {
+    type: Number,
+    default: 0
+  },
   bills: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Bill'
@@ -51,11 +55,7 @@ const customerSchema = new Schema({
     type: Number,
     default: 0
   },
-  paymentInfo: [paymentInfoSchema],
-  remainingAmount: {
-    type: Number,
-    default: 0
-  }
+  paymentInfo: [paymentInfoSchema]
 }, {
   timestamps: true
 });

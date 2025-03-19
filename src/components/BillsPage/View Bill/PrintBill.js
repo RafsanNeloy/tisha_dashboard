@@ -126,17 +126,17 @@ const PrintBill = (props) => {
                     <div style={{
                         borderTop: '2px solid green',
                         width: '100%',
-                        marginBottom: '5mm'
+                        marginBottom: '2mm'
                     }}></div>
 
                     {/* Header Content */}
                     <div style={{
                         textAlign: 'center',
-                        marginBottom: '5mm'
+                        marginBottom: '2mm'
                     }}>
                         <div style={{
                             fontSize: '10px',
-                            marginBottom: '3mm'
+                            marginBottom: '1mm'
                         }}>
                             নিত্যপ্রয়োজনীয় প্লাস্টিকের সামগ্রী
                         </div>
@@ -147,7 +147,7 @@ const PrintBill = (props) => {
                             alignItems: 'center',
                             justifyContent: 'center',
                             gap: '5mm',
-                            marginBottom: '3mm'
+                            marginBottom: '1mm'
                         }}>
                             <img 
                                 src={logo} 
@@ -162,28 +162,41 @@ const PrintBill = (props) => {
                                 fontSize: '28px',
                                 fontWeight: 'bold'
                             }}>
-                                TISHA   PLASTIC
+                                TISHA PLASTIC
                             </h1>
                         </div>
 
-                        {/* Address */}
+                        {/* Address and Contact */}
                         <div style={{
                             fontSize: '10px',
-                            marginBottom: '3mm'
+                            marginBottom: '1mm'
                         }}>
-                            ৬/৭/৭/১, চাম্পাতলী লেন, সয়ারিঘাট, ঢাকা
+                            <div>৬/৭/৭/১, চাম্পাতলী লেন, সয়ারিঘাট, ঢাকা</div>
+                            <div style={{ 
+                                display: 'flex', 
+                                alignItems: 'center', 
+                                justifyContent: 'center',
+                                gap: '8mm',
+                                marginTop: '1mm'
+                            }}>
+                                <div style={{ 
+                                    display: 'flex', 
+                                    alignItems: 'center',
+                                    gap: '1px'
+                                }}>
+                                    <PhoneIcon style={{ fontSize: '10px' }} />
+                                    <span>01744798523, 7343144</span>
+                                </div>
+                                
+                            </div>
                         </div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-        <PhoneIcon style={{ fontSize: '12px' }} />
-        <span>01674281440</span>
-    </div>
                     </div>
 
                     {/* Blue Line */}
                     <div style={{
                         borderTop: '2px solid blue',
                         width: '100%',
-                        marginBottom: '8mm'
+                        marginBottom: '5mm'
                     }}></div>
 
                     {/* Customer Info */}
@@ -362,6 +375,7 @@ const PrintBill = (props) => {
             >
                 Download Bill
             </Button>
+           
 
             <div style={{ display: 'none' }}>
                 <div ref={billRef}>

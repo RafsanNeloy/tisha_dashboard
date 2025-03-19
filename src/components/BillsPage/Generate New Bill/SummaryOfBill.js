@@ -32,9 +32,6 @@ const SummaryOfBill = (props) => {
     const dispatch = useDispatch()
     const navigate = useNavigate()
     const [discountPercentage, setDiscountPercentage] = useState('')
-    const [wastageAmount, setWastageAmount] = useState(0)
-    const [lessAmount, setLessAmount] = useState(0)
-    const [collectionAmount, setCollectionAmount] = useState(0)
 
     // Calculate totals
     const subtotal = lineItems.reduce((sum, item) => sum + item.subTotal, 0)
@@ -87,19 +84,14 @@ const SummaryOfBill = (props) => {
                         Math.floor(subtotal * (convertMixedInputToNumber(discountPercentage) / 100)) : 
                         0);
 
-        const wastage = Number(wastageAmount) || 0;
-        const less = Number(lessAmount) || 0;
-        const collection = Number(collectionAmount) || 0;
-        const remaining = total - wastage - less - collection;
-
         const billData = {
             customer: customerInfo._id,
             items: formattedLineItems,
             total: total,  // Ensure this is the final total after discount
-            wastageAmount: wastage,
-            lessAmount: less,
-            collectionAmount: collection,
-            remainingAmount: remaining
+            wastageAmount: 0,
+            lessAmount: 0,
+            collectionAmount: 0,
+            remainingAmount: 0
         };
 
         console.log('Bill Data:', billData);  // Add logging
@@ -154,41 +146,6 @@ const SummaryOfBill = (props) => {
                         <strong>Final Total:</strong> ৳{englishToBengali(finalTotal)}
                     </Typography>
                 </Box>
-                
-                <Grid container spacing={2} sx={{ mt: 2 }}>
-                    <Grid item xs={12} sm={3}>
-                        <TextField
-                            fullWidth
-                            label="Wastage Amount"
-                            type="number"
-                            value={wastageAmount}
-                            onChange={(e) => setWastageAmount(Number(e.target.value))}
-                        />
-                    </Grid>
-                    <Grid item xs={12} sm={3}>
-                        <TextField
-                            fullWidth
-                            label="Less Amount"
-                            type="number"
-                            value={lessAmount}
-                            onChange={(e) => setLessAmount(Number(e.target.value))}
-                        />
-                    </Grid>
-                    <Grid item xs={12} sm={3}>
-                        <TextField
-                            fullWidth
-                            label="Collection Amount"
-                            type="number"
-                            value={collectionAmount}
-                            onChange={(e) => setCollectionAmount(Number(e.target.value))}
-                        />
-                    </Grid>
-                    <Grid item xs={12} sm={3}>
-                        <Typography variant="h6">
-                            Remaining: ৳{formatLargeNumber(finalTotal - wastageAmount - lessAmount - collectionAmount)}
-                        </Typography>
-                    </Grid>
-                </Grid>
                 
                 <Button 
                     variant='contained' 

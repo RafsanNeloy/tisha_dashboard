@@ -114,10 +114,6 @@ const BillsTable = (props) => {
                         <TableCell className={classes.tableHeader}>Bill No</TableCell>
                         <TableCell className={classes.tableHeader}>Customer</TableCell>
                         <TableCell className={classes.tableHeader}>Bill Amount</TableCell>
-                        <TableCell className={classes.tableHeader}>Wastage</TableCell>
-                        <TableCell className={classes.tableHeader}>Less</TableCell>
-                        <TableCell className={classes.tableHeader}>Collection</TableCell>
-                        <TableCell className={classes.tableHeader}>Remaining</TableCell>
                         <TableCell className={classes.tableHeader}>Actions</TableCell>
                     </TableRow>
                 </TableHead>
@@ -128,10 +124,6 @@ const BillsTable = (props) => {
                             <TableCell>{bill.billNumber}</TableCell>
                             <TableCell>{getCustomerName(bill.customer)}</TableCell>
                             <TableCell>{formatAmount(bill.total)}</TableCell>
-                            <TableCell>{formatAmount(bill.wastageAmount)}</TableCell>
-                            <TableCell>{formatAmount(bill.lessAmount)}</TableCell>
-                            <TableCell>{formatAmount(bill.collectionAmount)}</TableCell>
-                            <TableCell>{formatAmount(bill.remainingAmount)}</TableCell>
                             <TableCell className={classes.actionCell}>
                                 <Button
                                     variant='contained'

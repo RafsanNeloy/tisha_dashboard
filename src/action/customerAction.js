@@ -55,7 +55,9 @@ export const asyncGetCustomers = () => {
                     'Authorization': `Bearer ${localStorage.getItem('token')}`
                 }
             })
-            dispatch(setCustomers(response.data))
+            // Ensure we're dispatching an array
+            const customers = Array.isArray(response.data) ? response.data : [];
+            dispatch(setCustomers(customers))
             return response; // Return the response for chaining
         } catch (error) {
             console.log('Error fetching customers', error)
