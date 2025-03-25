@@ -2,7 +2,6 @@ import React from 'react'
 import { Container, Typography, Grid } from '@mui/material'
 import { makeStyles } from '@mui/styles'
 import StatsContainer from './StatsContainer'
-import StatsChart from './StatsChart'
 
 const useStyle = makeStyles({
     container: {
@@ -25,9 +24,6 @@ const Dashboard = (props) => {
                 <Grid item lg={12}>
                     <StatsContainer />
                 </Grid>
-                {/* <Grid item lg={12}>
-                    <StatsChart />
-                </Grid> */}
             </Grid>
         </Container>
     )

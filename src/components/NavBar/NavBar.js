@@ -22,6 +22,7 @@ import WestageForm from '../WestagePage/WestageForm'
 import LessForm from '../LessPage/LessForm'
 import CollectionForm from '../CustomerPage/Collections/CollectionForm'
 import CustomerDetails from '../CustomerPage/customer_details'
+import MonthlyHistory from '../Dashboard/MonthlyHistory'
 import PrivateRoute from './PrivateRoute'
 
 const NavBar = (props) => {
@@ -61,6 +62,7 @@ const NavBar = (props) => {
                 <Route path="/westage" element={<PrivateRoute><WestageForm /></PrivateRoute>} />
                 <Route path="/less" element={<PrivateRoute><LessForm /></PrivateRoute>} />
                 <Route path="/collections" element={<PrivateRoute><CollectionForm /></PrivateRoute>} />
+                <Route path="/history" element={<PrivateRoute><MonthlyHistory /></PrivateRoute>} />
             </Routes>
         </div>
     )

@@ -78,9 +78,26 @@ const addBill = asyncHandler(async (req, res) => {
       currentRemainingAmount: customerToUpdate.remainingAmount
     });
 
+    // Add bill to customer's bills array
     customerToUpdate.bills.push(bill._id);
-    customerToUpdate.totalAmount += total;
-    customerToUpdate.remainingAmount += total;
+    
+    // Calculate new remaining amount
+    const allBills = await Bill.find({ customer: customerToUpdate._id });
+    const previousAmount = customerToUpdate.previousAmount || 0;
+    const totalBillAmount = allBills.reduce((sum, b) => sum + (b.total || 0), 0) + total;
+    
+    // Calculate totals from all payments
+    const payments = customerToUpdate.paymentInfo || [];
+    const totalCollection = payments.reduce((sum, payment) => 
+      payment.type === 'collection' ? sum + payment.amount : sum, 0);
+    const totalWastage = payments.reduce((sum, payment) => 
+      payment.type === 'wastage' ? sum + payment.amount : sum, 0);
+    const totalLess = payments.reduce((sum, payment) => 
+      payment.type === 'less' ? sum + payment.amount : sum, 0);
+
+    // Update total and remaining amounts
+    customerToUpdate.totalAmount = totalBillAmount;
+    customerToUpdate.remainingAmount = previousAmount + totalBillAmount - (totalCollection + totalLess + totalWastage);
     
     const updatedCustomer = await customerToUpdate.save();
 
@@ -237,36 +254,70 @@ const getCustomerBills = asyncHandler(async (req, res) => {
 const updateWastage = asyncHandler(async (req, res) => {
   try {
     const { amount } = req.body;
-    const billNumber = parseInt(req.params.billNumber); // Convert to number
+    const billNumber = parseInt(req.params.billNumber);
 
-    // Validate amount
     if (amount === undefined) {
       res.status(400);
       throw new Error('Please provide wastage amount');
     }
 
-    // Find bill by billNumber
     const bill = await Bill.findOne({ billNumber });
     if (!bill) {
       res.status(404);
       throw new Error('Bill not found');
     }
 
-    // Calculate new remaining amount
-    const newRemainingAmount = bill.total - amount - bill.lessAmount - bill.collectionAmount;
+    const customer = await Customer.findById(bill.customer);
+    if (!customer) {
+      res.status(404);
+      throw new Error('Customer not found');
+    }
 
-    // Update bill
-    const updatedBill = await Bill.findOneAndUpdate(
+    // Add payment info
+    customer.paymentInfo.push({
+      type: 'wastage',
+      amount: Number(amount),
+      date: new Date()
+    });
+
+    // Get customer stats for total remaining calculation
+    const bills = await Bill.find({ customer: customer._id });
+    const previousAmount = customer.previousAmount || 0;
+    const totalBillAmount = bills.reduce((sum, bill) => sum + (bill.total || 0), 0);
+    const payments = customer.paymentInfo;
+    const totalCollection = payments.reduce((sum, payment) => 
+      payment.type === 'collection' ? sum + Number(payment.amount) : sum, 0);
+    const totalWastage = payments.reduce((sum, payment) => 
+      payment.type === 'wastage' ? sum + Number(payment.amount) : sum, 0);
+    const totalLess = payments.reduce((sum, payment) => 
+      payment.type === 'less' ? sum + Number(payment.amount) : sum, 0);
+
+    // Calculate total remaining as per customer details
+    const totalRemaining = previousAmount + totalBillAmount - (totalCollection + totalLess + totalWastage);
+
+    // Update customer's remaining amount
+    customer.remainingAmount = totalRemaining;
+
+    await customer.save();
+
+    // Update bill's remaining amount to match customer's total remaining
+    await Bill.findOneAndUpdate(
       { billNumber },
-      {
-        wastageAmount: amount,
-        remainingAmount: newRemainingAmount
-      },
+      { remainingAmount: totalRemaining },
       { new: true }
-    ).populate('customer', 'name')
-     .populate('items.product', 'name price');
+    );
 
-    res.status(200).json(updatedBill);
+    res.status(200).json({
+      customer,
+      stats: {
+        previousAmount,
+        totalBillAmount,
+        totalCollection,
+        totalWastage,
+        totalLess,
+        totalRemaining
+      }
+    });
   } catch (error) {
     console.error('Error updating wastage:', error);
     res.status(500);
@@ -302,15 +353,48 @@ const updateLess = asyncHandler(async (req, res) => {
     // Add payment info
     customer.paymentInfo.push({
       type: 'less',
-      amount,
+      amount: Number(amount),
       date: new Date()
     });
 
-    // Update remaining amount
-    customer.remainingAmount -= amount;
+    // Get customer stats for total remaining calculation
+    const bills = await Bill.find({ customer: customer._id });
+    const previousAmount = customer.previousAmount || 0;
+    const totalBillAmount = bills.reduce((sum, bill) => sum + (bill.total || 0), 0);
+    const payments = customer.paymentInfo;
+    const totalCollection = payments.reduce((sum, payment) => 
+      payment.type === 'collection' ? sum + Number(payment.amount) : sum, 0);
+    const totalWastage = payments.reduce((sum, payment) => 
+      payment.type === 'wastage' ? sum + Number(payment.amount) : sum, 0);
+    const totalLess = payments.reduce((sum, payment) => 
+      payment.type === 'less' ? sum + Number(payment.amount) : sum, 0);
+
+    // Calculate total remaining as per customer details
+    const totalRemaining = previousAmount + totalBillAmount - (totalCollection + totalLess + totalWastage);
+
+    // Update customer's remaining amount
+    customer.remainingAmount = totalRemaining;
+
     await customer.save();
 
-    res.status(200).json(customer);
+    // Update bill's remaining amount to match customer's total remaining
+    await Bill.findOneAndUpdate(
+      { billNumber },
+      { remainingAmount: totalRemaining },
+      { new: true }
+    );
+
+    res.status(200).json({
+      customer,
+      stats: {
+        previousAmount,
+        totalBillAmount,
+        totalCollection,
+        totalWastage,
+        totalLess,
+        totalRemaining
+      }
+    });
   } catch (error) {
     console.error('Error updating less amount:', error);
     res.status(500);
@@ -346,15 +430,48 @@ const updateCollection = asyncHandler(async (req, res) => {
     // Add payment info
     customer.paymentInfo.push({
       type: 'collection',
-      amount,
+      amount: Number(amount),
       date: new Date()
     });
 
-    // Update remaining amount
-    customer.remainingAmount -= amount;
+    // Get customer stats for total remaining calculation
+    const bills = await Bill.find({ customer: customer._id });
+    const previousAmount = customer.previousAmount || 0;
+    const totalBillAmount = bills.reduce((sum, bill) => sum + (bill.total || 0), 0);
+    const payments = customer.paymentInfo;
+    const totalCollection = payments.reduce((sum, payment) => 
+      payment.type === 'collection' ? sum + Number(payment.amount) : sum, 0);
+    const totalWastage = payments.reduce((sum, payment) => 
+      payment.type === 'wastage' ? sum + Number(payment.amount) : sum, 0);
+    const totalLess = payments.reduce((sum, payment) => 
+      payment.type === 'less' ? sum + Number(payment.amount) : sum, 0);
+
+    // Calculate total remaining as per customer details
+    const totalRemaining = previousAmount + totalBillAmount - (totalCollection + totalLess + totalWastage);
+
+    // Update customer's remaining amount
+    customer.remainingAmount = totalRemaining;
+
     await customer.save();
 
-    res.status(200).json(customer);
+    // Update bill's remaining amount to match customer's total remaining
+    await Bill.findOneAndUpdate(
+      { billNumber },
+      { remainingAmount: totalRemaining },
+      { new: true }
+    );
+
+    res.status(200).json({
+      customer,
+      stats: {
+        previousAmount,
+        totalBillAmount,
+        totalCollection,
+        totalWastage,
+        totalLess,
+        totalRemaining
+      }
+    });
   } catch (error) {
     console.error('Error updating collection:', error);
     res.status(500);

@@ -171,7 +171,7 @@ const getCustomerBills = asyncHandler(async (req, res) => {
 // @desc    Add payment (wastage/less/collection)
 // @route   POST /api/customers/:id/payment
 // @access  Private
-const addPayment = asyncHandler(async (req, res) => {
+const addCustomerPayment = asyncHandler(async (req, res) => {
   const { type, amount } = req.body;
   
   if (!type || !amount) {
@@ -192,13 +192,13 @@ const addPayment = asyncHandler(async (req, res) => {
     date: new Date()
   });
 
-  // Calculate new remaining amount using the same formula as getCustomerBills
+  // Calculate new remaining amount
   const bills = await Bill.find({ customer: req.params.id });
   const previousAmount = customer.previousAmount || 0;
   const totalBillAmount = bills.reduce((sum, bill) => sum + (bill.total || 0), 0);
   
-  // Get all payments including the new one
-  const payments = [...customer.paymentInfo];
+  // Calculate totals from all payments including the new one
+  const payments = customer.paymentInfo;
   const totalCollection = payments.reduce((sum, payment) => 
     payment.type === 'collection' ? sum + payment.amount : sum, 0);
   const totalWastage = payments.reduce((sum, payment) => 
@@ -206,10 +206,11 @@ const addPayment = asyncHandler(async (req, res) => {
   const totalLess = payments.reduce((sum, payment) => 
     payment.type === 'less' ? sum + payment.amount : sum, 0);
 
-  // Calculate remaining using the same formula
-  const totalRemaining = previousAmount + (totalBillAmount - (totalCollection + totalLess + totalWastage));
+  // Update the remaining amount using the consistent formula
+  const totalRemaining = previousAmount + totalBillAmount - (totalCollection + totalLess + totalWastage);
+  customer.remainingAmount = totalRemaining;
 
-  // Save the customer with updated payment info
+  // Save the customer with updated payment info and remaining amount
   const updatedCustomer = await customer.save();
 
   // Return full customer data with stats
@@ -281,6 +282,6 @@ module.exports = {
   deleteCustomer,
   getCustomer,
   getCustomerBills,
-  addPayment,
+  addCustomerPayment,
   getPaymentHistory
 }; 

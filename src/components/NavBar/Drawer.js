@@ -10,6 +10,7 @@ import BarChartIcon from '@mui/icons-material/BarChart'
 import RecyclingIcon from '@mui/icons-material/Recycling'
 import PercentIcon from '@mui/icons-material/Percent'
 import PaymentsIcon from '@mui/icons-material/Payments'
+import HistoryIcon from '@mui/icons-material/History'
 import { useDispatch } from 'react-redux'
 import { setLogout } from '../../action/loginAction'
 import { asyncGetBills } from '../../action/billsAction'
@@ -117,6 +118,11 @@ const Drawer = (props) => {
             name: 'Bills',
             icon: <ReceiptIcon />,
             link: '/bills'
+        },
+        {
+            name: 'History',
+            icon: <HistoryIcon />,
+            link: '/history'
         },
         {
             name: 'Westage',

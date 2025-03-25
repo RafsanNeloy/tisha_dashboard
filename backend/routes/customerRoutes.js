@@ -8,7 +8,7 @@ const {
   deleteCustomer,
   getCustomer,
   getCustomerBills,
-  addPayment,
+  addCustomerPayment,
   getPaymentHistory
 } = require('../controllers/customerController');
 
@@ -29,6 +29,6 @@ router.route('/:id')
 
 // Payment routes
 router.get('/:id/payments', getPaymentHistory);
-router.post('/:id/payment', addPayment);
+router.post('/:id/payment', addCustomerPayment);
 
 module.exports = router; 

@@ -18,8 +18,9 @@ import {
 } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { useDispatch } from 'react-redux';
+import axios from 'axios';
 import CustomerSuggestion from '../BillsPage/Generate New Bill/CustomerSuggestion';
-import { addCustomerPayment, getCustomerPayments } from '../../action/customerAction';
+import { addCustomerPayment } from '../../action/customerAction';
 import { formatLargeNumber } from '../../utils/bengaliNumerals';
 import AmountHighlight from '../common/AmountHighlight';
 
@@ -57,8 +58,18 @@ const WestageForm = () => {
 
     const fetchCustomerData = async () => {
         try {
-            const data = await dispatch(getCustomerPayments(customerInfo._id));
-            setCustomerData(data);
+            const token = localStorage.getItem('token');
+            const response = await axios.get(
+                `http://localhost:5000/api/customers/${customerInfo._id}/bills`,
+                {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                }
+            );
+            
+            setCustomerData(response.data);
         } catch (error) {
             setAlert({
                 open: true,
@@ -141,8 +152,8 @@ const WestageForm = () => {
                     {customerData && (
                         <Paper elevation={3} sx={{ p: 3 }}>
                             <AmountHighlight 
-                                total={customerData.totalAmount} 
-                                remaining={customerData.remainingAmount} 
+                                total={customerData.stats.totalBillAmount} 
+                                remaining={customerData.stats.totalRemaining} 
                             />
 
                             <Typography variant="h6" gutterBottom>
@@ -186,7 +197,7 @@ const WestageForm = () => {
                                         </TableRow>
                                     </TableHead>
                                     <TableBody>
-                                        {customerData.paymentInfo.map((payment, index) => (
+                                        {customerData.customer.paymentInfo.map((payment, index) => (
                                             <TableRow key={index}>
                                                 <TableCell>
                                                     {new Date(payment.date).toLocaleDateString('bn-BD')}

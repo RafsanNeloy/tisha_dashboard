@@ -33,7 +33,7 @@ import AmountHighlight from '../common/AmountHighlight';
 import './customer_details.css';
 import { useSelector } from 'react-redux';
 
-const PaymentDetailsDialog = ({ open, onClose, paymentInfo }) => {
+const PaymentDetailsDialog = ({ open, onClose, paymentInfo = [] }) => {
   const getChipColor = (type) => {
     switch(type) {
       case 'wastage': return 'warning';
@@ -47,43 +47,52 @@ const PaymentDetailsDialog = ({ open, onClose, paymentInfo }) => {
     <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
       <DialogTitle>Payment Details</DialogTitle>
       <DialogContent>
-        <TableContainer>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell>Date</TableCell>
-                <TableCell>Type</TableCell>
-                <TableCell align="right">Amount</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {paymentInfo.map((payment, index) => (
-                <TableRow key={index}>
-                  <TableCell>
-                    {new Date(payment.date).toLocaleDateString('bn-BD')}
-                  </TableCell>
-                  <TableCell>
-                    <Chip 
-                      label={payment.type} 
-                      color={getChipColor(payment.type)}
-                      size="small"
-                    />
-                  </TableCell>
-                  <TableCell align="right">
-                    <Typography 
-                      color={
-                        payment.type === 'collection' ? 'success.main' : 'error.main'
-                      }
-                    >
-                      ৳{formatLargeNumber(payment.amount)}
-                    </Typography>
-                  </TableCell>
+        {paymentInfo.length > 0 ? (
+          <TableContainer>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell>Date</TableCell>
+                  <TableCell>Type</TableCell>
+                  <TableCell align="right">Amount</TableCell>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
+              </TableHead>
+              <TableBody>
+                {paymentInfo.map((payment, index) => (
+                  <TableRow key={index}>
+                    <TableCell>
+                      {new Date(payment.date).toLocaleDateString('bn-BD')}
+                    </TableCell>
+                    <TableCell>
+                      <Chip 
+                        label={payment.type} 
+                        color={getChipColor(payment.type)}
+                        size="small"
+                      />
+                    </TableCell>
+                    <TableCell align="right">
+                      <Typography 
+                        color={
+                          payment.type === 'collection' ? 'success.main' : 'error.main'
+                        }
+                      >
+                        ৳{formatLargeNumber(payment.amount)}
+                      </Typography>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        ) : (
+          <Typography variant="body1" textAlign="center" py={3}>
+            No payments found for this type
+          </Typography>
+        )}
       </DialogContent>
+      <DialogActions>
+        <Button onClick={onClose}>Close</Button>
+      </DialogActions>
     </Dialog>
   );
 };
@@ -192,13 +201,13 @@ const CustomerDetails = () => {
   };
 
   const calculatePaymentSummary = () => {
-    if (!customerData?.paymentInfo) return {
+    if (!customerData?.customer?.paymentInfo) return {
       wastage: { total: 0, count: 0 },
       less: { total: 0, count: 0 },
       collection: { total: 0, count: 0 }
     };
 
-    return customerData.paymentInfo.reduce((summary, payment) => {
+    return customerData.customer.paymentInfo.reduce((summary, payment) => {
       // Initialize the payment type if not exists
       if (!summary[payment.type]) {
         summary[payment.type] = {
@@ -227,8 +236,8 @@ const CustomerDetails = () => {
     setPaymentDetailsOpen(true);
   };
 
-  const filteredPaymentInfo = selectedPaymentType 
-    ? customerData.paymentInfo.filter(p => p.type === selectedPaymentType)
+  const filteredPaymentInfo = selectedPaymentType && customerData?.customer?.paymentInfo 
+    ? customerData.customer.paymentInfo.filter(p => p.type === selectedPaymentType)
     : [];
 
   const handlePreviousAmountSubmit = async () => {
