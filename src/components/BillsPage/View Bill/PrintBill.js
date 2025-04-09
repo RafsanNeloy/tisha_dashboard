@@ -122,6 +122,19 @@ const PrintBill = (props) => {
                         {copyType}
                     </div>
 
+                    {/* Bill Text in Bengali */}
+                    <div style={{
+                        position: 'absolute',
+                        top: '12mm',
+                        right: '3mm',
+                        fontSize: '10px',
+                        fontWeight: 'bold',
+                        padding: '1px 3px',
+                        border: '1px solid #000'
+                    }}>
+                        ক্যাশ মেমো
+                    </div>
+
                     {/* Green Line */}
                     <div style={{
                         borderTop: '2px solid green',
@@ -138,7 +151,7 @@ const PrintBill = (props) => {
                             fontSize: '10px',
                             marginBottom: '1mm'
                         }}>
-                            নিত্যপ্রয়োজনীয় প্লাস্টিকের সামগ্রী
+                            বিসমিল্লাহির রাহমানির রাহিম
                         </div>
 
                         {/* Logo and Company Name */}
@@ -171,7 +184,7 @@ const PrintBill = (props) => {
                             fontSize: '10px',
                             marginBottom: '1mm'
                         }}>
-                            <div>৬/৭/৭/১, চাম্পাতলী লেন, সয়ারিঘাট, ঢাকা</div>
+                            <div>৬/৭/এ/১, চাম্পাতলী লেন, সোয়ারিঘাট, ঢাকা</div>
                             <div style={{ 
                                 display: 'flex', 
                                 alignItems: 'center', 
@@ -334,7 +347,7 @@ const PrintBill = (props) => {
                                 color: '#7f8c8d',
                                 fontSize: '9px'
                             }}>
-                                <p style={{ margin: '0' }}>Thank you for your business!</p>
+                                <p style={{ margin: '0' }}>নামাজ বেহেশতের চাবি</p>
                             </div>
                         </>
                     )}
