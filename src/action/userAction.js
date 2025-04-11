@@ -3,7 +3,7 @@ import { asyncGetCustomers } from './customerAction'
 import { asyncGetProducts } from './productAction'
 import { asyncGetBills } from './billsAction'
 
-const url = 'http://localhost:5000/api/users'  // Add base URL
+const url = 'http://localhost:5001/api/users'  // Add base URL
 
 export const setUser = (data) => {
     return {
@@ -22,7 +22,7 @@ export const asyncGetUser = () => {
     return (dispatch) => {
         const token = localStorage.getItem('token')
         if(token) {
-            axios.get('http://localhost:5000/api/users/account', {
+            axios.get('http://localhost:5001/api/users/account', {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }

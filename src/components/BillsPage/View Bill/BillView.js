@@ -42,7 +42,7 @@ const BillView = () => {
                     return
                 }
                 
-                const response = await axios.get(`http://localhost:5000/api/bills/${id}`, {
+                const response = await axios.get(`http://localhost:5001/api/bills/${id}`, {
                     headers: {
                         Authorization: `Bearer ${token}`
                     }

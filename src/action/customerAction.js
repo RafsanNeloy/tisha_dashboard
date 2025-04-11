@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-const url = 'http://localhost:5000/api/customers'
+const url = 'http://localhost:5001/api/customers'
 
 export const setCustomers = (data) => {
     return {
@@ -50,7 +50,7 @@ export const asyncCustomerDetail = (id, handleChange) => {
 export const asyncGetCustomers = () => {
     return async (dispatch) => {
         try {
-            const response = await axios.get('http://localhost:5000/api/customers', {
+            const response = await axios.get('http://localhost:5001/api/customers', {
                 headers: {
                     'Authorization': `Bearer ${localStorage.getItem('token')}`
                 }

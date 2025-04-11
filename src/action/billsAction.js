@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-const url = 'http://localhost:5000/api/bills'
+const url = 'http://localhost:5001/api/bills'
 
 export const setBills = (data) => {
     return {
@@ -49,7 +49,7 @@ export const asyncAddBill = (data) => {
 
         try {
             console.log('Sending Bill Data:', data);  // Add logging
-            const response = await axios.post('http://localhost:5000/api/bills', data, {
+            const response = await axios.post('http://localhost:5001/api/bills', data, {
                 headers: {
                     'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json'

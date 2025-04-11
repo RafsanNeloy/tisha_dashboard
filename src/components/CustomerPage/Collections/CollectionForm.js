@@ -60,7 +60,7 @@ const CollectionForm = () => {
         try {
             const token = localStorage.getItem('token');
             const response = await axios.get(
-                `http://localhost:5000/api/customers/${customerInfo._id}/bills`,
+                `http://localhost:5001/api/customers/${customerInfo._id}/bills`,
                 {
                     headers: {
                         'Authorization': `Bearer ${token}`,

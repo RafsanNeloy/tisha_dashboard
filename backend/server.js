@@ -13,7 +13,7 @@ const app = express();
 
 // Middleware
 app.use(cors({
-    origin: ['http://localhost:5001', 'http://localhost:3000'],  // Allow both ports
+    origin: ['http://localhost:5001', 'http://localhost:3000', 'http://localhost:5000'],  // Added http://localhost:5000
     credentials: true
 }));
 app.use(express.json());
@@ -28,7 +28,7 @@ app.use('/api/bills', require('./routes/billRoutes'));
 // Error Handler
 app.use(errorHandler);
 
-const port = process.env.PORT || 5000;
+const port = process.env.PORT || 5001;
 
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);

@@ -126,7 +126,7 @@ const CustomerDetails = () => {
       }
 
       const response = await axios.get(
-        `http://localhost:5000/api/customers/${customerId}/bills`, 
+        `http://localhost:5001/api/customers/${customerId}/bills`, 
         {
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -173,7 +173,7 @@ const CustomerDetails = () => {
       console.log('Updating customer with data:', updatedData);
 
       const response = await axios.put(
-        `http://localhost:5000/api/customers/${customerId}`,
+        `http://localhost:5001/api/customers/${customerId}`,
         updatedData,
         {
           headers: {
@@ -253,7 +253,7 @@ const CustomerDetails = () => {
       console.log('Updating previous amount:', updatedData);
 
       const response = await axios.put(
-        `http://localhost:5000/api/customers/${customerId}`,
+        `http://localhost:5001/api/customers/${customerId}`,
         updatedData,
         {
           headers: {

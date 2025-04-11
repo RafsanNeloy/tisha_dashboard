@@ -59,7 +59,7 @@ const ProductDetails = (props) => {
             setIsLoading(true)
             try {
                 const token = localStorage.getItem('token')
-                const response = await axios.get(`http://localhost:5000/api/products/${productId}/bills`, {
+                const response = await axios.get(`http://localhost:5001/api/products/${productId}/bills`, {
                     headers: {
                         'Authorization': `Bearer ${token}`,
                         'Content-Type': 'application/json'

@@ -37,7 +37,7 @@ const ViewCustomer = () => {
                     throw new Error('No authentication token found')
                 }
 
-                const response = await axios.get(`http://localhost:5000/api/customers/${id}/bills`, {
+                const response = await axios.get(`http://localhost:5001/api/customers/${id}/bills`, {
                     headers: {
                         'Authorization': `Bearer ${token}`,
                         'Content-Type': 'application/json'

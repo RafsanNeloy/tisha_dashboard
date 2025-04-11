@@ -11,7 +11,7 @@ const BillSelector = ({ bills, selectedBill, onBillSelect }) => {
         try {
             // Remove token for public access
             const response = await axios.get(
-                `http://localhost:5000/api/customers/${customerId}/bills`
+                `http://localhost:5001/api/customers/${customerId}/bills`
             );
             setCustomerBills(response.data.bills);
         } catch (error) {

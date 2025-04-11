@@ -11,7 +11,7 @@ const ViewCustomer = (props) => {
 
     const fetchCustomerData = async () => {
         try {
-            const response = await axios.get(`http://localhost:5000/api/customers/${id}/bills`, {
+            const response = await axios.get(`http://localhost:5001/api/customers/${id}/bills`, {
                 headers: {
                     'Authorization': `Bearer ${localStorage.getItem('token')}`
                 }
@@ -24,7 +24,7 @@ const ViewCustomer = (props) => {
             if (error.response?.status === 404) {
                 try {
                     // Fetch just the customer info
-                    const customerResponse = await axios.get(`http://localhost:5000/api/customers/${id}`, {
+                    const customerResponse = await axios.get(`http://localhost:5001/api/customers/${id}`, {
                         headers: {
                             'Authorization': `Bearer ${localStorage.getItem('token')}`
                         }
