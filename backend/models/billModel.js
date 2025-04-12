@@ -46,7 +46,17 @@ const billSchema = new mongoose.Schema({
   additionalPrice: {
     type: Number,
     default: 0,
-    required: false
+    select: true
+  },
+  discountPercentage: {
+    type: Number,
+    default: 0,
+    select: true
+  },
+  discountAmount: {
+    type: Number,
+    default: 0,
+    select: true
   },
   total: {
     type: Number,
@@ -56,9 +66,26 @@ const billSchema = new mongoose.Schema({
   timestamps: true
 });
 
+// Add a pre-save middleware to ensure numbers are properly converted
+billSchema.pre('save', function(next) {
+  if (this.discountPercentage) {
+    this.discountPercentage = Number(this.discountPercentage);
+  }
+  if (this.discountAmount) {
+    this.discountAmount = Number(this.discountAmount);
+  }
+  if (this.additionalPrice) {
+    this.additionalPrice = Number(this.additionalPrice);
+  }
+  next();
+});
+
+// Ensure these fields are always included in the response
 billSchema.set('toJSON', {
   transform: function(doc, ret, options) {
-    ret.additionalPrice = ret.additionalPrice || 0;
+    ret.additionalPrice = doc.additionalPrice || 0;
+    ret.discountPercentage = doc.discountPercentage || 0;
+    ret.discountAmount = doc.discountAmount || 0;
     return ret;
   }
 });

@@ -1,7 +1,7 @@
 import React from 'react'
 import { Container, Typography, Box } from '@mui/material'
 import { makeStyles } from '@mui/styles'
-import { englishToBengali, formatLargeNumber } from '../../../utils/bengaliNumerals'
+import { englishToBengali, formatLargeNumber, convertMixedInputToNumber } from '../../../utils/bengaliNumerals'
 
 const useStyle = makeStyles({
     ordersSection: {
@@ -9,12 +9,24 @@ const useStyle = makeStyles({
     }
 })
 
-const OrderDetails = ({ lineItems, additionalPrice = 0, showAdditionalPrice = false }) => {
+const OrderDetails = ({ lineItems, additionalPrice = 0, showAdditionalPrice = false, discountPercentage = '' }) => {
     const classes = useStyle()
 
     // Calculate totals
-    const subTotal = lineItems.reduce((sum, item) => sum + item.subTotal, 0)
-    const totalWithAdditional = subTotal + (showAdditionalPrice ? Number(additionalPrice) : 0)
+    const subTotal = lineItems.reduce((sum, item) => sum + item.subTotal, 0);
+    
+    // Calculate discount
+    const discountPercent = discountPercentage ? convertMixedInputToNumber(discountPercentage) : 0;
+    const discountAmount = Math.floor(subTotal * (discountPercent / 100));
+    
+    // Calculate amount after discount
+    const afterDiscount = subTotal - discountAmount;
+    
+    // Add service charge if enabled
+    const serviceCharge = showAdditionalPrice ? Number(additionalPrice || 0) : 0;
+    
+    // Calculate final total
+    const finalTotal = afterDiscount + serviceCharge;
 
     return (
         <Container>
@@ -25,7 +37,7 @@ const OrderDetails = ({ lineItems, additionalPrice = 0, showAdditionalPrice = fa
                 </Box>
                 <Box display='flex' flexDirection='column' alignItems='center'>
                     <Typography variant='body1'><strong>মোট টাকা:</strong></Typography>               
-                    <Typography variant='h2' align='center'>৳{englishToBengali(totalWithAdditional)}</Typography>
+                    <Typography variant='h2' align='center'>৳{englishToBengali(finalTotal)}</Typography>
                 </Box>
             </Box>
         </Container>

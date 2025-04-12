@@ -65,19 +65,6 @@ const SummaryOfBill = (props) => {
     const [showAdditionalPrice, setShowAdditionalPrice] = useState(false)
     const [additionalPrice, setAdditionalPrice] = useState(0)
 
-    // Calculate subtotal from line items
-    const subtotal = lineItems.reduce((sum, item) => sum + item.subTotal, 0)
-    
-    // Calculate discount amount if discount percentage is provided
-    const discountAmount = discountPercentage ? 
-        Math.floor(subtotal * (convertMixedInputToNumber(discountPercentage) / 100)) : 0
-    
-    // Calculate additional price (if enabled)
-    const additionalPriceValue = showAdditionalPrice ? Number(additionalPrice || 0) : 0
-
-    // Calculate final total: subtotal - discount + additionalPrice
-    const finalTotal = subtotal - discountAmount + additionalPriceValue
-
     const handleDiscountChange = (e) => {
         const value = e.target.value
         
@@ -117,22 +104,30 @@ const SummaryOfBill = (props) => {
             subTotal: Number(item.subTotal)
         }));
 
-        // Calculate subtotal and discount
+        // Calculate subtotal
         const subtotal = lineItems.reduce((sum, item) => sum + item.subTotal, 0);
-        const discount = discountPercentage ? 
-            Math.floor(subtotal * (convertMixedInputToNumber(discountPercentage) / 100)) : 0;
         
-        // Add additional price to calculate final total
-        const totalAmount = subtotal - discount + additionalPriceValue;
+        // Calculate discount
+        const discountPercent = discountPercentage ? 
+            convertMixedInputToNumber(discountPercentage) : 0;
+        const discountAmount = Math.floor(subtotal * (discountPercent / 100));
+        
+        // Get service charge
+        const serviceCharge = showAdditionalPrice ? Number(additionalPrice || 0) : 0;
+        
+        // Calculate final total
+        const totalAmount = subtotal - discountAmount + serviceCharge;
 
         const billData = {
             customer: customerInfo._id,
             items: formattedLineItems,
             total: totalAmount,
-            additionalPrice: additionalPriceValue
+            additionalPrice: serviceCharge,
+            discountPercentage: discountPercent,
+            discountAmount: discountAmount // Add this explicitly
         };
 
-        console.log('Sending bill data:', billData);  // Debug log
+        console.log('Sending bill data:', billData);
 
         dispatch(asyncAddBill(billData))
             .then(response => {
@@ -146,6 +141,19 @@ const SummaryOfBill = (props) => {
                 props.setIsLoading(false);
             });
     };
+
+    // Calculate display values for the UI
+    const subtotal = lineItems.reduce((sum, item) => sum + item.subTotal, 0);
+    
+    // Calculate discount amount
+    const discountAmount = discountPercentage ? 
+        Math.floor(subtotal * (convertMixedInputToNumber(discountPercentage) / 100)) : 0;
+    
+    // Get service charge amount
+    const serviceCharge = showAdditionalPrice ? Number(additionalPrice || 0) : 0;
+    
+    // Calculate final total
+    const finalTotal = subtotal - discountAmount + serviceCharge;
 
     return (
         <Paper elevation={3} className={classes.summaryContainer}>
@@ -162,13 +170,13 @@ const SummaryOfBill = (props) => {
                 lineItems={lineItems} 
                 additionalPrice={additionalPrice}
                 showAdditionalPrice={showAdditionalPrice}
+                discountPercentage={discountPercentage}
             />
             
             <Container>
                 <Box className={classes.amountContainer}>
-                    <Typography variant="h6" sx={{ fontWeight: 600, display: 'flex', justifyContent: 'space-between' }}>
-                        <span>Subtotal:</span> 
-                        <span>৳{englishToBengali(formatLargeNumber(subtotal))}</span>
+                    <Typography variant="h6">
+                        <strong>Subtotal:</strong> ৳{englishToBengali(subtotal)}
                     </Typography>
                     
                     <TextField
@@ -182,23 +190,18 @@ const SummaryOfBill = (props) => {
                         InputProps={{
                             endAdornment: <span>%</span>,
                         }}
-                        size="small"
                     />
                     
                     {discountAmount > 0 && (
-                        <Typography variant="h6" style={{ 
-                            color: 'green', 
-                            display: 'flex', 
-                            justifyContent: 'space-between',
-                            marginTop: '8px'
-                        }}>
-                            <span>(-) Discount:</span> 
-                            <span>৳{englishToBengali(formatLargeNumber(discountAmount))}</span>
+                        <Typography variant="h6" style={{ color: 'green' }}>
+                            <strong>(-) Discount ({englishToBengali(discountPercentage)}%):</strong> ৳{englishToBengali(discountAmount)}
                         </Typography>
                     )}
-                </Box>
-                
-                <Box className={classes.totalContainer}>
+
+                    <Typography variant="h6" sx={{ mt: 2 }}>
+                        <strong>After Discount:</strong> ৳{englishToBengali(subtotal - discountAmount)}
+                    </Typography>
+                    
                     <FormControlLabel 
                         control={
                             <Checkbox 
@@ -208,34 +211,34 @@ const SummaryOfBill = (props) => {
                             />
                         }
                         label="Add Service Charge"
-                        sx={{ marginBottom: '8px' }}
+                        sx={{ mt: 2, mb: 1 }}
                     />
                     
                     {showAdditionalPrice && (
-                        <TextField
-                            fullWidth
-                            margin="dense"
-                            label="Service Charge Amount"
-                            type="number"
-                            value={additionalPrice}
-                            onChange={(e) => setAdditionalPrice(e.target.value)}
-                            inputProps={{ min: 0 }}
-                            variant="outlined"
-                            size="small"
-                            sx={{ mb: 2 }}
-                        />
+                        <>
+                            <TextField
+                                fullWidth
+                                margin="dense"
+                                label="Service Charge"
+                                type="number"
+                                value={additionalPrice}
+                                onChange={(e) => setAdditionalPrice(e.target.value)}
+                                inputProps={{ min: 0 }}
+                                variant="outlined"
+                                size="small"
+                            />
+                            {serviceCharge > 0 && (
+                                <Typography variant="h6" sx={{ mt: 1 }}>
+                                    <strong>(+) Service Charge:</strong> ৳{englishToBengali(serviceCharge)}
+                                </Typography>
+                            )}
+                        </>
                     )}
                     
-                    <Typography className={classes.totalText} variant="h6" sx={{ 
-                        display: 'flex', 
-                        justifyContent: 'space-between',
-                        padding: '8px 12px',
-                        backgroundColor: '#e3e8ff',
-                        borderRadius: '6px',
-                        marginTop: '12px'
-                    }}>
-                        <span>Final Total:</span> 
-                        <span>৳{englishToBengali(formatLargeNumber(finalTotal))}</span>
+                    <Divider sx={{ my: 2 }} />
+                    
+                    <Typography variant="h6" className={classes.totalText}>
+                        <strong>Final Total:</strong> ৳{englishToBengali(finalTotal)}
                     </Typography>
                 </Box>
                 

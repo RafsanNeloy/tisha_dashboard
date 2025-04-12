@@ -20,6 +20,9 @@ const BillItemTable = (props) => {
     // Get additionalPrice from either the bill object or props
     const additionalPrice = (bill?.additionalPrice || props.additionalPrice || 0)
     
+    // Get discount percentage and amount from the bill object
+    const discountPercentage = bill?.discountPercentage || 0;
+    
     const getProductType = (type) => {
         return type === 0 ? 'ডজন' : 'পিস';
     }
@@ -27,9 +30,9 @@ const BillItemTable = (props) => {
     // Calculate subtotal from items
     const subtotal = items.reduce((sum, item) => sum + item.subTotal, 0);
     
-    // Calculate discount - add additionalPrice back to total to get the actual discount amount
-    const discountAmount = subtotal > (total - additionalPrice) ? 
-        subtotal - (total - additionalPrice) : 0;
+    // Use the discountAmount from the bill if available, otherwise calculate it
+    const discountAmount = bill?.discountAmount || 
+        (subtotal > (total - additionalPrice) ? subtotal - (total - additionalPrice) : 0);
 
     return (
         <TableContainer component={Paper}>
@@ -69,7 +72,7 @@ const BillItemTable = (props) => {
                     {discountAmount > 0 && (
                         <TableRow>
                             <TableCell colSpan={4} align="right" className={classes.tableHeaderFooter} style={{ color: 'green' }}>
-                                (-) ডিসকাউন্ট:
+                                (-) ডিসকাউন্ট ({englishToBengali(discountPercentage)}%):
                             </TableCell>
                             <TableCell colSpan={2} className={classes.tableHeaderFooter} style={{ color: 'green' }}>
                                 ৳{englishToBengali(discountAmount)}
