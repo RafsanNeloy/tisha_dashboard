@@ -14,14 +14,19 @@ const BillDetail = (props) => {
         }
     }
 
-    // Calculate subtotal and discount
+    // Calculate subtotal and additional price
     const calculateSubtotal = () => {
         if (!bill?.items) return 0;
         return bill.items.reduce((sum, item) => sum + item.subTotal, 0);
     }
 
     const subtotal = calculateSubtotal();
-    const discountAmount = subtotal - (bill?.total || 0);
+    const additionalPrice = bill?.additionalPrice || 0;
+    
+    // Calculate discount by comparing subtotal to total, taking additionalPrice into account
+    // If total + additionalPrice < subtotal, then there was a discount applied
+    const discountAmount = subtotal > (bill?.total - additionalPrice) ? 
+        subtotal - (bill?.total - additionalPrice) : 0;
 
     return (
         <Box sx={{ my: 2 }}>
@@ -54,6 +59,12 @@ const BillDetail = (props) => {
             {discountAmount > 0 && (
                 <Typography variant='h6' sx={{ color: 'green' }}>
                     <strong>(-) ডিসকাউন্ট:</strong> ৳{englishToBengali(discountAmount)}
+                </Typography>
+            )}
+            
+            {additionalPrice > 0 && (
+                <Typography variant='h6' sx={{ mt: 1 }}>
+                    <strong>(+) সার্ভিস চার্জ:</strong> ৳{englishToBengali(additionalPrice)}
                 </Typography>
             )}
             

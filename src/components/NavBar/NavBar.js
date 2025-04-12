@@ -28,6 +28,7 @@ import { Box } from '@mui/material'
 import { makeStyles } from '@mui/styles'
 import { useTheme } from '@mui/material/styles'
 import { useMediaQuery } from '@mui/material'
+import useDrawerState from '../../hooks/useDrawerState'
 
 const useStyles = makeStyles({
   content: {
@@ -45,11 +46,7 @@ const NavBar = (props) => {
     const navigate = useNavigate()
     const location = useLocation()
     
-    // Get the drawer width from localStorage or use default
-    const drawerWidth = localStorage.getItem('drawerWidth') || 260
-    const theme = useTheme()
-    const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
-    
+    const { drawerWidth, isMobile } = useDrawerState();
     const classes = useStyles({ isLoggedIn, drawerWidth, isMobile })
 
     useEffect(() => {

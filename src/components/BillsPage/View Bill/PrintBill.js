@@ -44,6 +44,53 @@ const PrintBill = (props) => {
         return type === 0 ? 'ডজন' : 'পিস';
     }
 
+    const subtotal = bill.items.reduce((sum, item) => sum + item.subTotal, 0);
+    const additionalPrice = bill.additionalPrice || 0;
+    const discountAmount = subtotal > (bill.total - additionalPrice) ? 
+        subtotal - (bill.total - additionalPrice) : 0;
+
+    const PrintBillContent = ({ bill, customer }) => {
+        const subtotal = bill.items.reduce((sum, item) => sum + item.subTotal, 0);
+        const additionalPrice = bill.additionalPrice || 0;
+        const discountAmount = subtotal > (bill.total - additionalPrice) ? 
+            subtotal - (bill.total - additionalPrice) : 0;
+
+        return (
+            <div className="print-container">
+                {/* ... existing header content ... */}
+                
+                {/* ... existing items table ... */}
+                
+                <div className="totals-section">
+                    <div className="total-row">
+                        <span className="total-label">সাবটোটাল:</span>
+                        <span className="total-value">৳{englishToBengali(subtotal)}</span>
+                    </div>
+                    
+                    {discountAmount > 0 && (
+                        <div className="total-row discount">
+                            <span className="total-label">(-) ডিসকাউন্ট:</span>
+                            <span className="total-value">৳{englishToBengali(discountAmount)}</span>
+                        </div>
+                    )}
+                    
+                    {additionalPrice > 0 && (
+                        <div className="total-row additional">
+                            <span className="total-label">(+) সার্ভিস চার্জ:</span>
+                            <span className="total-value">৳{englishToBengali(additionalPrice)}</span>
+                        </div>
+                    )}
+                    
+                    <div className="total-row grand-total">
+                        <span className="total-label">মোট টাকা:</span>
+                        <span className="total-value">৳{englishToBengali(bill.total)}</span>
+                    </div>
+                </div>
+                
+                {/* ... existing footer content ... */}
+            </div>
+        );
+    };
 
     const BillTemplate = ({ copyType, pageItems, pageNumber, totalPages, isLastPage }) => {
         // Calculate the total of all items (not just current page)
@@ -51,10 +98,9 @@ const PrintBill = (props) => {
             return items.reduce((sum, item) => sum + item.subTotal, 0);
         };
 
-        // Get the full subtotal and discount only for the last page
+        // Get the full subtotal and additionalPrice for the last page
         const fullSubtotal = calculateTotalAmount();
-        const discountAmount = fullSubtotal - bill.total;
-
+        
         return (
             <div style={{ 
                 width: '148mm',
@@ -287,6 +333,7 @@ const PrintBill = (props) => {
                                             <strong>৳{englishToBengali(fullSubtotal)}</strong>
                                         </td>
                                     </tr>
+                                    
                                     {discountAmount > 0 && (
                                         <tr style={{ backgroundColor: '#f8f9fa' }}>
                                             <td colSpan="4" style={{ padding: '2mm', border: '0.5px solid #bdc3c7', textAlign: 'right' }}>
@@ -297,6 +344,18 @@ const PrintBill = (props) => {
                                             </td>
                                         </tr>
                                     )}
+                                    
+                                    {additionalPrice > 0 && (
+                                        <tr style={{ backgroundColor: '#f8f9fa' }}>
+                                            <td colSpan="4" style={{ padding: '2mm', border: '0.5px solid #bdc3c7', textAlign: 'right' }}>
+                                                <strong>(+) Service Charge:</strong>
+                                            </td>
+                                            <td style={{ padding: '2mm', border: '0.5px solid #bdc3c7', textAlign: 'right' }}>
+                                                <strong>৳{englishToBengali(additionalPrice)}</strong>
+                                            </td>
+                                        </tr>
+                                    )}
+                                    
                                     <tr style={{ backgroundColor: '#f8f9fa' }}>
                                         <td colSpan="4" style={{ padding: '2mm', border: '0.5px solid #bdc3c7', textAlign: 'right', borderTop: '2px solid #000' }}>
                                             <strong>Total Amount:</strong>

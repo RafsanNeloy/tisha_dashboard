@@ -48,7 +48,15 @@ const BillView = () => {
                     }
                 })
 
+                console.log('Bill additionalPrice check:', {
+                    hasField: 'additionalPrice' in response.data,
+                    value: response.data.additionalPrice,
+                    billTotal: response.data.total,
+                    subtotal: response.data.items?.reduce((sum, item) => sum + item.subTotal, 0) || 0
+                })
+
                 setBill(response.data)
+                console.log('Received bill data:', response.data)
             } catch (err) {
                 console.error('Error fetching bill:', err)
                 setError(err.response?.data?.message || 'Error loading bill')
@@ -87,6 +95,8 @@ const BillView = () => {
         )
     }
 
+    const additionalPrice = bill?.additionalPrice || 0;
+
     return (
         <Container className={classes.container}>
             <Box display='flex' flexDirection='row' justifyContent='space-between'>
@@ -119,7 +129,9 @@ const BillView = () => {
                         product: item.product._id,
                         name: item.product.name
                     }))} 
-                    total={bill.total} 
+                    total={bill.total}
+                    additionalPrice={bill.additionalPrice || 0}
+                    bill={bill}
                 />
             )}
         </Container>

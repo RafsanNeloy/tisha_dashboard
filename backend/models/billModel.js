@@ -43,12 +43,24 @@ const billSchema = new mongoose.Schema({
       required: true
     }
   }],
+  additionalPrice: {
+    type: Number,
+    default: 0,
+    required: false
+  },
   total: {
     type: Number,
     required: true
   }
 }, {
   timestamps: true
+});
+
+billSchema.set('toJSON', {
+  transform: function(doc, ret, options) {
+    ret.additionalPrice = ret.additionalPrice || 0;
+    return ret;
+  }
 });
 
 module.exports = mongoose.model('Bill', billSchema); 

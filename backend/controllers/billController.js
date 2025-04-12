@@ -19,12 +19,13 @@ const getBills = asyncHandler(async (req, res) => {
 // @access  Private
 const addBill = asyncHandler(async (req, res) => {
   try {
-    const { customer, items, total } = req.body;
+    const { customer, items, total, additionalPrice = 0 } = req.body;
 
     console.log('Bill Creation Request:', {
       customerId: customer,
       total,
-      items: items.length
+      items: items.length,
+      additionalPrice
     });
 
     // Validate required fields
@@ -55,14 +56,31 @@ const addBill = asyncHandler(async (req, res) => {
       };
     }));
 
-    // Create bill
+    // Calculate subtotals and total
+    let totalBill = 0;
+    const processedItems = itemsWithProductType.map(item => {
+      const subTotal = item.quantity * item.price;
+      totalBill += subTotal;
+      return {
+        ...item,
+        subTotal
+      };
+    });
+    
+    // Add the additional price to the total
+    totalBill += Number(additionalPrice);
+
+    // Create bill with explicit setting of additionalPrice
     const billData = {
       user: req.user._id,
       billNumber,
       customer,
-      items: itemsWithProductType,
-      total
+      items: processedItems,
+      additionalPrice: Number(additionalPrice || 0),
+      total: totalBill
     };
+
+    console.log('Creating bill with data:', billData);
 
     const bill = await Bill.create(billData);
 
@@ -84,7 +102,7 @@ const addBill = asyncHandler(async (req, res) => {
     // Calculate new remaining amount
     const allBills = await Bill.find({ customer: customerToUpdate._id });
     const previousAmount = customerToUpdate.previousAmount || 0;
-    const totalBillAmount = allBills.reduce((sum, b) => sum + (b.total || 0), 0) + total;
+    const totalBillAmount = allBills.reduce((sum, b) => sum + (b.total || 0), 0) + totalBill;
     
     // Calculate totals from all payments
     const payments = customerToUpdate.paymentInfo || [];
@@ -106,10 +124,18 @@ const addBill = asyncHandler(async (req, res) => {
       newRemainingAmount: updatedCustomer.remainingAmount
     });
 
-    // Populate and return bill
+    // Populate and return bill - make sure to include additionalPrice in the response
     const populatedBill = await Bill.findById(bill._id)
       .populate('customer', 'name')
       .populate('items.product', 'name price');
+
+    // Log the populated bill to verify additionalPrice is present
+    console.log('Created bill:', {
+      _id: populatedBill._id,
+      billNumber: populatedBill.billNumber,
+      additionalPrice: populatedBill.additionalPrice,
+      total: populatedBill.total
+    });
 
     res.status(201).json(populatedBill);
 
@@ -145,17 +171,30 @@ const deleteBill = asyncHandler(async (req, res) => {
 // @route   GET /api/bills/:id
 // @access  Private
 const getBill = asyncHandler(async (req, res) => {
-  const bill = await Bill.findById(req.params.id)
-    .populate('customer', 'name address')
-    .populate('items.product', 'name price');
+  try {
+    const bill = await Bill.findById(req.params.id)
+      .populate('customer', 'name address')
+      .populate('items.product', 'name price');
 
-  if (!bill) {
-    res.status(404);
-    throw new Error('Bill not found');
+    if (!bill) {
+      res.status(404);
+      throw new Error('Bill not found');
+    }
+
+    // Explicitly check for additionalPrice and log it
+    console.log('Fetched bill additionalPrice check:', {
+      hasProp: bill.hasOwnProperty('additionalPrice'),
+      value: bill.additionalPrice,
+      rawBill: JSON.stringify(bill)
+    });
+
+    // Here we make sure to send all fields, including additionalPrice
+    res.status(200).json(bill);
+  } catch (error) {
+    console.error('Error fetching bill:', error);
+    res.status(500);
+    throw new Error(`Error fetching bill: ${error.message}`);
   }
-
-  // Remove user check to allow viewing any bill
-  res.status(200).json(bill);
 });
 
 // @desc    Get product bills and stats

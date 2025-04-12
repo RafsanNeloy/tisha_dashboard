@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { Box, Drawer as MUIDrawer, List, ListItem, ListItemIcon, ListItemText, Typography, IconButton, useMediaQuery, useTheme } from '@mui/material'
 import { makeStyles } from '@mui/styles'
@@ -19,6 +19,7 @@ import { asyncGetBills } from '../../action/billsAction'
 import { asyncGetCustomers } from '../../action/customerAction'
 import { asyncGetProducts } from '../../action/productAction'
 import { asyncGetUser } from '../../action/userAction'
+import useDrawerState from '../../hooks/useDrawerState'
 
 const useStyle = makeStyles({
     drawer: {
@@ -107,11 +108,7 @@ const useStyle = makeStyles({
 });
 
 const Drawer = (props) => {
-    const theme = useTheme()
-    const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
-    const [isDrawerOpen, setIsDrawerOpen] = useState(!isMobile)
-    const drawerWidth = isDrawerOpen ? 260 : 64
-    
+    const { isDrawerOpen, setIsDrawerOpen, drawerWidth, isMobile } = useDrawerState();
     const classes = useStyle({ isDrawerOpen, drawerWidth })
     const dispatch = useDispatch()
     const location = useLocation()
@@ -122,17 +119,6 @@ const Drawer = (props) => {
         dispatch(asyncGetProducts())
         dispatch(asyncGetUser())
     }, [dispatch])
-
-    useEffect(() => {
-        const handleResize = () => {
-            if (isMobile && isDrawerOpen) {
-                setIsDrawerOpen(false)
-            }
-        }
-        
-        window.addEventListener('resize', handleResize)
-        return () => window.removeEventListener('resize', handleResize)
-    }, [isMobile, isDrawerOpen])
 
     const handleLogout = () => {
         localStorage.removeItem('token')
