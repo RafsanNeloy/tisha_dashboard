@@ -119,7 +119,7 @@ const PrintBill = (props) => {
                     left: '50%',
                     transform: 'translate(-50%, -50%)',
                     zIndex: 0,
-                    opacity: 0.07,
+                    opacity: 0.12,
                     pointerEvents: 'none',
                     textAlign: 'center'
                 }}>
@@ -140,7 +140,7 @@ const PrintBill = (props) => {
                     left: '50%',
                     transform: 'translateX(-50%)',
                     zIndex: 0,
-                    opacity: 0.1,
+                    opacity: 0.2,
                     pointerEvents: 'none',
                     textAlign: 'center'
                 }}>
@@ -247,7 +247,7 @@ const PrintBill = (props) => {
                                     gap: '1px'
                                 }}>
                                     <PhoneIcon style={{ fontSize: '10px' }} />
-                                    <span>01744798523, 7343144</span>
+                                    <span style={{ color: '#88304E',fontSize: '12px' }}>01744798523, 02-7343144,</span>
                                 </div>
                                 
                             </div>
@@ -265,15 +265,16 @@ const PrintBill = (props) => {
                     <div style={{
                         display: 'flex',
                         justifyContent: 'space-between',
-                        fontSize: '10px',
-                        marginBottom: '8mm'
+                        fontSize: '13px',
+                        marginBottom: '3mm',
+                        fontWeight: 'bold'
                     }}>
                         <div>
                             <span style={{ fontWeight: 'bold' }}>ক্রেতার নাম:</span> {customer?.name || 'N/A'}<br />
                             <span style={{ fontWeight: 'bold' }}>ঠিকানা:</span> {customerAddress || 'N/A'}
                         </div>
                         <div>
-                            <span style={{ fontWeight: 'bold' }}>বিল নং:</span> {englishToBengali(bill?.billNumber || '')}<br />
+                            <span style={{ fontWeight: 'bold' }}>বিল নং:</span> <span style={{ color: 'blue' }}>{englishToBengali(bill?.billNumber || '')}</span><br />
                             <span style={{ fontWeight: 'bold' }}>তারিখ:</span> {bill?.createdAt ? moment(bill.createdAt).format('DD/MM/YYYY') : 'N/A'}
                         </div>
                     </div>
@@ -294,32 +295,81 @@ const PrintBill = (props) => {
                     <table style={{ 
                         width: '100%', 
                         borderCollapse: 'collapse',
-                        marginBottom: '4mm',
-                        fontSize: '10px'
+                        marginBottom: '2mm',
+                        fontSize: '12px'
                     }}>
                         <thead>
-                            <tr style={{ backgroundColor: '#3498db', color: 'white' }}>
-                                <th style={{ padding: '2mm', border: '0.5px solid #bdc3c7', width: '8%' }}>SL</th>
-                                <th style={{ padding: '2mm', border: '0.5px solid #bdc3c7', width: '40%' }}>মালের নাম</th>
-                                <th style={{ padding: '2mm', border: '0.5px solid #bdc3c7', width: '17%' }}>দাম</th>
-                                <th style={{ padding: '2mm', border: '0.5px solid #bdc3c7', width: '15%' }}>পরিমান</th>
-                                <th style={{ padding: '2mm', border: '0.5px solid #bdc3c7', width: '20%' }}>মোট</th>
+                            <tr style={{ backgroundColor: '#B4D4FF', color: 'black' }}>
+                                <th style={{ 
+                                    padding: '1mm', 
+                                    border: '0.5px solid #bdc3c7', 
+                                    width: '8%',
+                                    fontWeight: 'bold'
+                                }}>SL</th>
+                                <th style={{ 
+                                    padding: '1mm', 
+                                    border: '0.5px solid #bdc3c7', 
+                                    width: '40%',
+                                    fontWeight: 'bold'
+                                }}>মালের নাম</th>
+                                <th style={{ 
+                                    padding: '1mm', 
+                                    border: '0.5px solid #bdc3c7', 
+                                    width: '15%',
+                                    fontWeight: 'bold'
+                                }}>পরিমান</th>
+                                <th style={{ 
+                                    padding: '1mm', 
+                                    border: '0.5px solid #bdc3c7', 
+                                    width: '17%',
+                                    fontWeight: 'bold'
+                                }}>দাম</th>
+                                <th style={{ 
+                                    padding: '1mm', 
+                                    border: '0.5px solid #bdc3c7', 
+                                    width: '20%',
+                                    fontWeight: 'bold'
+                                }}>মোট</th>
                             </tr>
                         </thead>
                         <tbody>
                             {pageItems.map((item, i) => (
                                 <tr key={i}>
-                                    <td style={{ padding: '2mm', border: '0.5px solid #bdc3c7', textAlign: 'center' }}>
-                                        {englishToBengali(((pageNumber - 1) * 14) + i + 1)}
+                                    <td style={{ 
+                                        padding: '2mm', 
+                                        border: '0.5px solid #bdc3c7', 
+                                        textAlign: 'center',
+                                        fontWeight: 'bold'
+                                    }}>
+                                        {englishToBengali(((pageNumber - 1) * 10) + i + 1)}
                                     </td>
-                                    <td style={{ padding: '2mm', border: '0.5px solid #bdc3c7' }}>{item.product.name}</td>
-                                    <td style={{ padding: '2mm', border: '0.5px solid #bdc3c7', textAlign: 'right' }}>
-                                        ৳{englishToBengali(item.price)}
-                                    </td>
-                                    <td style={{ padding: '2mm', border: '0.5px solid #bdc3c7', textAlign: 'center' }}>
+                                    <td style={{ 
+                                        padding: '2mm', 
+                                        border: '0.5px solid #bdc3c7',
+                                        fontWeight: 'bold'
+                                    }}>{item.product.name}</td>                                
+                                    <td style={{ 
+                                        padding: '2mm', 
+                                        border: '0.5px solid #bdc3c7', 
+                                        textAlign: 'center',
+                                        fontWeight: 'bold'
+                                    }}>
                                         {englishToBengali(item.quantity)} {getProductType(item.product_type)}
                                     </td>
-                                    <td style={{ padding: '2mm', border: '0.5px solid #bdc3c7', textAlign: 'right' }}>
+                                    <td style={{ 
+                                        padding: '2mm', 
+                                        border: '0.5px solid #bdc3c7', 
+                                        textAlign: 'right',
+                                        fontWeight: 'bold'
+                                    }}>
+                                        ৳{englishToBengali(item.price)}
+                                    </td>
+                                    <td style={{ 
+                                        padding: '2mm', 
+                                        border: '0.5px solid #bdc3c7', 
+                                        textAlign: 'right',
+                                        fontWeight: 'bold'
+                                    }}>
                                         ৳{englishToBengali(item.subTotal)}
                                     </td>
                                 </tr>
@@ -329,20 +379,20 @@ const PrintBill = (props) => {
                             {isLastPage ? (
                                 <>
                                     <tr style={{ backgroundColor: '#f8f9fa' }}>
-                                        <td colSpan="4" style={{ padding: '2mm', border: '0.5px solid #bdc3c7', textAlign: 'right' }}>
+                                        <td colSpan="4" style={{ padding: '1mm', border: '0.5px solid #bdc3c7', textAlign: 'right' }}>
                                             <strong>Subtotal:</strong>
                                         </td>
-                                        <td style={{ padding: '2mm', border: '0.5px solid #bdc3c7', textAlign: 'right' }}>
+                                        <td style={{ padding: '1mm', border: '0.5px solid #bdc3c7', textAlign: 'right' }}>
                                             <strong>৳{englishToBengali(fullSubtotal)}</strong>
                                         </td>
                                     </tr>
                                     
                                     {discountAmount > 0 && (
                                         <tr style={{ backgroundColor: '#f8f9fa' }}>
-                                            <td colSpan="4" style={{ padding: '2mm', border: '0.5px solid #bdc3c7', textAlign: 'right' }}>
+                                            <td colSpan="4" style={{ padding: '1mm', border: '0.5px solid #bdc3c7', textAlign: 'right' }}>
                                                 <strong>(-) Discount:</strong>
                                             </td>
-                                            <td style={{ padding: '2mm', border: '0.5px solid #bdc3c7', textAlign: 'right' }}>
+                                            <td style={{ padding: '1mm', border: '0.5px solid #bdc3c7', textAlign: 'right' }}>
                                                 <strong>৳{englishToBengali(discountAmount)}</strong>
                                             </td>
                                         </tr>
@@ -350,30 +400,30 @@ const PrintBill = (props) => {
                                     
                                     {additionalPrice > 0 && (
                                         <tr style={{ backgroundColor: '#f8f9fa' }}>
-                                            <td colSpan="4" style={{ padding: '2mm', border: '0.5px solid #bdc3c7', textAlign: 'right' }}>
+                                            <td colSpan="4" style={{ padding: '1mm', border: '0.5px solid #bdc3c7', textAlign: 'right' }}>
                                                 <strong>(+) Service Charge:</strong>
                                             </td>
-                                            <td style={{ padding: '2mm', border: '0.5px solid #bdc3c7', textAlign: 'right' }}>
+                                            <td style={{ padding: '1mm', border: '0.5px solid #bdc3c7', textAlign: 'right' }}>
                                                 <strong>৳{englishToBengali(additionalPrice)}</strong>
                                             </td>
                                         </tr>
                                     )}
                                     
                                     <tr style={{ backgroundColor: '#f8f9fa' }}>
-                                        <td colSpan="4" style={{ padding: '2mm', border: '0.5px solid #bdc3c7', textAlign: 'right', borderTop: '2px solid #000' }}>
+                                        <td colSpan="4" style={{ padding: '1mm', border: '0.5px solid #bdc3c7', textAlign: 'right', borderTop: '2px solid #000' }}>
                                             <strong>Total Amount:</strong>
                                         </td>
-                                        <td style={{ padding: '2mm', border: '0.5px solid #bdc3c7', textAlign: 'right', borderTop: '2px solid #000' }}>
+                                        <td style={{ padding: '1mm', border: '0.5px solid #bdc3c7', textAlign: 'right', borderTop: '2px solid #000' }}>
                                             <strong>৳{englishToBengali(bill.total)}</strong>
                                         </td>
                                     </tr>
                                 </>
                             ) : (
                                 <tr style={{ backgroundColor: '#f8f9fa' }}>
-                                    <td colSpan="4" style={{ padding: '2mm', border: '0.5px solid #bdc3c7', textAlign: 'right' }}>
+                                    <td colSpan="4" style={{ padding: '1mm', border: '0.5px solid #bdc3c7', textAlign: 'right' }}>
                                         <strong>Page Total:</strong>
                                     </td>
-                                    <td style={{ padding: '2mm', border: '0.5px solid #bdc3c7', textAlign: 'right' }}>
+                                    <td style={{ padding: '1mm', border: '0.5px solid #bdc3c7', textAlign: 'right' }}>
                                         <strong>৳{englishToBengali(pageItems.reduce((sum, item) => sum + item.subTotal, 0))}</strong>
                                     </td>
                                 </tr>
@@ -419,7 +469,7 @@ const PrintBill = (props) => {
     }
 
     const renderBillPages = (items, copyType) => {
-        const ITEMS_PER_PAGE = 14;
+        const ITEMS_PER_PAGE = 10;  // Changed from 14 to 10
         const totalPages = Math.ceil(items.length / ITEMS_PER_PAGE);
         
         return Array.from({ length: totalPages }, (_, i) => {
