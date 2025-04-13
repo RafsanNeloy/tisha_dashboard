@@ -13,10 +13,12 @@ import {
 } from '@mui/material';
 import moment from 'moment';
 import { formatLargeNumber } from '../../utils/bengaliNumerals';
+import useDrawerState from '../../hooks/useDrawerState';
 
 const MonthlyHistory = () => {
     const bills = useSelector(state => state.bills) || [];
     const customers = useSelector(state => state.customers) || [];
+    const { drawerWidth, isMobile } = useDrawerState();
 
     const monthlyData = useMemo(() => {
         const data = new Map();
@@ -57,7 +59,16 @@ const MonthlyHistory = () => {
     }, [bills, customers]);
 
     return (
-        <Container maxWidth="md" sx={{ mt: 4, ml: '260px' }}>
+        <Container 
+            maxWidth="md" 
+            sx={{ 
+                mt: 4, 
+                ml: { xs: 0, sm: isMobile ? 0 : `${drawerWidth}px` }, 
+                width: { xs: '100%', sm: `calc(100% - ${isMobile ? 0 : drawerWidth}px)` },
+                transition: 'margin-left 225ms cubic-bezier(0.4, 0, 0.6, 1) 0ms',
+                padding: { xs: 1, sm: 2 }
+            }}
+        >
             <Paper sx={{ p: 2, borderRadius: 2, boxShadow: 2 }}>
                 <Typography variant="h6" gutterBottom sx={{ mb: 3, fontWeight: 600 }}>
                     Monthly History

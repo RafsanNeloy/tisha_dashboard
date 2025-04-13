@@ -1,7 +1,7 @@
 import React from 'react'
 import { Container, Typography, Box } from '@mui/material'
 import { makeStyles } from '@mui/styles'
-import { englishToBengali } from '../../../utils/bengaliNumerals'
+import { englishToBengali, formatLargeNumber, convertMixedInputToNumber } from '../../../utils/bengaliNumerals'
 
 const useStyle = makeStyles({
     ordersSection: {
@@ -9,15 +9,24 @@ const useStyle = makeStyles({
     }
 })
 
-const OrderDetails = (props) => {
-    const { lineItems } = props
+const OrderDetails = ({ lineItems, additionalPrice = 0, showAdditionalPrice = false, discountPercentage = '' }) => {
     const classes = useStyle()
 
-    const calculateTotal = (data) => {
-        let total = 0
-        data.forEach(ele => total = total + ele.subTotal)
-        return englishToBengali(total)
-    }
+    // Calculate totals
+    const subTotal = lineItems.reduce((sum, item) => sum + item.subTotal, 0);
+    
+    // Calculate discount
+    const discountPercent = discountPercentage ? convertMixedInputToNumber(discountPercentage) : 0;
+    const discountAmount = Math.floor(subTotal * (discountPercent / 100));
+    
+    // Calculate amount after discount
+    const afterDiscount = subTotal - discountAmount;
+    
+    // Add service charge if enabled
+    const serviceCharge = showAdditionalPrice ? Number(additionalPrice || 0) : 0;
+    
+    // Calculate final total
+    const finalTotal = afterDiscount + serviceCharge;
 
     return (
         <Container>
@@ -28,7 +37,7 @@ const OrderDetails = (props) => {
                 </Box>
                 <Box display='flex' flexDirection='column' alignItems='center'>
                     <Typography variant='body1'><strong>মোট টাকা:</strong></Typography>               
-                    <Typography variant='h2' align='center'>৳{calculateTotal(lineItems)}</Typography>
+                    <Typography variant='h2' align='center'>৳{englishToBengali(finalTotal)}</Typography>
                 </Box>
             </Box>
         </Container>

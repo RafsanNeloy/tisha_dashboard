@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react'
 import { Link, useLocation } from 'react-router-dom'
-import { Box, Drawer as MUIDrawer, List, ListItem, ListItemIcon, ListItemText, Typography } from '@mui/material'
+import { Box, Drawer as MUIDrawer, List, ListItem, ListItemIcon, ListItemText, Typography, IconButton, useMediaQuery, useTheme } from '@mui/material'
 import { makeStyles } from '@mui/styles'
 import PeopleIcon from '@mui/icons-material/People'
 import LocalOfferIcon from '@mui/icons-material/LocalOffer'
@@ -11,22 +11,35 @@ import RecyclingIcon from '@mui/icons-material/Recycling'
 import PercentIcon from '@mui/icons-material/Percent'
 import PaymentsIcon from '@mui/icons-material/Payments'
 import HistoryIcon from '@mui/icons-material/History'
+import MenuIcon from '@mui/icons-material/Menu'
+import ChevronLeftIcon from '@mui/icons-material/ChevronLeft'
 import { useDispatch } from 'react-redux'
 import { setLogout } from '../../action/loginAction'
 import { asyncGetBills } from '../../action/billsAction'
 import { asyncGetCustomers } from '../../action/customerAction'
 import { asyncGetProducts } from '../../action/productAction'
 import { asyncGetUser } from '../../action/userAction'
+import useDrawerState from '../../hooks/useDrawerState'
 
 const useStyle = makeStyles({
     drawer: {
-        width: 260,
+        width: props => props.drawerWidth,
+        flexShrink: 0,
         '& .MuiDrawer-paper': {
-            width: 260,
+            width: props => props.drawerWidth,
             background: '#F8F3D9',
             color: '#030637',
             height: '100%',
             position: 'fixed',
+            overflowY: 'auto',
+            transition: 'width 225ms cubic-bezier(0.4, 0, 0.6, 1) 0ms'
+        }
+    },
+    drawerMobile: {
+        '& .MuiDrawer-paper': {
+            background: '#F8F3D9',
+            color: '#030637',
+            height: '100%',
             overflowY: 'auto'
         }
     },
@@ -36,7 +49,10 @@ const useStyle = makeStyles({
         borderBottom: '1px solid rgba(255,255,255,0.1)',
         position: 'sticky',
         top: 0,
-        zIndex: 1
+        zIndex: 1,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between'
     },
     menuList: {
         padding: '10px 0',
@@ -53,14 +69,17 @@ const useStyle = makeStyles({
     },
     menuIcon: {
         color: '#9292a1',
-        minWidth: '35px'
+        minWidth: props => props.isDrawerOpen ? '35px' : '100%',
+        display: 'flex',
+        justifyContent: props => props.isDrawerOpen ? 'flex-start' : 'center'
     },
     activeIcon: {
         color: '#fff'
     },
     menuText: {
         color: '#1D1616',
-        fontSize: '14px'
+        fontSize: '14px',
+        opacity: props => props.isDrawerOpen ? 1 : 0
     },
     logoutText: {
         color: '#8E1616',
@@ -75,14 +94,22 @@ const useStyle = makeStyles({
     logoutSection: {
         position: 'fixed',
         bottom: 20,
-        width: '260px',
+        width: props => props.isDrawerOpen ? '260px' : '64px',
         borderTop: '1px solid rgba(255,255,255,0.1)',
         backgroundColor: '#F8F3D9'
+    },
+    toggleButton: {
+        color: '#030637'
+    },
+    companyName: {
+        fontWeight: 'bold',
+        flex: 1
     }
 });
 
 const Drawer = (props) => {
-    const classes = useStyle()
+    const { isDrawerOpen, setIsDrawerOpen, drawerWidth, isMobile } = useDrawerState();
+    const classes = useStyle({ isDrawerOpen, drawerWidth })
     const dispatch = useDispatch()
     const location = useLocation()
 
@@ -96,6 +123,10 @@ const Drawer = (props) => {
     const handleLogout = () => {
         localStorage.removeItem('token')
         dispatch(setLogout())
+    }
+
+    const toggleDrawer = () => {
+        setIsDrawerOpen(!isDrawerOpen)
     }
 
     const menuItems = [
@@ -141,15 +172,104 @@ const Drawer = (props) => {
         }
     ]
 
+    if (isMobile) {
+        return (
+            <>
+                <IconButton 
+                    color="inherit" 
+                    aria-label="open drawer"
+                    onClick={toggleDrawer}
+                    edge="start"
+                    sx={{ 
+                        position: 'fixed', 
+                        top: '10px', 
+                        left: '10px', 
+                        zIndex: 1200,
+                        bgcolor: '#B9B28A',
+                        '&:hover': { bgcolor: '#a09c7c' }
+                    }}
+                >
+                    <MenuIcon />
+                </IconButton>
+                
+                <MUIDrawer
+                    variant="temporary"
+                    open={isDrawerOpen}
+                    onClose={toggleDrawer}
+                    className={classes.drawerMobile}
+                    ModalProps={{ keepMounted: true }}
+                >
+                    <Box className={classes.header}>
+                        <Typography variant="h6" className={classes.companyName}>
+                            TISHA PLASTIC
+                        </Typography>
+                        <IconButton onClick={toggleDrawer} className={classes.toggleButton}>
+                            <ChevronLeftIcon />
+                        </IconButton>
+                    </Box>
+                    
+                    <List className={classes.menuList}>
+                        {menuItems.map((menu, i) => {
+                            const { name, icon, link } = menu
+                            const isActive = location.pathname === link
+                            return (
+                                <Link key={i} to={link} className={classes.menuLink}>
+                                    <ListItem 
+                                        button
+                                        className={`${classes.menuItem} ${isActive ? classes.activeMenuItem : ''}`}
+                                        onClick={isMobile ? toggleDrawer : null}
+                                    >
+                                        <ListItemIcon className={`${classes.menuIcon} ${isActive ? classes.activeIcon : ''}`}>
+                                            {icon}
+                                        </ListItemIcon>
+                                        <ListItemText 
+                                            primary={name} 
+                                            classes={{ 
+                                                primary: `${classes.menuText} ${isActive ? classes.activeText : ''}`
+                                            }}
+                                        />
+                                    </ListItem>
+                                </Link>
+                            )
+                        })}
+                    </List>
+
+                    <Box className={classes.logoutSection}>
+                        <Link to='/login-or-register' className={classes.menuLink}>
+                            <ListItem 
+                                button 
+                                className={classes.menuItem}
+                                onClick={handleLogout}
+                            >
+                                <ListItemIcon className={classes.menuIcon}>
+                                    <ExitToAppIcon />
+                                </ListItemIcon>
+                                <ListItemText 
+                                    primary="Logout" 
+                                    classes={{ primary: classes.logoutText }}
+                                />
+                            </ListItem>
+                        </Link>
+                    </Box>
+                </MUIDrawer>
+            </>
+        )
+    }
+
     return (
         <MUIDrawer 
             variant='permanent'
             className={classes.drawer}
         >
             <Box className={classes.header}>
-                <Typography className={classes.companyName}>
-                    TISHA PLASTIC
-                </Typography>
+                {isDrawerOpen && (
+                    <Typography className={classes.companyName}>
+                        TISHA PLASTIC
+                    </Typography>
+                )}
+                <IconButton onClick={toggleDrawer} className={classes.toggleButton}>
+                    {isDrawerOpen ? <ChevronLeftIcon /> : <MenuIcon />}
+                </IconButton>
             </Box>
             
             <List className={classes.menuList}>
@@ -165,12 +285,14 @@ const Drawer = (props) => {
                                 <ListItemIcon className={`${classes.menuIcon} ${isActive ? classes.activeIcon : ''}`}>
                                     {icon}
                                 </ListItemIcon>
-                                <ListItemText 
-                                    primary={name} 
-                                    classes={{ 
-                                        primary: `${classes.menuText} ${isActive ? classes.activeText : ''}`
-                                    }}
-                                />
+                                {isDrawerOpen && (
+                                    <ListItemText 
+                                        primary={name} 
+                                        classes={{ 
+                                            primary: `${classes.menuText} ${isActive ? classes.activeText : ''}`
+                                        }}
+                                    />
+                                )}
                             </ListItem>
                         </Link>
                     )
@@ -187,10 +309,12 @@ const Drawer = (props) => {
                         <ListItemIcon className={classes.menuIcon}>
                             <ExitToAppIcon />
                         </ListItemIcon>
-                        <ListItemText 
-                            primary="Logout" 
-                            classes={{ primary: classes.logoutText }}
-                        />
+                        {isDrawerOpen && (
+                            <ListItemText 
+                                primary="Logout" 
+                                classes={{ primary: classes.logoutText }}
+                            />
+                        )}
                     </ListItem>
                 </Link>
             </Box>
