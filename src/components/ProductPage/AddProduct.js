@@ -41,9 +41,15 @@ const AddProduct = (props) => {
         if (name.length === 0) {
             errors.name = "name can't be blank"
         } else {
-            // Check for duplicate product name (case-insensitive)
+            // Check for duplicate product name (case-insensitive and normalized)
+            const normalizeName = (str) => {
+                // Remove all types of whitespace and normalize
+                return str.replace(/\s+/g, '').toLowerCase()
+            }
+            
+            const trimmedName = normalizeName(name)
             const isDuplicate = products.some(product => 
-                product.name.toLowerCase() === name.trim().toLowerCase()
+                normalizeName(product.name) === trimmedName
             )
             if (isDuplicate) {
                 errors.name = "A product with this name already exists"

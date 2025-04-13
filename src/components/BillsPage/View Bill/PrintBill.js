@@ -158,23 +158,26 @@ const PrintBill = (props) => {
                         <div style={{
                             display: 'flex',
                             alignItems: 'center',
-                            justifyContent: 'center',
-                            gap: '5mm',
-                            marginBottom: '1mm'
+                            justifyContent: 'flex-start',
+                            gap: '9mm',
+                            marginBottom: '1mm',
+                            paddingLeft: '17mm'
                         }}>
                             <img 
                                 src={logo} 
                                 alt="Logo" 
                                 style={{
-                                    width: '45px',
+                                    width: '55px',
                                     height: 'auto'
                                 }}
                             />
                             <h1 style={{
                                 margin: '0',
                                 fontSize: '28px',
-                                fontWeight: 'bold'
+                                fontWeight: 'bold',
+                                lineHeight: '1.2'
                             }}>
+                                টিসা প্লাস্টিক<br />
                                 TISHA PLASTIC
                             </h1>
                         </div>
