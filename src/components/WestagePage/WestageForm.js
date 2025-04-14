@@ -49,6 +49,7 @@ const WestageForm = () => {
     const [loading, setLoading] = useState(false);
     const [alert, setAlert] = useState({ open: false, message: '', severity: 'success' });
     const [customerData, setCustomerData] = useState(null);
+    const [selectedDate, setSelectedDate] = useState(new Date());
 
     useEffect(() => {
         if (customerInfo?._id) {
@@ -84,9 +85,15 @@ const WestageForm = () => {
         setLoading(true);
 
         try {
+            // Format the date properly for the backend
+            const formattedDate = new Date(selectedDate);
+            // Set time to noon to avoid timezone issues
+            formattedDate.setHours(12, 0, 0, 0);
+
             await dispatch(addCustomerPayment(customerInfo._id, {
                 type: 'wastage',
-                amount: Number(amount)
+                amount: Number(amount),
+                date: formattedDate.toISOString()  // Send as ISO string
             }));
             
             setAlert({
@@ -98,6 +105,7 @@ const WestageForm = () => {
             // Refresh customer data
             fetchCustomerData();
             setAmount('');
+            setSelectedDate(new Date()); // Reset date to current date
         } catch (error) {
             setAlert({
                 open: true,
@@ -107,6 +115,13 @@ const WestageForm = () => {
         } finally {
             setLoading(false);
         }
+    };
+
+    const handleDateChange = (e) => {
+        // Create date object at noon to avoid timezone issues
+        const newDate = new Date(e.target.value);
+        newDate.setHours(12, 0, 0, 0);
+        setSelectedDate(newDate);
     };
 
     return (
@@ -134,6 +149,18 @@ const WestageForm = () => {
                                 onChange={(e) => setAmount(e.target.value)}
                                 fullWidth
                                 required
+                            />
+
+                            <TextField
+                                type="date"
+                                value={selectedDate.toISOString().split('T')[0]}
+                                onChange={handleDateChange}
+                                fullWidth
+                                margin="normal"
+                                InputLabelProps={{
+                                    shrink: true,
+                                }}
+                                label="তারিখ নির্বাচন করুন"
                             />
 
                             <Button 

@@ -49,6 +49,7 @@ const CollectionForm = () => {
     const [loading, setLoading] = useState(false);
     const [alert, setAlert] = useState({ open: false, message: '', severity: 'success' });
     const [customerData, setCustomerData] = useState(null);
+    const [selectedDate, setSelectedDate] = useState(new Date());
 
     useEffect(() => {
         if (customerInfo?._id) {
@@ -79,14 +80,24 @@ const CollectionForm = () => {
         }
     };
 
+    const handleDateChange = (e) => {
+        const newDate = new Date(e.target.value);
+        newDate.setHours(12, 0, 0, 0);
+        setSelectedDate(newDate);
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
 
         try {
+            const formattedDate = new Date(selectedDate);
+            formattedDate.setHours(12, 0, 0, 0);
+
             await dispatch(addCustomerPayment(customerInfo._id, {
                 type: 'collection',
-                amount: Number(amount)
+                amount: Number(amount),
+                date: formattedDate.toISOString()
             }));
             
             setAlert({
@@ -98,6 +109,7 @@ const CollectionForm = () => {
             // Refresh customer data
             fetchCustomerData();
             setAmount('');
+            setSelectedDate(new Date()); // Reset date
         } catch (error) {
             setAlert({
                 open: true,
@@ -134,6 +146,18 @@ const CollectionForm = () => {
                                 onChange={(e) => setAmount(e.target.value)}
                                 fullWidth
                                 required
+                            />
+
+                            <TextField
+                                type="date"
+                                value={selectedDate.toISOString().split('T')[0]}
+                                onChange={handleDateChange}
+                                fullWidth
+                                margin="normal"
+                                InputLabelProps={{
+                                    shrink: true,
+                                }}
+                                label="তারিখ নির্বাচন করুন"
                             />
 
                             <Button 

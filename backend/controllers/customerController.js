@@ -140,18 +140,7 @@ const getCustomerBills = asyncHandler(async (req, res) => {
             totalLess,
             totalRemaining
         };
-
-        // Add debug logging
-        console.log('Customer Data:', {
-            customerId: customer._id,
-            previousAmount: previousAmountValue,
-            totalBillAmount,
-            totalCollection,
-            totalWastage,
-            totalLess,
-            totalRemaining,
-            stats
-        });
+  
 
         res.status(200).json({
             customer: {
@@ -172,7 +161,7 @@ const getCustomerBills = asyncHandler(async (req, res) => {
 // @route   POST /api/customers/:id/payment
 // @access  Private
 const addCustomerPayment = asyncHandler(async (req, res) => {
-  const { type, amount } = req.body;
+  const { type, amount, date } = req.body;
   
   if (!type || !amount) {
     res.status(400);
@@ -185,11 +174,11 @@ const addCustomerPayment = asyncHandler(async (req, res) => {
     throw new Error('Customer not found');
   }
 
-  // Add payment info
+  // Add payment info with the provided date or current date as fallback
   customer.paymentInfo.push({
     type,
-    amount,
-    date: new Date()
+    amount: Number(amount),
+    date: date ? new Date(date) : new Date()
   });
 
   // Calculate new remaining amount
