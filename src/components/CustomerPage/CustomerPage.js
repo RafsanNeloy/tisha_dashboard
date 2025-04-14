@@ -22,10 +22,11 @@ const useStyle = makeStyles({
         marginBottom: '1.5rem'
     },
     tableContainer: {
-        position: 'fixed',
-        marginTop: '175px',
+        marginTop: '100px',
+        marginBottom: '80px',
         maxWidth: '1200px',
-        width: '100%'
+        width: '100%',
+        position: 'relative'
     },
     divider: {
         width: '100%',

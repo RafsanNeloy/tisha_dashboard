@@ -69,14 +69,14 @@ const PrintBill = (props) => {
                     
                     {discountAmount > 0 && (
                         <div className="total-row discount">
-                            <span className="total-label">(-) ডিসকাউন্ট:</span>
+                            <span className="total-label">(-) কমিশন:</span>
                             <span className="total-value">৳{englishToBengali(discountAmount)}</span>
                         </div>
                     )}
                     
                     {additionalPrice > 0 && (
                         <div className="total-row additional">
-                            <span className="total-label">(+) সার্ভিস চার্জ:</span>
+                            <span className="total-label">(+) ট্রাঃ খরচ:</span>
                             <span className="total-value">৳{englishToBengali(additionalPrice)}</span>
                         </div>
                     )}
@@ -223,14 +223,14 @@ const PrintBill = (props) => {
                                 fontWeight: 'bold',
                                 lineHeight: '1.2'
                             }}>
-                                টিসা প্লাস্টিক<br />
-                                TISHA PLASTIC
+                                <span style={{ color: '#503C3C' }}>টিসা প্লাস্টিক</span><br />
+                                <span style={{ color: 'black' }}>TISHA PLASTIC</span>
                             </h1>
                         </div>
 
                         {/* Address and Contact */}
                         <div style={{
-                            fontSize: '10px',
+                            fontSize: '11px',
                             marginBottom: '1mm'
                         }}>
                             <div>৬/৭/এ/১, চাম্পাতলী লেন, সোয়ারিঘাট, ঢাকা</div>
@@ -247,7 +247,7 @@ const PrintBill = (props) => {
                                     gap: '1px'
                                 }}>
                                     <PhoneIcon style={{ fontSize: '10px' }} />
-                                    <span style={{ color: '#88304E',fontSize: '12px' }}>01744798523, 02-7343144,</span>
+                                    <span style={{ color: '#88304E',fontSize: '12px' }}>01744798523, 02-7343144, 01718088956</span>
                                 </div>
                                 
                             </div>
@@ -299,7 +299,7 @@ const PrintBill = (props) => {
                         fontSize: '12px'
                     }}>
                         <thead>
-                            <tr style={{ backgroundColor: '#B4D4FF', color: 'black' }}>
+                            <tr style={{ backgroundColor: '#FAF1E6', color: 'black' }}>
                                 <th style={{ 
                                     padding: '1mm', 
                                     border: '0.5px solid #bdc3c7', 
@@ -390,7 +390,7 @@ const PrintBill = (props) => {
                                     {discountAmount > 0 && (
                                         <tr style={{ backgroundColor: '#f8f9fa' }}>
                                             <td colSpan="4" style={{ padding: '1mm', border: '0.5px solid #bdc3c7', textAlign: 'right' }}>
-                                                <strong>(-) Discount:</strong>
+                                                <strong>(-) কমিশন:</strong>
                                             </td>
                                             <td style={{ padding: '1mm', border: '0.5px solid #bdc3c7', textAlign: 'right' }}>
                                                 <strong>৳{englishToBengali(discountAmount)}</strong>
@@ -401,7 +401,7 @@ const PrintBill = (props) => {
                                     {additionalPrice > 0 && (
                                         <tr style={{ backgroundColor: '#f8f9fa' }}>
                                             <td colSpan="4" style={{ padding: '1mm', border: '0.5px solid #bdc3c7', textAlign: 'right' }}>
-                                                <strong>(+) Service Charge:</strong>
+                                                <strong>(+) ট্রাঃ খরচ:</strong>
                                             </td>
                                             <td style={{ padding: '1mm', border: '0.5px solid #bdc3c7', textAlign: 'right' }}>
                                                 <strong>৳{englishToBengali(additionalPrice)}</strong>

@@ -19,6 +19,24 @@ const useStyle = makeStyles({
         justifyContent: 'space-between',
         padding: '8px 0',
         borderBottom: '1px solid #eee'
+    },
+    scrollContainer: {
+        maxHeight: '300px',  // Adjust height as needed
+        overflowY: 'auto',
+        paddingRight: '10px',
+        '&::-webkit-scrollbar': {
+            width: '6px'
+        },
+        '&::-webkit-scrollbar-track': {
+            background: '#f1f1f1'
+        },
+        '&::-webkit-scrollbar-thumb': {
+            background: '#888',
+            borderRadius: '3px'
+        },
+        '&::-webkit-scrollbar-thumb:hover': {
+            background: '#555'
+        }
     }
 })
 
@@ -69,10 +87,14 @@ const StatsContainer = (props) => {
                 const productName = typeof item.product === 'object' ? item.product.name : 
                     products.find(p => p._id === productId)?.name || 'Unknown Product';
                 
+                // Determine product type (0 for dozen, 1 for piece)
+                const productType = item.product_type === 0 ? 'ডজন' : 'পিস';
+                
                 if (!productQuantities[productId]) {
                     productQuantities[productId] = {
                         name: productName,
-                        quantity: 0
+                        quantity: 0,
+                        type: productType
                     };
                 }
                 productQuantities[productId].quantity += item.quantity;
@@ -102,14 +124,54 @@ const StatsContainer = (props) => {
 
             {/* Daily Product Quantities */}
             <Paper className={classes.productStats}>
-                <Typography variant='h6' className={classes.statsHeader}>আজকের বিক্রয়ের পরিমাণ</Typography>
+                <Typography 
+                    variant='h6' 
+                    className={classes.statsHeader} 
+                    style={{ 
+                        display: 'flex', 
+                        justifyContent: 'space-between', 
+                        alignItems: 'center' 
+                    }}
+                >
+                    <span>আজকের বিক্রয়ের পরিমাণ</span>
+                    {dailyProductStats.length > 0 && (
+                        <Typography 
+                            variant='caption' 
+                            color="textSecondary"
+                            style={{ fontSize: '0.8rem' }}
+                        >
+                            মোট: {englishToBengali(dailyProductStats.length)} আইটেম
+                        </Typography>
+                    )}
+                </Typography>
                 {dailyProductStats.length > 0 ? (
-                    dailyProductStats.map((product, index) => (
-                        <Box key={index} className={classes.productRow}>
-                            <Typography>{product.name}</Typography>
-                            <Typography>{englishToBengali(product.quantity)}</Typography>
-                        </Box>
-                    ))
+                    <div className={classes.scrollContainer}>
+                        {dailyProductStats.map((product, index) => (
+                            <Box key={index} className={classes.productRow} style={{ 
+                                display: 'flex', 
+                                justifyContent: 'space-between',
+                                alignItems: 'center',
+                                gap: '5px'
+                            }}>
+                                <Typography style={{ 
+                                    width: '30%', 
+                                    textAlign: 'left',
+                                    fontWeight: 'bold'
+                                }}>
+                                    {englishToBengali(index + 1)}। {product.name}
+                                </Typography>
+                               
+                                <Typography style={{ 
+                                    width: '15%', 
+                                    textAlign: 'center',
+                                    color: 'black'
+                                }}>
+                                     {englishToBengali(product.quantity)} {product.type}
+                                </Typography>
+                               
+                            </Box>
+                        ))}
+                    </div>
                 ) : (
                     <Typography align="center" style={{ marginTop: '10px', color: 'gray' }}>
                         আজ কোনো বিক্রয় হয়নি

@@ -7,6 +7,7 @@ import { theme } from './theme/theme'
 import { useDispatch } from 'react-redux'
 import { asyncGetUser, setLogout } from './action/userAction'
 import { isTokenExpired } from './utils/authUtils'
+import Watermark from './components/Watermark/Watermark'
 
 const App = (props) => {
   const dispatch = useDispatch()
@@ -29,6 +30,7 @@ const App = (props) => {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
+      <Watermark />
       <NavBar {...props} />
     </ThemeProvider>
   )

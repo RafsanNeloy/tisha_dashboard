@@ -72,7 +72,7 @@ const BillItemTable = (props) => {
                     {discountAmount > 0 && (
                         <TableRow>
                             <TableCell colSpan={4} align="right" className={classes.tableHeaderFooter} style={{ color: 'green' }}>
-                                (-) ডিসকাউন্ট ({englishToBengali(discountPercentage)}%):
+                                (-) কমিশন ({englishToBengali(discountPercentage)}%):
                             </TableCell>
                             <TableCell colSpan={2} className={classes.tableHeaderFooter} style={{ color: 'green' }}>
                                 ৳{englishToBengali(discountAmount)}
@@ -83,7 +83,7 @@ const BillItemTable = (props) => {
                     {additionalPrice > 0 && (
                         <TableRow>
                             <TableCell colSpan={4} align="right" className={classes.tableHeaderFooter}>
-                                (+) সার্ভিস চার্জ:
+                                (+) ট্রাঃ খরচ:
                             </TableCell>
                             <TableCell colSpan={2} className={classes.tableHeaderFooter}>
                                 ৳{englishToBengali(additionalPrice)}

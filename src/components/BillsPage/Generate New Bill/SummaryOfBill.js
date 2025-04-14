@@ -194,7 +194,7 @@ const SummaryOfBill = (props) => {
                     
                     {discountAmount > 0 && (
                         <Typography variant="h6" style={{ color: 'green' }}>
-                            <strong>(-) Discount ({englishToBengali(discountPercentage)}%):</strong> ৳{englishToBengali(discountAmount)}
+                            <strong>(-) কমিশন ({englishToBengali(discountPercentage)}%):</strong> ৳{englishToBengali(discountAmount)}
                         </Typography>
                     )}
 
@@ -210,7 +210,7 @@ const SummaryOfBill = (props) => {
                                 color="primary"
                             />
                         }
-                        label="Add Service Charge"
+                        label="Add ট্রাঃ খরচ"
                         sx={{ mt: 2, mb: 1 }}
                     />
                     
@@ -219,7 +219,7 @@ const SummaryOfBill = (props) => {
                             <TextField
                                 fullWidth
                                 margin="dense"
-                                label="Service Charge"
+                                label="ট্রাঃ খরচ"
                                 type="number"
                                 value={additionalPrice}
                                 onChange={(e) => setAdditionalPrice(e.target.value)}
@@ -229,7 +229,7 @@ const SummaryOfBill = (props) => {
                             />
                             {serviceCharge > 0 && (
                                 <Typography variant="h6" sx={{ mt: 1 }}>
-                                    <strong>(+) Service Charge:</strong> ৳{englishToBengali(serviceCharge)}
+                                    <strong>(+) ট্রাঃ খরচ:</strong> ৳{englishToBengali(serviceCharge)}
                                 </Typography>
                             )}
                         </>

@@ -9,8 +9,22 @@ import Swal from 'sweetalert2'
 const useStyle = makeStyles({
     table: {
         width: '90vw',
-        marginTop: '5px',
-        maxHeight: '380px'
+        marginTop: '10px',
+        marginBottom: '50px',
+        maxHeight: '480px',
+        overflowY: 'auto'
+    },
+    tableContainer: {
+        maxHeight: 540,
+        overflowY: 'auto',
+        marginBottom: '50px',
+        border: '1px solid #e0e0e0',
+        borderRadius: '8px',
+        boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+    },
+    tableScroll: {
+        maxHeight: 480,
+        overflowY: 'auto'
     },
     nameColumn: {
         width: '25%'
@@ -85,77 +99,79 @@ const CustomerTable = (props) => {
     ]
 
     return (
-        <TableContainer component={Paper} className={classes.table}>
-            <Table stickyHeader size='small'>
-                <TableHead>
-                    <TableRow>
-                        <TableCell className={classes.tableHeader} align='center'>ID</TableCell>
-                        <TableCell className={`${classes.nameColumn} ${classes.tableHeader}`} align='center'>Customer Name</TableCell>
-                        <TableCell className={classes.tableHeader} align='center'>Mobile</TableCell>
-                        <TableCell className={classes.tableHeader} align='center'>Address</TableCell>
-                        <TableCell className={classes.tableHeader} align='center'>Email</TableCell>
-                        <TableCell className={classes.tableHeader} align='center'>View</TableCell>
-                        <TableCell className={classes.tableHeader} align='center'>Details</TableCell>
-                        {user.role === 'admin' && (
-                            <TableCell className={classes.tableHeader} align='center'>Action</TableCell>
-                        )}
-                    </TableRow>
-                </TableHead>
-                <TableBody>
-                    {customers.map((cust, index) => {
-                        const canModify = user.role === 'admin' || 
-                            cust.user?.toString() === user._id?.toString();
+        <TableContainer component={Paper} className={classes.tableContainer}>
+            <div className={classes.tableScroll}>
+                <Table stickyHeader size='small'>
+                    <TableHead>
+                        <TableRow>
+                            <TableCell className={classes.tableHeader} align='center'>ID</TableCell>
+                            <TableCell className={`${classes.nameColumn} ${classes.tableHeader}`} align='center'>Customer Name</TableCell>
+                            <TableCell className={classes.tableHeader} align='center'>Mobile</TableCell>
+                            <TableCell className={classes.tableHeader} align='center'>Address</TableCell>
+                            <TableCell className={classes.tableHeader} align='center'>Email</TableCell>
+                            <TableCell className={classes.tableHeader} align='center'>View</TableCell>
+                            <TableCell className={classes.tableHeader} align='center'>Details</TableCell>
+                            {user.role === 'admin' && (
+                                <TableCell className={classes.tableHeader} align='center'>Action</TableCell>
+                            )}
+                        </TableRow>
+                    </TableHead>
+                    <TableBody>
+                        {customers.map((cust, index) => {
+                            const canModify = user.role === 'admin' || 
+                                cust.user?.toString() === user._id?.toString();
 
-                        return (
-                            <TableRow hover key={cust._id}>
-                                <TableCell>{index + 1}</TableCell>
-                                <TableCell>{cust.name}</TableCell>
-                                <TableCell>{cust.mobile}</TableCell>
-                                <TableCell>{cust.address}</TableCell>
-                                <TableCell>{cust.email}</TableCell>
-                                <TableCell align='center'>
-                                    <Link to={`/customers/${cust._id}`} className={classes.viewLink}>
-                                        <Button variant='contained' color='primary'>
-                                            View
-                                        </Button>
-                                    </Link>
-                                </TableCell>
-                                <TableCell align='center'>
-                                    <Link to={`/customer-details/${cust._id}`} className={classes.viewLink}>
-                                        <Button variant='contained' color='primary'>
-                                            Details
-                                        </Button>
-                                    </Link>
-                                </TableCell>
-                                {user.role === 'admin' && (
-                                    <TableCell className={classes.tableBtns} align='center'>
-                                        {canModify && (
+                            return (
+                                <TableRow hover key={cust._id}>
+                                    <TableCell>{index + 1}</TableCell>
+                                    <TableCell>{cust.name}</TableCell>
+                                    <TableCell>{cust.mobile}</TableCell>
+                                    <TableCell>{cust.address}</TableCell>
+                                    <TableCell>{cust.email}</TableCell>
+                                    <TableCell align='center'>
+                                        <Link to={`/customers/${cust._id}`} className={classes.viewLink}>
+                                            <Button variant='contained' color='primary'>
+                                                View
+                                            </Button>
+                                        </Link>
+                                    </TableCell>
+                                    <TableCell align='center'>
+                                        <Link to={`/customer-details/${cust._id}`} className={classes.viewLink}>
+                                            <Button variant='contained' color='primary'>
+                                                Details
+                                            </Button>
+                                        </Link>
+                                    </TableCell>
+                                    {user.role === 'admin' && (
+                                        <TableCell className={classes.tableBtns} align='center'>
+                                            {canModify && (
+                                                <Button
+                                                    variant='contained'
+                                                    color='primary'
+                                                    onClick={() => {
+                                                        handleUpdateCustomer(cust)
+                                                        resetSearch()
+                                                    }}
+                                                >
+                                                    Update
+                                                </Button>
+                                            )}
                                             <Button
                                                 variant='contained'
-                                                color='primary'
-                                                onClick={() => {
-                                                    handleUpdateCustomer(cust)
-                                                    resetSearch()
-                                                }}
+                                                color='secondary'
+                                                onClick={() => handleDelete(cust._id)}
+                                                style={{ marginLeft: '8px' }}
                                             >
-                                                Update
+                                                Delete
                                             </Button>
-                                        )}
-                                        <Button
-                                            variant='contained'
-                                            color='secondary'
-                                            onClick={() => handleDelete(cust._id)}
-                                            style={{ marginLeft: '8px' }}
-                                        >
-                                            Delete
-                                        </Button>
-                                    </TableCell>
-                                )}
-                            </TableRow>
-                        )
-                    })}
-                </TableBody>
-            </Table>
+                                        </TableCell>
+                                    )}
+                                </TableRow>
+                            )
+                        })}
+                    </TableBody>
+                </Table>
+            </div>
         </TableContainer>
     )
 }

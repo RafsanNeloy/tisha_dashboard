@@ -97,7 +97,7 @@ const BillDetail = (props) => {
               transition: 'color 0.3s ease',
             }}
           >
-            <strong>(-) ডিসকাউন্ট ({englishToBengali(discountPercentage)}%):</strong>{' '}
+            <strong>(-) কমিশন ({englishToBengali(discountPercentage)}%):</strong>{' '}
             ৳{englishToBengali(discountAmount)}
           </Typography>
         )}
@@ -110,7 +110,7 @@ const BillDetail = (props) => {
               transition: 'color 0.3s ease',
             }}
           >
-            <strong>(+) সার্ভিস চার্জ:</strong> ৳{englishToBengali(additionalPrice)}
+            <strong>(+) ট্রাঃ খরচ:</strong> ৳{englishToBengali(additionalPrice)}
           </Typography>
         )}
 

@@ -20,14 +20,14 @@ const generateBillPDF = (bill, customer) => {
     
     {discountAmount > 0 && (
         <View style={styles.row}>
-            <Text style={styles.label}>(-) ডিসকাউন্ট:</Text>
+            <Text style={styles.label}>(-) কমিশন:</Text>
             <Text style={styles.value}>৳{englishToBengali(discountAmount)}</Text>
         </View>
     )}
     
     {additionalPrice > 0 && (
         <View style={styles.row}>
-            <Text style={styles.label}>(+) সার্ভিস চার্জ:</Text>
+            <Text style={styles.label}>(+) ট্রাঃ খরচ:</Text>
             <Text style={styles.value}>৳{englishToBengali(additionalPrice)}</Text>
         </View>
     )}
