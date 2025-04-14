@@ -22,7 +22,7 @@ const PrintBill = (props) => {
         const element = billRef.current
         const opt = {
             margin: 0,
-            filename: `Bill-${bill.billNumber}.pdf`,
+            filename: `${customer.name}-Bill-${bill.billNumber}.pdf`,
             image: { type: 'jpeg', quality: 0.98 },
             html2canvas: { 
                 scale: 2,
@@ -270,7 +270,7 @@ const PrintBill = (props) => {
                         fontWeight: 'bold'
                     }}>
                         <div>
-                            <span style={{ fontWeight: 'bold' }}>ক্রেতার নাম:</span> {customer?.name || 'N/A'}<br />
+                            <span style={{ fontWeight: 'bold' }}>ক্রেতার নাম: </span> {customer?.name || 'N/A'}<br />
                             <span style={{ fontWeight: 'bold' }}>ঠিকানা:</span> {customerAddress || 'N/A'}
                         </div>
                         <div>
@@ -296,7 +296,7 @@ const PrintBill = (props) => {
                         width: '100%', 
                         borderCollapse: 'collapse',
                         marginBottom: '2mm',
-                        fontSize: '12px'
+                        fontSize: '13px'
                     }}>
                         <thead>
                             <tr style={{ backgroundColor: '#FAF1E6', color: 'black' }}>
@@ -444,11 +444,11 @@ const PrintBill = (props) => {
                             }}>
                                 <div style={{ textAlign: 'center' }}>
                                     <div style={{ borderTop: '0.5px solid #000', width: '35mm', margin: '0 auto' }}></div>
-                                    <p style={{ margin: '2mm 0 0 0' }}>Customer's Signature</p>
+                                    <p style={{ margin: '2mm 0 0 0' }}>ক্রেতার স্বাক্ষর</p>
                                 </div>
                                 <div style={{ textAlign: 'center' }}>
                                     <div style={{ borderTop: '0.5px solid #000', width: '35mm', margin: '0 auto' }}></div>
-                                    <p style={{ margin: '2mm 0 0 0' }}>Seller's Signature</p>
+                                    <p style={{ margin: '2mm 0 0 0' }}>বিক্রেতার স্বাক্ষর</p>
                                 </div>
                             </div>
 
@@ -456,7 +456,7 @@ const PrintBill = (props) => {
                             <div style={{ 
                                 textAlign: 'center', 
                                 marginTop: '6mm',
-                                color: '#7f8c8d',
+                                color: '#000',
                                 fontSize: '9px'
                             }}>
                                 <p style={{ margin: '0' }}>নামাজ বেহেশতের চাবি</p>

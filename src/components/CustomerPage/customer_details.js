@@ -402,7 +402,7 @@ const CustomerDetails = () => {
           </Grid>
           <Grid item xs={12} md={2.4}>
             <Paper sx={{ p: 2, textAlign: 'center', backgroundColor: 'white' }}>
-              <Typography variant="subtitle2" color="textSecondary">Total Collection</Typography>
+              <Typography variant="subtitle2" color="textSecondary">Total তাগাদা</Typography>
               <Typography variant="h6" color="success.main">
                 ৳{formatLargeNumber(customerData.stats.totalCollection)}
               </Typography>
@@ -410,7 +410,7 @@ const CustomerDetails = () => {
           </Grid>
           <Grid item xs={12} md={2.4}>
             <Paper sx={{ p: 2, textAlign: 'center', backgroundColor: 'white' }}>
-              <Typography variant="subtitle2" color="textSecondary">Total Less</Typography>
+              <Typography variant="subtitle2" color="textSecondary">Total কমিশন</Typography>
               <Typography variant="h6" color="warning.main">
                 ৳{formatLargeNumber(customerData.stats.totalLess)}
               </Typography>
@@ -418,7 +418,7 @@ const CustomerDetails = () => {
           </Grid>
           <Grid item xs={12} md={2.4}>
             <Paper sx={{ p: 2, textAlign: 'center', backgroundColor: 'white' }}>
-              <Typography variant="subtitle2" color="textSecondary">Total Remaining</Typography>
+              <Typography variant="subtitle2" color="textSecondary">বিল বাকি</Typography>
               <Typography variant="h6" color="error.main">
                 ৳{formatLargeNumber(customerData.stats.totalRemaining)}
               </Typography>
