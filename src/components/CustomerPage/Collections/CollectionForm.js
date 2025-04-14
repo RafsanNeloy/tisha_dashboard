@@ -127,7 +127,7 @@ const CollectionForm = () => {
                 <Grid item xs={12} md={4}>
                     <Paper elevation={3} sx={{ p: 3 }}>
                         <Typography variant="h5" className={classes.title}>
-                            কালেকশন এন্ট্রি
+                            তাগাদা এন্ট্রি
                         </Typography>
                         
                         <form onSubmit={handleSubmit} className={classes.form}>
