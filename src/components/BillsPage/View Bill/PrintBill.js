@@ -1,6 +1,6 @@
-import { Button } from '@mui/material'
+import React, { useRef, useState } from 'react'
+import { Button, TextField, Box } from '@mui/material'
 import moment from 'moment'
-import React, { useRef } from 'react'
 import html2pdf from 'html2pdf.js'
 import GetAppIcon from '@mui/icons-material/GetApp'
 import logo from '../../../images/tppr.png'
@@ -12,13 +12,15 @@ import PhoneIcon from '@mui/icons-material/Phone';
 const PrintBill = (props) => {
     const { customer, customerAddress, bill, id, items } = props
     const billRef = useRef(null)
+    const [manualDate, setManualDate] = useState(bill.createdAt ? moment(bill.createdAt).format('YYYY-MM-DD') : moment().format('YYYY-MM-DD'))
+    const [useManualDate, setUseManualDate] = useState(false)
 
     // Add validation check
     if (!customer || !bill || !items) {
         return null // Or return a loading state
     }
 
-    const generatePdf = () => {
+    const handlePdfGeneration = () => {
         const element = billRef.current
         const opt = {
             margin: 0,
@@ -40,6 +42,7 @@ const PrintBill = (props) => {
 
         html2pdf().from(element).set(opt).save()
     }
+
     const getProductType = (type) => {
         return type === 0 ? 'ডজন' : 'পিস';
     }
@@ -275,7 +278,7 @@ const PrintBill = (props) => {
                         </div>
                         <div>
                             <span style={{ fontWeight: 'bold' }}>বিল নং:</span> <span style={{ color: 'blue' }}>{englishToBengali(bill?.billNumber || '')}</span><br />
-                            <span style={{ fontWeight: 'bold' }}>তারিখ:</span> {bill?.createdAt ? moment(bill.createdAt).format('DD/MM/YYYY') : 'N/A'}
+                            <span style={{ fontWeight: 'bold' }}>তারিখ:</span> {useManualDate ? moment(manualDate).format('DD/MM/YYYY') : (bill?.createdAt ? moment(bill.createdAt).format('DD/MM/YYYY') : 'N/A')}
                         </div>
                     </div>
 
@@ -469,7 +472,7 @@ const PrintBill = (props) => {
     }
 
     const renderBillPages = (items, copyType) => {
-        const ITEMS_PER_PAGE = 10;  // Changed from 14 to 10
+        const ITEMS_PER_PAGE = 10;
         const totalPages = Math.ceil(items.length / ITEMS_PER_PAGE);
         
         return Array.from({ length: totalPages }, (_, i) => {
@@ -491,16 +494,33 @@ const PrintBill = (props) => {
     };
 
     return (
-        <>
+        <Box display="flex" alignItems="center" gap={2}>
             <Button
                 variant='contained'
                 color='primary'
                 startIcon={<GetAppIcon />}
-                onClick={generatePdf}
+                onClick={handlePdfGeneration}
             >
                 Download Bill
             </Button>
-           
+            <TextField
+                type="date"
+                size="small"
+                value={manualDate}
+                onChange={(e) => {
+                    setManualDate(e.target.value)
+                    setUseManualDate(true)
+                }}
+                InputLabelProps={{
+                    shrink: true,
+                }}
+                sx={{ 
+                    width: '200px',
+                    '& .MuiOutlinedInput-root': {
+                        height: '40px'
+                    }
+                }}
+            />
 
             <div style={{ display: 'none' }}>
                 <div ref={billRef}>
@@ -508,7 +528,7 @@ const PrintBill = (props) => {
                     {renderBillPages(items, "CUSTOMER COPY")}
                 </div>
             </div>
-        </>
+        </Box>
     )
 }
 
