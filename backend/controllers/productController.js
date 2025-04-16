@@ -104,20 +104,16 @@ const getProduct = asyncHandler(async (req, res) => {
 const getProductBills = asyncHandler(async (req, res) => {
   const productId = req.params.id;
 
-  // First verify if product exists and belongs to user
-  const product = await Product.findOne({
-    _id: productId,
-    user: req.user.id
-  });
+  // First verify if product exists (removed user filter)
+  const product = await Product.findById(productId);
 
   if (!product) {
     res.status(404);
     throw new Error('Product not found');
   }
 
-  // Get all bills containing this product
+  // Get all bills containing this product (removed user filter)
   const bills = await Bill.find({
-    user: req.user.id,
     'items.product': productId
   })
   .populate('customer', 'name email mobile')
