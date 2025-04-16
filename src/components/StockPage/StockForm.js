@@ -10,8 +10,8 @@ import {
     Snackbar,
 } from '@mui/material';
 import { makeStyles } from '@mui/styles';
-import { useDispatch } from 'react-redux';
-import { updatePreviousStock } from '../../action/stockAction';
+import { useDispatch, useSelector } from 'react-redux';
+import { updatePreviousStock, updateStockInStore } from '../../action/stockAction';
 import { englishToBengali } from '../../utils/bengaliNumerals';
 import axios from 'axios';
 
@@ -37,36 +37,25 @@ const StockForm = ({ product }) => {
     const dispatch = useDispatch();
     const [loading, setLoading] = useState(false);
     const [alert, setAlert] = useState({ open: false, message: '', severity: 'success' });
-    const [previousStock, setPreviousStock] = useState(0);
-
-    useEffect(() => {
-        if (product?._id) {
-            const fetchStockData = async () => {
-                try {
-                    const token = localStorage.getItem('token');
-                    const response = await axios.get(
-                        `http://localhost:5001/api/stock/${product._id}`,
-                        {
-                            headers: {
-                                'Authorization': `Bearer ${token}`,
-                                'Content-Type': 'application/json'
-                            }
-                        }
-                    );
-                    setPreviousStock(response.data.previousStock || 0);
-                } catch (error) {
-                    // If stock doesn't exist, use default values
-                    setPreviousStock(0);
-                }
-            };
-            fetchStockData();
-        }
-    }, [product]);
+    
+    // Get stock data directly from Redux store
+    const stockData = useSelector(state => state.stock[product?._id]) || {
+        previousStock: 0,
+        addedStock: [],
+        billedStock: 0
+    };
 
     const handleUpdatePreviousStock = async () => {
         setLoading(true);
         try {
-            await dispatch(updatePreviousStock(product._id, previousStock));
+            // Optimistically update the UI
+            dispatch(updateStockInStore(product._id, {
+                ...stockData,
+                previousStock: Number(stockData.previousStock)
+            }));
+
+            // Then make the API call
+            await dispatch(updatePreviousStock(product._id, stockData.previousStock));
             
             setAlert({
                 open: true,
@@ -74,6 +63,8 @@ const StockForm = ({ product }) => {
                 severity: 'success'
             });
         } catch (error) {
+            // Revert to original value if API call fails
+            dispatch(updateStockInStore(product._id, stockData));
             setAlert({
                 open: true,
                 message: error.response?.data?.message || 'পূর্ববর্তী স্টক আপডেট করতে সমস্যা হয়েছে',
@@ -95,8 +86,11 @@ const StockForm = ({ product }) => {
                     <TextField
                         label="পূর্ববর্তী স্টক"
                         type="number"
-                        value={previousStock}
-                        onChange={(e) => setPreviousStock(e.target.value)}
+                        value={stockData.previousStock || 0}
+                        onChange={(e) => dispatch(updateStockInStore(product._id, {
+                            ...stockData,
+                            previousStock: Number(e.target.value)
+                        }))}
                         fullWidth
                         size="small"
                     />

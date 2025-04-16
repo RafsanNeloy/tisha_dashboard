@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, IconButton, Collapse, Box, TextField, Grid, Typography } from '@mui/material'
 import { makeStyles } from '@mui/styles'
 import { useSelector, useDispatch } from 'react-redux'
@@ -37,33 +37,33 @@ const getProductType = (type) => {
 const ProductRow = ({ prod, index, handleDeleteProduct, handleViewProduct, handleUpdateProd, resetSearch }) => {
     const dispatch = useDispatch()
     const [open, setOpen] = useState(false)
+    const classes = useStyle()
+    const { role } = useSelector(state => state.auth.user) || {}
+    const isAdmin = role === 'admin'
     const stockData = useSelector(state => state.stock[prod._id]) || {
         previousStock: 0,
         addedStock: [],
         billedStock: 0
     }
-    const [previousStock, setPreviousStock] = useState(stockData.previousStock || 0)
-    const classes = useStyle()
-    const auth = useSelector(state => state.auth)
-    const isAdmin = auth?.user?.role === 'admin'
-
-    useEffect(() => {
-        setPreviousStock(stockData.previousStock || 0)
-    }, [stockData])
 
     const handlePreviousStockUpdate = async (newValue) => {
         try {
+            dispatch(updateStockInStore(prod._id, {
+                ...stockData,
+                previousStock: Number(newValue)
+            }))
+            
             await dispatch(updatePreviousStock(prod._id, newValue))
         } catch (error) {
+            dispatch(updateStockInStore(prod._id, stockData))
             console.error('Error updating previous stock:', error)
         }
     }
 
-    const calculateCurrentStock = () => {
-        if (!stockData) return 0;
-        const totalAdded = stockData.addedStock?.reduce((sum, item) => sum + item.amount, 0) || 0;
-        return (stockData.previousStock || 0) + totalAdded - (stockData.billedStock || 0);
-    }
+    const calculateCurrentStock = useCallback(() => {
+        const totalAdded = stockData.addedStock?.reduce((sum, item) => sum + item.amount, 0) || 0
+        return (stockData.previousStock || 0) + totalAdded - (stockData.billedStock || 0)
+    }, [stockData])
 
     return (
         <>
@@ -126,7 +126,7 @@ const ProductRow = ({ prod, index, handleDeleteProduct, handleViewProduct, handl
                                     <TextField
                                         label="পূর্ববর্তী স্টক"
                                         type="number"
-                                        value={previousStock}
+                                        value={stockData.previousStock || 0}
                                         onChange={(e) => handlePreviousStockUpdate(e.target.value)}
                                         fullWidth
                                         size="small"

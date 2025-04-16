@@ -161,12 +161,7 @@ const getBill = asyncHandler(async (req, res) => {
       throw new Error('Bill not found');
     }
 
-    console.log('Retrieved bill details:', {
-      _id: bill._id,
-      discountPercentage: bill.discountPercentage,
-      discountAmount: bill.discountAmount,
-      additionalPrice: bill.additionalPrice
-    });
+ 
 
     res.status(200).json(bill);
   } catch (error) {

@@ -1,11 +1,9 @@
 import axios from 'axios';
 
-export const updateStockInStore = (productId, stockData) => {
-    return {
-        type: 'UPDATE_STOCK',
-        payload: { productId, stockData }
-    };
-};
+export const updateStockInStore = (productId, stockData) => ({
+    type: 'UPDATE_STOCK',
+    payload: { productId, stockData }
+});
 
 export const updatePreviousStock = (productId, previousStock) => {
     return async (dispatch) => {
