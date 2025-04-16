@@ -20,6 +20,7 @@ import { asyncGetCustomers } from '../../action/customerAction'
 import { asyncGetProducts } from '../../action/productAction'
 import { asyncGetUser } from '../../action/userAction'
 import useDrawerState from '../../hooks/useDrawerState'
+import Inventory2Icon from '@mui/icons-material/Inventory2'
 
 const useStyle = makeStyles({
     drawer: {
@@ -169,6 +170,11 @@ const Drawer = (props) => {
             name: 'Collections',
             icon: <PaymentsIcon />,
             link: '/collections'
+        },
+        {
+            name: 'স্টক',
+            icon: <Inventory2Icon />,
+            link: '/stock'
         }
     ]
 

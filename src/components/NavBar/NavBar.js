@@ -29,6 +29,7 @@ import { makeStyles } from '@mui/styles'
 import { useTheme } from '@mui/material/styles'
 import { useMediaQuery } from '@mui/material'
 import useDrawerState from '../../hooks/useDrawerState'
+import StockPage from '../StockPage/StockPage'
 
 const useStyles = makeStyles({
   content: {
@@ -82,6 +83,7 @@ const NavBar = (props) => {
                     <Route path="/less" element={<PrivateRoute><LessForm /></PrivateRoute>} />
                     <Route path="/collections" element={<PrivateRoute><CollectionForm /></PrivateRoute>} />
                     <Route path="/history" element={<PrivateRoute><MonthlyHistory /></PrivateRoute>} />
+                    <Route path="/stock" element={<PrivateRoute><StockPage /></PrivateRoute>} />
                 </Routes>
             </Box>
         </div>

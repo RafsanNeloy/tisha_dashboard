@@ -2,6 +2,8 @@ const asyncHandler = require('express-async-handler');
 const Bill = require('../models/billModel');
 const Product = require('../models/productModel');
 const Customer = require('../models/customerModel');
+const Stock = require('../models/stockModel');
+const axios = require('axios');
 
 // @desc    Get all bills
 // @route   GET /api/bills
@@ -31,55 +33,92 @@ const addBill = asyncHandler(async (req, res) => {
       throw new Error('User not authenticated');
     }
 
-    const lastBill = await Bill.findOne().sort({ billNumber: -1 }).limit(1);
-    const billNumber = lastBill ? lastBill.billNumber + 1 : 1;
+    // Start a session for transaction
+    const session = await Bill.startSession();
+    session.startTransaction();
 
-    const itemsWithProductType = await Promise.all(items.map(async (item) => {
-      const product = await Product.findById(item.product);
-      if (!product) {
-        throw new Error(`Product not found: ${item.product}`);
-      }
-      return {
-        ...item,
-        product_type: product.product_type
-      };
-    }));
+    try {
+      const lastBill = await Bill.findOne().sort({ billNumber: -1 }).limit(1);
+      const billNumber = lastBill ? lastBill.billNumber + 1 : 1;
 
-    let subtotal = 0;
-    const processedItems = itemsWithProductType.map(item => {
-      const subTotal = item.quantity * item.price;
-      subtotal += subTotal;
-      return {
-        ...item,
-        subTotal
-      };
-    });
-    
-    const discountAmount = Math.floor(subtotal * (Number(discountPercentage) / 100));
-    const afterDiscount = subtotal - discountAmount;
-    const finalTotal = afterDiscount + Number(additionalPrice);
+      // Process items and update stock
+      const itemsWithProductType = await Promise.all(items.map(async (item) => {
+        const product = await Product.findById(item.product);
+        if (!product) {
+          throw new Error(`Product not found: ${item.product}`);
+        }
 
-    const billData = {
-      user: req.user._id,
-      billNumber,
-      customer,
-      items: processedItems,
-      additionalPrice: Number(additionalPrice),
-      discountPercentage: Number(discountPercentage),
-      discountAmount,
-      total: Number(total)
-    };
+        // Get or create stock record
+        let stock = await Stock.findOne({ product: item.product });
+        if (!stock) {
+          stock = await Stock.create({
+            product: item.product,
+            previousStock: 0,
+            addedStock: [],
+            billedStock: 0
+          });
+        }
 
-    const bill = await Bill.create(billData);
-    const populatedBill = await Bill.findById(bill._id)
-      .populate('customer', 'name address')
-      .populate('items.product', 'name price')
-      .select('user billNumber customer items additionalPrice discountPercentage discountAmount total date createdAt updatedAt');
+        // Update billed stock - allow negative values
+        stock.billedStock += Number(item.quantity);
+        await stock.save({ session });
 
-    res.status(201).json(populatedBill);
+        // Calculate current stock (can be negative)
+        const totalAdded = stock.addedStock.reduce((sum, added) => sum + added.amount, 0);
+        const currentStock = stock.previousStock + totalAdded - stock.billedStock;
+
+        return {
+          ...item,
+          product_type: product.product_type
+        };
+      }));
+
+      let subtotal = 0;
+      const processedItems = itemsWithProductType.map(item => {
+        const subTotal = item.quantity * item.price;
+        subtotal += subTotal;
+        return {
+          ...item,
+          subTotal
+        };
+      });
+      
+      const discountAmount = Math.floor(subtotal * (Number(discountPercentage) / 100));
+      const afterDiscount = subtotal - discountAmount;
+      const finalTotal = afterDiscount + Number(additionalPrice);
+
+      const bill = await Bill.create([{
+        user: req.user._id,
+        billNumber,
+        customer,
+        items: processedItems,
+        additionalPrice,
+        discountPercentage,
+        discountAmount,
+        total: finalTotal,
+        date: new Date()
+      }], { session });
+
+      await Customer.findByIdAndUpdate(
+        customer,
+        {
+          $push: { bills: bill[0]._id }
+        },
+        { session }
+      );
+
+      await session.commitTransaction();
+      session.endSession();
+
+      res.status(201).json(bill[0]);
+    } catch (error) {
+      await session.abortTransaction();
+      session.endSession();
+      throw error;
+    }
   } catch (error) {
     res.status(500);
-    throw new Error(`Error creating bill: ${error.message}`);
+    throw new Error('Error creating bill: ' + error.message);
   }
 });
 

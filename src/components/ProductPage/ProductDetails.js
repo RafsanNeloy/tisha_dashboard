@@ -6,6 +6,7 @@ import { asyncDeleteProducts } from '../../action/productAction'
 import moment from 'moment'
 import axios from 'axios'
 import { englishToBengali } from '../../utils/bengaliNumerals'
+import StockForm from '../StockPage/StockForm'
 
 const useStyle = makeStyles({
     container: {
@@ -212,6 +213,8 @@ const ProductDetails = (props) => {
                     Close
                 </Button>
             </Box>
+
+            {/* <StockForm product={productData?.product} /> */}
         </Paper>
     )
 }

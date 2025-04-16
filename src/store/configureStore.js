@@ -6,6 +6,7 @@ import productReducer from '../reducer/productReducer'
 import userReducer from '../reducer/userReducer'
 import billsReducer from '../reducer/billsReducer'
 import authReducer from '../reducer/authReducer'
+import stockReducer from '../reducer/stockReducer'
 
 const configureStore = () => {
     const store = createStore(combineReducers({
@@ -14,7 +15,8 @@ const configureStore = () => {
         customers: customerReducer, 
         products: productReducer,
         bills: billsReducer,
-        auth: authReducer
+        auth: authReducer,
+        stock: stockReducer
     }), applyMiddleware(thunk))
     return store
 }
