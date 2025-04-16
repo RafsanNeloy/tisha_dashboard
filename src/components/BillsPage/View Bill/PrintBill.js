@@ -33,7 +33,7 @@ const PrintBill = (props) => {
             },
             jsPDF: { 
                 unit: 'mm',
-                format: 'a5',  // Keep A5 format
+                format: [148, 230],  // Keep A5 format
                 orientation: 'portrait',
                 compress: true
             },
@@ -107,7 +107,7 @@ const PrintBill = (props) => {
         return (
             <div style={{ 
                 width: '148mm',
-                height: '210mm',
+                height: '230mm',
                 padding: '8mm',
                 boxSizing: 'border-box',
                 backgroundColor: 'white',
@@ -188,17 +188,17 @@ const PrintBill = (props) => {
                     <div style={{
                         borderTop: '2px solid green',
                         width: '100%',
-                        marginBottom: '2mm'
+                        marginBottom: '0.5mm'
                     }}></div>
 
                     {/* Header Content */}
                     <div style={{
                         textAlign: 'center',
-                        marginBottom: '2mm'
+                        marginBottom: '0.5mm'
                     }}>
                         <div style={{
                             fontSize: '10px',
-                            marginBottom: '1mm'
+                            marginBottom: '0.5mm'
                         }}>
                             বিসমিল্লাহির রাহমানির রাহিম
                         </div>
@@ -209,7 +209,7 @@ const PrintBill = (props) => {
                             alignItems: 'center',
                             justifyContent: 'flex-start',
                             gap: '9mm',
-                            marginBottom: '1mm',
+                            marginBottom: '0.02mm',
                             paddingLeft: '17mm'
                         }}>
                             <img 
@@ -224,7 +224,7 @@ const PrintBill = (props) => {
                                 margin: '0',
                                 fontSize: '28px',
                                 fontWeight: 'bold',
-                                lineHeight: '1.2'
+                                lineHeight: '1'
                             }}>
                                 <span style={{ color: '#503C3C' }}>টিসা প্লাস্টিক</span><br />
                                 <span style={{ color: 'black' }}>TISHA PLASTIC</span>
@@ -234,15 +234,15 @@ const PrintBill = (props) => {
                         {/* Address and Contact */}
                         <div style={{
                             fontSize: '11px',
-                            marginBottom: '1mm'
+                            marginBottom: '0.5mm'
                         }}>
                             <div>৬/৭/এ/১, চাম্পাতলী লেন, সোয়ারিঘাট, ঢাকা</div>
                             <div style={{ 
                                 display: 'flex', 
                                 alignItems: 'center', 
                                 justifyContent: 'center',
-                                gap: '8mm',
-                                marginTop: '1mm'
+                                gap: '4mm',
+                                marginTop: '0.5mm'
                             }}>
                                 <div style={{ 
                                     display: 'flex', 
@@ -250,7 +250,7 @@ const PrintBill = (props) => {
                                     gap: '1px'
                                 }}>
                                     <PhoneIcon style={{ fontSize: '10px' }} />
-                                    <span style={{ color: '#88304E',fontSize: '12px' }}>01744798523, 02-7343144, 01718088956</span>
+                                    <span style={{ color: '#88304E',fontSize: '12px' }}> 02-7343144, 01674281440, 01744798523</span>
                                 </div>
                                 
                             </div>
@@ -261,7 +261,7 @@ const PrintBill = (props) => {
                     <div style={{
                         borderTop: '2px solid blue',
                         width: '100%',
-                        marginBottom: '5mm'
+                        marginBottom: '3mm'
                     }}></div>
 
                     {/* Customer Info */}
@@ -298,37 +298,37 @@ const PrintBill = (props) => {
                     <table style={{ 
                         width: '100%', 
                         borderCollapse: 'collapse',
-                        marginBottom: '2mm',
-                        fontSize: '13px'
+                        marginBottom: '1mm',
+                        fontSize: '12px'
                     }}>
                         <thead>
                             <tr style={{ backgroundColor: '#FAF1E6', color: 'black' }}>
                                 <th style={{ 
-                                    padding: '1mm', 
+                                    padding: '0.8mm', 
                                     border: '0.5px solid #bdc3c7', 
                                     width: '8%',
                                     fontWeight: 'bold'
                                 }}>SL</th>
                                 <th style={{ 
-                                    padding: '1mm', 
+                                    padding: '0.8mm', 
                                     border: '0.5px solid #bdc3c7', 
                                     width: '40%',
                                     fontWeight: 'bold'
                                 }}>মালের নাম</th>
                                 <th style={{ 
-                                    padding: '1mm', 
+                                    padding: '0.8mm', 
                                     border: '0.5px solid #bdc3c7', 
                                     width: '15%',
                                     fontWeight: 'bold'
                                 }}>পরিমান</th>
                                 <th style={{ 
-                                    padding: '1mm', 
+                                    padding: '0.8mm', 
                                     border: '0.5px solid #bdc3c7', 
                                     width: '17%',
                                     fontWeight: 'bold'
                                 }}>দাম</th>
                                 <th style={{ 
-                                    padding: '1mm', 
+                                    padding: '0.8mm', 
                                     border: '0.5px solid #bdc3c7', 
                                     width: '20%',
                                     fontWeight: 'bold'
@@ -339,20 +339,20 @@ const PrintBill = (props) => {
                             {pageItems.map((item, i) => (
                                 <tr key={i}>
                                     <td style={{ 
-                                        padding: '2mm', 
+                                        padding: '1.5mm', 
                                         border: '0.5px solid #bdc3c7', 
                                         textAlign: 'center',
                                         fontWeight: 'bold'
                                     }}>
-                                        {englishToBengali(((pageNumber - 1) * 10) + i + 1)}
+                                        {englishToBengali(((pageNumber - 1) * 15) + i + 1)}
                                     </td>
                                     <td style={{ 
-                                        padding: '2mm', 
+                                        padding: '1.5mm', 
                                         border: '0.5px solid #bdc3c7',
                                         fontWeight: 'bold'
                                     }}>{item.product.name}</td>                                
                                     <td style={{ 
-                                        padding: '2mm', 
+                                        padding: '1.5mm', 
                                         border: '0.5px solid #bdc3c7', 
                                         textAlign: 'center',
                                         fontWeight: 'bold'
@@ -360,7 +360,7 @@ const PrintBill = (props) => {
                                         {englishToBengali(item.quantity)} {getProductType(item.product_type)}
                                     </td>
                                     <td style={{ 
-                                        padding: '2mm', 
+                                        padding: '1.5mm', 
                                         border: '0.5px solid #bdc3c7', 
                                         textAlign: 'right',
                                         fontWeight: 'bold'
@@ -368,7 +368,7 @@ const PrintBill = (props) => {
                                         ৳{englishToBengali(item.price)}
                                     </td>
                                     <td style={{ 
-                                        padding: '2mm', 
+                                        padding: '1.5mm', 
                                         border: '0.5px solid #bdc3c7', 
                                         textAlign: 'right',
                                         fontWeight: 'bold'
@@ -472,7 +472,7 @@ const PrintBill = (props) => {
     }
 
     const renderBillPages = (items, copyType) => {
-        const ITEMS_PER_PAGE = 10;
+        const ITEMS_PER_PAGE = 15;
         const totalPages = Math.ceil(items.length / ITEMS_PER_PAGE);
         
         return Array.from({ length: totalPages }, (_, i) => {
