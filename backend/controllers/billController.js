@@ -16,110 +16,100 @@ const getBills = asyncHandler(async (req, res) => {
   res.status(200).json(bills);
 });
 
+// Helper function to get the next bill number
+const getNextBillNumber = async () => {
+    const lastBill = await Bill.findOne().sort({ billNumber: -1 });
+    return lastBill ? lastBill.billNumber + 1 : 1;
+};
+
+// Helper function to handle stock updates
+const updateStockForBill = async (items, io) => {
+    try {
+        for (const item of items) {
+            const updatedStock = await Stock.findOneAndUpdate(
+                { product: item.product },
+                {
+                    $inc: { billedStock: item.quantity },
+                    $setOnInsert: {
+                        previousStock: 0,
+                        addedStock: []
+                    }
+                },
+                { 
+                    new: true, 
+                    upsert: true
+                }
+            );
+            
+            // Emit stock update event
+            io.emit('stockUpdate', {
+                productId: item.product,
+                stock: updatedStock
+            });
+        }
+        return true;
+    } catch (error) {
+        throw new Error(`Stock update failed: ${error.message}`);
+    }
+};
+
 // @desc    Add new bill
 // @route   POST /api/bills
 // @access  Private
 const addBill = asyncHandler(async (req, res) => {
-  try {
-    const { customer, items, total, additionalPrice = 0, discountPercentage = 0 } = req.body;
+    const io = req.app.get('io');
+    const { customer, items, total, paid, due } = req.body;
 
-    if (!customer || !items || !total) {
-      res.status(400);
-      throw new Error('Please add all fields');
+    if (!customer || !items || items.length === 0) {
+        res.status(400);
+        throw new Error('Please add all required fields');
     }
-
-    if (!req.user || !req.user._id) {
-      res.status(401);
-      throw new Error('User not authenticated');
-    }
-
-    // Start a session for transaction
-    const session = await Bill.startSession();
-    session.startTransaction();
 
     try {
-      const lastBill = await Bill.findOne().sort({ billNumber: -1 }).limit(1);
-      const billNumber = lastBill ? lastBill.billNumber + 1 : 1;
+        // 1. Get the next bill number
+        const billNumber = await getNextBillNumber();
 
-      // Process items and update stock
-      const itemsWithProductType = await Promise.all(items.map(async (item) => {
-        const product = await Product.findById(item.product);
-        if (!product) {
-          throw new Error(`Product not found: ${item.product}`);
-        }
+        // 2. Create the bill with the generated bill number
+        const bill = await Bill.create({
+            billNumber,
+            customer,
+            items,
+            total,
+            paid: paid || 0,
+            due: due || total,
+            user: req.user.id,
+            date: new Date()
+        });
 
-        // Get or create stock record
-        let stock = await Stock.findOne({ product: item.product });
-        if (!stock) {
-          stock = await Stock.create({
-            product: item.product,
-            previousStock: 0,
-            addedStock: [],
-            billedStock: 0
-          });
-        }
+        // 3. Update stock for each product
+        await updateStockForBill(items, io);
 
-        // Update billed stock - allow negative values
-        stock.billedStock += Number(item.quantity);
-        await stock.save({ session });
+        // 4. Update customer's bills array and remaining amount
+        await Customer.findByIdAndUpdate(
+            customer,
+            { 
+                $push: { bills: bill._id },
+                $inc: { remainingAmount: total - (paid || 0) }
+            }
+        );
 
-        // Calculate current stock (can be negative)
-        const totalAdded = stock.addedStock.reduce((sum, added) => sum + added.amount, 0);
-        const currentStock = stock.previousStock + totalAdded - stock.billedStock;
+        // 5. Fetch the complete bill with populated fields
+        const completeBill = await Bill.findById(bill._id)
+            .populate('customer', 'name')
+            .populate('items.product', 'name price');
 
-        return {
-          ...item,
-          product_type: product.product_type
-        };
-      }));
+        res.status(201).json(completeBill);
 
-      let subtotal = 0;
-      const processedItems = itemsWithProductType.map(item => {
-        const subTotal = item.quantity * item.price;
-        subtotal += subTotal;
-        return {
-          ...item,
-          subTotal
-        };
-      });
-      
-      const discountAmount = Math.floor(subtotal * (Number(discountPercentage) / 100));
-      const afterDiscount = subtotal - discountAmount;
-      const finalTotal = afterDiscount + Number(additionalPrice);
-
-      const bill = await Bill.create([{
-        user: req.user._id,
-        billNumber,
-        customer,
-        items: processedItems,
-        additionalPrice,
-        discountPercentage,
-        discountAmount,
-        total: finalTotal,
-        date: new Date()
-      }], { session });
-
-      await Customer.findByIdAndUpdate(
-        customer,
-        {
-          $push: { bills: bill[0]._id }
-        },
-        { session }
-      );
-
-      await session.commitTransaction();
-      session.endSession();
-
-      res.status(201).json(bill[0]);
     } catch (error) {
-      await session.abortTransaction();
-      session.endSession();
-      throw error;
+        // If any operation fails, we need to handle cleanup
+        if (error.message.includes('Stock update failed') && bill) {
+            // If stock update failed, delete the created bill
+            await Bill.findByIdAndDelete(bill._id);
+        }
+        
+        res.status(500);
+        throw new Error(`Error creating bill: ${error.message}`);
     }
-  } catch (error) {
-    res.status(500);
-    throw new Error('Error creating bill: ' + error.message);
-  }
 });
 
 // @desc    Delete bill

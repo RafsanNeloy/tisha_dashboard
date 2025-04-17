@@ -9,6 +9,7 @@ const billSchema = new mongoose.Schema({
   billNumber: {
     type: Number,
     required: true,
+    unique: true
   },
   customer: {
     type: mongoose.Schema.Types.ObjectId,
@@ -59,6 +60,14 @@ const billSchema = new mongoose.Schema({
     select: true
   },
   total: {
+    type: Number,
+    required: true
+  },
+  paid: {
+    type: Number,
+    default: 0
+  },
+  due: {
     type: Number,
     required: true
   }
