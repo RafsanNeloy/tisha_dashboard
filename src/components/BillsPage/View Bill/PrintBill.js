@@ -108,7 +108,7 @@ const PrintBill = (props) => {
             <div style={{ 
                 width: '148mm',
                 height: '230mm',
-                padding: '8mm',
+                padding: '7mm',
                 boxSizing: 'border-box',
                 backgroundColor: 'white',
                 position: 'relative',
@@ -139,7 +139,7 @@ const PrintBill = (props) => {
                 {/* Bottom Plastic Watermark */}
                 <div style={{
                     position: 'absolute',
-                    bottom: '5mm',
+                    bottom: '10mm',
                     left: '50%',
                     transform: 'translateX(-50%)',
                     zIndex: 0,
@@ -299,39 +299,52 @@ const PrintBill = (props) => {
                         width: '100%', 
                         borderCollapse: 'collapse',
                         marginBottom: '1mm',
-                        fontSize: '12px'
+                        fontSize: '13px',
+                        tableLayout: 'fixed'
                     }}>
+                        <colgroup>
+                            <col style={{ width: '8%' }} />
+                            <col style={{ width: '40%' }} />
+                            <col style={{ width: '15%' }} />
+                            <col style={{ width: '17%' }} />
+                            <col style={{ width: '20%' }} />
+                        </colgroup>
                         <thead>
                             <tr style={{ backgroundColor: '#FAF1E6', color: 'black' }}>
                                 <th style={{ 
-                                    padding: '0.8mm', 
+                                    padding: '1mm', 
                                     border: '0.5px solid #bdc3c7', 
-                                    width: '8%',
-                                    fontWeight: 'bold'
+                                    fontWeight: 'bold',
+                                    textAlign: 'center',
+                                    verticalAlign: 'middle'
                                 }}>SL</th>
                                 <th style={{ 
-                                    padding: '0.8mm', 
+                                    padding: '1mm', 
                                     border: '0.5px solid #bdc3c7', 
-                                    width: '40%',
-                                    fontWeight: 'bold'
+                                    fontWeight: 'bold',
+                                    textAlign: 'left',
+                                    verticalAlign: 'middle'
                                 }}>মালের নাম</th>
                                 <th style={{ 
-                                    padding: '0.8mm', 
+                                    padding: '1mm', 
                                     border: '0.5px solid #bdc3c7', 
-                                    width: '15%',
-                                    fontWeight: 'bold'
+                                    fontWeight: 'bold',
+                                    textAlign: 'center',
+                                    verticalAlign: 'middle'
                                 }}>পরিমান</th>
                                 <th style={{ 
-                                    padding: '0.8mm', 
+                                    padding: '1mm', 
                                     border: '0.5px solid #bdc3c7', 
-                                    width: '17%',
-                                    fontWeight: 'bold'
+                                    fontWeight: 'bold',
+                                    textAlign: 'right',
+                                    verticalAlign: 'middle'
                                 }}>দাম</th>
                                 <th style={{ 
-                                    padding: '0.8mm', 
+                                    padding: '1mm', 
                                     border: '0.5px solid #bdc3c7', 
-                                    width: '20%',
-                                    fontWeight: 'bold'
+                                    fontWeight: 'bold',
+                                    textAlign: 'right',
+                                    verticalAlign: 'middle'
                                 }}>মোট</th>
                             </tr>
                         </thead>
@@ -339,39 +352,50 @@ const PrintBill = (props) => {
                             {pageItems.map((item, i) => (
                                 <tr key={i}>
                                     <td style={{ 
-                                        padding: '1.5mm', 
+                                        padding: '1mm', 
                                         border: '0.5px solid #bdc3c7', 
                                         textAlign: 'center',
-                                        fontWeight: 'bold'
+                                        fontWeight: 'bold',
+                                        verticalAlign: 'middle',
+                                        height: '8mm'
                                     }}>
-                                        {englishToBengali(((pageNumber - 1) * 15) + i + 1)}
+                                        {englishToBengali(((pageNumber - 1) * 12) + i + 1)}
                                     </td>
                                     <td style={{ 
-                                        padding: '1.5mm', 
+                                        padding: '1mm', 
                                         border: '0.5px solid #bdc3c7',
-                                        fontWeight: 'bold'
+                                        fontWeight: 'bold',
+                                        textAlign: 'left',
+                                        verticalAlign: 'middle',
+                                        height: '8mm'
                                     }}>{item.product.name}</td>                                
                                     <td style={{ 
-                                        padding: '1.5mm', 
+                                        padding: '1mm', 
                                         border: '0.5px solid #bdc3c7', 
                                         textAlign: 'center',
-                                        fontWeight: 'bold'
+                                        fontWeight: 'bold',
+                                        verticalAlign: 'middle',
+                                        height: '8mm'
                                     }}>
                                         {englishToBengali(item.quantity)} {getProductType(item.product_type)}
                                     </td>
                                     <td style={{ 
-                                        padding: '1.5mm', 
+                                        padding: '1mm', 
                                         border: '0.5px solid #bdc3c7', 
                                         textAlign: 'right',
-                                        fontWeight: 'bold'
+                                        fontWeight: 'bold',
+                                        verticalAlign: 'middle',
+                                        height: '8mm'
                                     }}>
                                         ৳{englishToBengali(item.price)}
                                     </td>
                                     <td style={{ 
-                                        padding: '1.5mm', 
+                                        padding: '1mm', 
                                         border: '0.5px solid #bdc3c7', 
                                         textAlign: 'right',
-                                        fontWeight: 'bold'
+                                        fontWeight: 'bold',
+                                        verticalAlign: 'middle',
+                                        height: '8mm'
                                     }}>
                                         ৳{englishToBengali(item.subTotal)}
                                     </td>
@@ -472,7 +496,7 @@ const PrintBill = (props) => {
     }
 
     const renderBillPages = (items, copyType) => {
-        const ITEMS_PER_PAGE = 15;
+        const ITEMS_PER_PAGE = 12;
         const totalPages = Math.ceil(items.length / ITEMS_PER_PAGE);
         
         return Array.from({ length: totalPages }, (_, i) => {
