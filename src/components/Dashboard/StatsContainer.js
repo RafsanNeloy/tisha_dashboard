@@ -1,10 +1,13 @@
-import React from 'react'
+import React, { useRef } from 'react'
 import { Grid, Typography, Paper, Box } from '@mui/material'
 import { makeStyles } from '@mui/styles'
 import { useSelector } from 'react-redux'
 import StatsItem from './StatsItem'
 import moment from 'moment'
 import { englishToBengali } from '../../utils/bengaliNumerals'
+import html2pdf from 'html2pdf.js'
+import GetAppIcon from '@mui/icons-material/GetApp'
+import { Button } from '@mui/material'
 
 const useStyle = makeStyles({
     statsHeader: {
@@ -45,6 +48,7 @@ const StatsContainer = (props) => {
     const customers = useSelector(state => state.customers) || []
     const bills = useSelector(state => state.bills) || []
     const classes = useStyle()
+    const dailyStatsRef = useRef(null)
 
     const todayBills = Array.isArray(bills) ? bills.filter(bill => 
         moment(bill.createdAt).isBetween(moment().startOf('days'), moment())
@@ -106,6 +110,26 @@ const StatsContainer = (props) => {
 
     const dailyProductStats = getDailyProductQuantities();
 
+    const handleDailyStatsPdfDownload = () => {
+        const element = dailyStatsRef.current
+        const opt = {
+            margin: [10, 10, 10, 10],
+            filename: `Daily_Sales_${moment().format('YYYY-MM-DD')}.pdf`,
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { 
+                scale: 2,
+                useCORS: true 
+            },
+            jsPDF: { 
+                unit: 'mm',
+                format: 'a4',
+                orientation: 'portrait'
+            }
+        }
+
+        html2pdf().from(element).set(opt).save()
+    }
+
     return(
         <>
             <Typography variant='h6' className={classes.statsHeader}>Overall Stats</Typography>
@@ -123,7 +147,7 @@ const StatsContainer = (props) => {
             </Grid>
 
             {/* Daily Product Quantities */}
-            <Paper className={classes.productStats}>
+            <Paper className={classes.productStats} ref={dailyStatsRef}>
                 <Typography 
                     variant='h6' 
                     className={classes.statsHeader} 
@@ -133,7 +157,7 @@ const StatsContainer = (props) => {
                         alignItems: 'center' 
                     }}
                 >
-                    <span>আজকের বিক্রয়ের পরিমাণ</span>
+                    <span>আজকের বিক্রয়ের পরিমাণ {moment().format('YYYY-MM-DD')}</span>
                     {dailyProductStats.length > 0 && (
                         <Typography 
                             variant='caption' 
@@ -142,6 +166,18 @@ const StatsContainer = (props) => {
                         >
                             মোট: {englishToBengali(dailyProductStats.length)} আইটেম
                         </Typography>
+                    )}
+                    {dailyProductStats.length > 0 && (
+                        <Button 
+                            variant="contained" 
+                            color="primary" 
+                            size="small"
+                            startIcon={<GetAppIcon />}
+                            onClick={handleDailyStatsPdfDownload}
+                            style={{ marginLeft: '10px' }}
+                        >
+                            PDF ডাউনলোড
+                        </Button>
                     )}
                 </Typography>
                 {dailyProductStats.length > 0 ? (
