@@ -46,18 +46,17 @@ const billSchema = new mongoose.Schema({
   }],
   additionalPrice: {
     type: Number,
-    default: 0,
-    select: true
+    default: 0
   },
   discountPercentage: {
     type: Number,
     default: 0,
-    select: true
+    min: 0,
+    max: 100
   },
   discountAmount: {
     type: Number,
-    default: 0,
-    select: true
+    default: 0
   },
   total: {
     type: Number,
