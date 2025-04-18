@@ -48,7 +48,7 @@ const CustomerSuggestion = (props) => {
                 (value !== null && Object.keys(value).length>0) ? (
                     <Box className={classes.custInfo} display='flex' flexDirection='column' justifyContent='center'>
                         <Typography variant='body1'><strong>Name: </strong>{value.name}</Typography>
-                        <Typography variant='body1'><strong>Email: </strong>{value.email}</Typography>
+                        <Typography variant='body1'><strong>Address: </strong>{value.address}</Typography>
                         <Typography variant='body1'><strong>Mobile: </strong>{value.mobile}</Typography>
                     </Box>
                 ) : (

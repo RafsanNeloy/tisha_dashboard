@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { Box, TextField, Button } from '@mui/material'
 import { makeStyles } from '@mui/styles'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { asyncAddCustomer, asyncUpdateCustomer } from '../../action/customerAction'
 import validator from 'validator'
 
@@ -42,6 +42,7 @@ const CustomerForm = (props) => {
     const errors = {}
     const dispatch = useDispatch()
     const classes = useStyle()
+    const customers = useSelector(state => state.customers)
 
     const handleChange = (e) => {
         if(e.target.name==='name') {
@@ -70,6 +71,23 @@ const CustomerForm = (props) => {
         setFormErrors(errors)
     }
 
+    const checkForDuplicate = () => {
+        const normalizedName = name.trim().toLowerCase()
+        const normalizedAddress = address.trim().toLowerCase()
+        
+        const duplicate = customers.find(customer => 
+            customer.name.trim().toLowerCase() === normalizedName && 
+            customer.address.trim().toLowerCase() === normalizedAddress
+        )
+        
+        if (duplicate) {
+            errors.duplicate = "A customer with this name and address already exists"
+            setFormErrors(errors)
+            return true
+        }
+        return false
+    }
+
     const resetForm = () => {
         setName('')
         setAddress('')
@@ -83,15 +101,17 @@ const CustomerForm = (props) => {
         e.preventDefault()
         validate()
         if(Object.keys(errors).length === 0){
-            const formData = {
-                name: name[0].toUpperCase() + name.slice(1),
-                mobile: mobile,
-                address: address
-            }
-            if(_id) {
-                dispatch(asyncUpdateCustomer(_id, formData, resetUpdateCust))
-            } else {
-                dispatch(asyncAddCustomer(formData, resetForm, handleClose))
+            if (!checkForDuplicate()) {
+                const formData = {
+                    name: name[0].toUpperCase() + name.slice(1),
+                    mobile: mobile,
+                    address: address
+                }
+                if(_id) {
+                    dispatch(asyncUpdateCustomer(_id, formData, resetUpdateCust))
+                } else {
+                    dispatch(asyncAddCustomer(formData, resetForm, handleClose))
+                }
             }
         }
     }
@@ -134,6 +154,11 @@ const CustomerForm = (props) => {
                         multiline
                         rows={3}
                     />
+                    {formErrors.duplicate && (
+                        <Box width="100%" color="error.main" mt={1}>
+                            {formErrors.duplicate}
+                        </Box>
+                    )}
                     {
                         _id ? (
                             <div className={classes.button}>

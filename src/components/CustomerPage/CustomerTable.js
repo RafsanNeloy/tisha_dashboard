@@ -56,7 +56,7 @@ const CustomerTable = (props) => {
     const { user } = useSelector(state => state.auth)
 
     const handleDelete = (id) => {
-        if (user.role === 'admin') {
+        if (user && user.role === 'admin') {
             Swal.fire({
                 title: 'Are you sure?',
                 text: "You won't be able to revert this!",
@@ -111,15 +111,15 @@ const CustomerTable = (props) => {
                             <TableCell className={classes.tableHeader} align='center'>Email</TableCell>
                             <TableCell className={classes.tableHeader} align='center'>View</TableCell>
                             <TableCell className={classes.tableHeader} align='center'>Details</TableCell>
-                            {user.role === 'admin' && (
+                            {user && user.role === 'admin' && (
                                 <TableCell className={classes.tableHeader} align='center'>Action</TableCell>
                             )}
                         </TableRow>
                     </TableHead>
                     <TableBody>
                         {customers.map((cust, index) => {
-                            const canModify = user.role === 'admin' || 
-                                cust.user?.toString() === user._id?.toString();
+                            const canModify = user && (user.role === 'admin' || 
+                                cust.user?.toString() === user._id?.toString());
 
                             return (
                                 <TableRow hover key={cust._id}>
@@ -142,7 +142,7 @@ const CustomerTable = (props) => {
                                             </Button>
                                         </Link>
                                     </TableCell>
-                                    {user.role === 'admin' && (
+                                    {user && user.role === 'admin' && (
                                         <TableCell className={classes.tableBtns} align='center'>
                                             {canModify && (
                                                 <Button
