@@ -10,53 +10,44 @@ A billing application is used to create and manage orders for Tisha Plastic Prod
 
 ## Screenshots
 ### Home Page
-![Home Page](![image](https://github.com/user-attachments/assets/bc60a7e9-9028-49d3-a25f-303723e86549)
-)
+![homepage](https://github.com/user-attachments/assets/c26c5d41-3a1d-4245-8f98-69f93ac79de6)
+
 
 ### Login and Register Page
 Users can create their account or login into account through the page shown below
-![Login Page](https://user-images.githubusercontent.com/70807417/120588262-899d0c80-c454-11eb-9c86-8a775cc8efef.png)
-![Register Page](https://user-images.githubusercontent.com/70807417/120588270-8dc92a00-c454-11eb-9df3-b3d5993ad010.png)
+![Login Page](https://github.com/user-attachments/assets/dc5a5071-e84f-4d7d-9626-f217a0b888f8)
+A new user need to register with these credentials
+![Register Page](https://github.com/user-attachments/assets/f9ed8c1c-c8aa-4507-9a43-21bd986bc7d2)
 
 ### Dashboard
-Once the user logged in, they land to the dashboard page of the application.
-![Dashboard](https://user-images.githubusercontent.com/70807417/120588301-991c5580-c454-11eb-90c9-866fd3cbca4f.png)
-In the below image, there is a drawer on left of the page where the user can navigate between different modules of the application
-![Drawer open](https://user-images.githubusercontent.com/70807417/120588331-a5081780-c454-11eb-9086-484b4c98d7d4.png)
+Once the user logged in, they land to the dashboard page of the application.Where daily and total transactions will be shown.
+![Untitled design](https://github.com/user-attachments/assets/0210a4cb-1b8f-45a0-b47d-05926f8b1abb)
 
-### User Detail Page
-![User Detail Page](https://user-images.githubusercontent.com/70807417/120588392-b94c1480-c454-11eb-9156-28093e59880b.png)
 
-### Customers Page
-Here the users can add and manage customers.
-![Customer Page](https://user-images.githubusercontent.com/70807417/120588416-c5d06d00-c454-11eb-95fd-19ffa97da327.png)
 
-### Customer Detail Page
-The user can also view customer details with all the bills generated under the respective customers
-![Customer Detail Page](https://user-images.githubusercontent.com/70807417/120588440-cff26b80-c454-11eb-802c-6bf9425b3cfe.png)
 
 ### Product Page
 Here the users can add and manage products.
-![Product Page without View](https://user-images.githubusercontent.com/70807417/120588474-e0a2e180-c454-11eb-9a77-4f44454dcc0a.png)
+![image](https://github.com/user-attachments/assets/0961d2bf-7702-4b38-95c4-ee9580afe263)
 
 ### Product Page with View detail
 On click of view button of a product, its details are shown on right side of the page.
-![Product Page](https://user-images.githubusercontent.com/70807417/120588495-eb5d7680-c454-11eb-86c6-e41aa49c9bcc.png)
+![image](https://github.com/user-attachments/assets/4e18084d-619a-4d9c-9e6b-24a634f07c45)
 
-### Bills Page
-All the generated bills are displayed in the bills page.
-![Bills Page](https://user-images.githubusercontent.com/70807417/120588562-07611800-c455-11eb-87b2-fd7ea413ee0f.png)
+
+
 
 ### Add Bill page
 To generate a new bill, we will fill in the details of the customer and all the products here. Suppose you want to add a new customer, then you can click on the ADD NEW CUSTOMER button which is on top right of the page, where a modal pops up to fill in the details of the new customer and proceed with generating the bill.
-![New Bill Page](https://user-images.githubusercontent.com/70807417/120588609-19db5180-c455-11eb-96c8-f638559f46e0.png)
+![image](https://github.com/user-attachments/assets/71318970-52a8-4039-b05a-e698213bfc82)
+
 
 ### Invoice Page
 Here user can download the bill in PDF format.
-![Bill View Page](https://user-images.githubusercontent.com/70807417/120588675-36778980-c455-11eb-8b26-a338d8b20ea3.png)
+![image](https://github.com/user-attachments/assets/bfc8014e-24f4-455c-a789-cb68f890be35)
 
 ### PDF format of Bill
-![Bill in PDF](https://user-images.githubusercontent.com/70807417/120588734-51e29480-c455-11eb-898d-baf49a3c2d75.png)
+![Untitled design (1)](https://github.com/user-attachments/assets/de2aea29-e11e-433e-9d60-14f1f062f3fd)
 
 ## Libraries and Utilities
-React, Redux, react-router-dom, react-redux, redux-thunk, react-google-charts, moment, axios, material UI, validator
+React, Redux, react-router-dom, react-redux, redux-thunk, moment, axios, material UI, validator
