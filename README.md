@@ -1,15 +1,17 @@
-# Point of Sale Application - Billing App
+# TISHA Billing Application
 ## About
-A billing application is used to create and manage orders for a store. It helps in inventory and customer management. This application deals with four main modules namely Users, Customers, Products, and Bills. Users can view information about each module and also download bills if required.
+A billing application is used to create and manage orders for Tisha Plastic Products. It helps in inventory and customer management. This application deals with four main modules namely Users, Customers, Products, and Bills. Users can view information about each module and also download bills if required.
 
 ## Features
 * Create Bills, Manage Bills, View Bills, and Print Bill in PDF format.
 * Create Customer, Update Customer, Delete Customer, and View Customer Details including all bills made under the respective customer.
 * Add Product, Update Customer, View Products, and Delete Product.
+* cutomers transactions history, less and westage Information 
 
 ## Screenshots
 ### Home Page
-![Home Page](https://user-images.githubusercontent.com/70807417/120587988-fbc12180-c453-11eb-9098-a1c69f540d2d.png)
+![Home Page](![image](https://github.com/user-attachments/assets/bc60a7e9-9028-49d3-a25f-303723e86549)
+)
 
 ### Login and Register Page
 Users can create their account or login into account through the page shown below
